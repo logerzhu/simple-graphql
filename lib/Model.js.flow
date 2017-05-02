@@ -67,7 +67,7 @@ type ColumnConfig = {
   set?:(any) =>void
 }
 
-type BaseFieldType = typeof String | typeof Number | typeof Boolean | typeof JSON | GS.ModelRef | GS.Connection.ConnectionType | GS.Connection.EdgeType
+type BaseFieldType = typeof String | typeof Number | typeof Boolean | typeof Date | typeof JSON | GS.ModelRef | GS.Connection.ConnectionType | GS.Connection.EdgeType
 
 
 type FieldType = BaseFieldType | {
