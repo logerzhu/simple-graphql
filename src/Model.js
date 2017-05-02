@@ -11,6 +11,11 @@ type QueryConfig ={
             models:any) => any
 }
 
+export type ScalarTypeConfig ={
+  graphQLType:graphql.GraphQLScalarType,
+  columnType:Sequelize.DataType
+}
+
 type ValidateConfig = {
   is?: [string,string] | RegExp,
   not?: [string,string],
@@ -67,7 +72,7 @@ type ColumnConfig = {
   set?:(any) =>void
 }
 
-type BaseFieldType = typeof String | typeof Number | typeof Boolean | typeof Date | typeof JSON | GS.ModelRef | GS.Connection.ConnectionType | GS.Connection.EdgeType
+type BaseFieldType = typeof String | typeof Number | typeof Boolean | typeof Date | typeof JSON | GS.ModelRef | ScalarTypeConfig | GS.Connection.ConnectionType | GS.Connection.EdgeType
 
 
 type FieldType = BaseFieldType | {
@@ -279,22 +284,22 @@ export default class Model {
     return this
   }
 
-  hasOne(config:HasOneConfig):Model{
+  hasOne(config:HasOneConfig):Model {
     this.config.associations.hasOne.push(config)
     return this
   }
 
-  belongsTo(config:BelongsToConfig):Model{
+  belongsTo(config:BelongsToConfig):Model {
     this.config.associations.belongsTo.push(config)
     return this
   }
 
-  hasMany(config:HasManyConfig):Model{
+  hasMany(config:HasManyConfig):Model {
     this.config.associations.hasMany.push(config)
     return this
   }
 
-  belongsToMany(config:BelongsToManyConfig):Model{
+  belongsToMany(config:BelongsToManyConfig):Model {
     this.config.associations.belongsToMany.push(config)
     return this
   }

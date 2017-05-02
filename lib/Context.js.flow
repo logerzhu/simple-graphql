@@ -157,6 +157,9 @@ export default class Context {
       const dbDefinition = {}
 
       const dbType = (fieldType:any) => {
+        if (fieldType && fieldType.graphQLType && fieldType.columnType) {
+          return fieldType.columnType
+        }
         switch (fieldType) {
           case String:
             return Sequelize.STRING

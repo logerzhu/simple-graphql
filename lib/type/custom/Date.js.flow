@@ -19,11 +19,11 @@ export default new GraphQLScalarType({
     if (typeof value === 'string') {
       const result = moment(value)
       if (!result.isValid()) {
-        throw new GraphQLError('Query error: Invalid date', value)
+        throw new GraphQLError('Query error: Invalid date')
       }
       return result.toDate()
     } else {
-      throw new GraphQLError("Query error: Invalid date", value)
+      throw new GraphQLError("Query error: Invalid date")
     }
 
   },

@@ -6,7 +6,8 @@ import _ from 'lodash'
 import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
 
-import type {GraphQLInputField, GraphQLOutputType, GraphQLFieldConfig,GraphQLInputFieldMap,GraphQLInputFieldConfig, GraphQLInputFieldConfigMap, GraphQLFieldResolver} from 'graphql'
+import type {GraphQLInputField, GraphQLOutputType, GraphQLFieldConfig,GraphQLInputFieldMap,GraphQLInputFieldConfig,
+  GraphQLInputFieldConfigMap, GraphQLFieldResolver} from 'graphql'
 
 import Model from './Model'
 import Type from './type'
@@ -14,7 +15,19 @@ import Context from './Context'
 import StringHelper from "./utils/StringHelper"
 import Connection from "./Connection"
 
+import type {ScalarTypeConfig} from './Model'
+
 const GS = {}
+
+GS.ScalarTypes = ({
+  Id: {graphQLType: graphql.GraphQLID, columnType: Sequelize.INTEGER},
+  String: {graphQLType: graphql.GraphQLString, columnType: Sequelize.STRING},
+  Float: {graphQLType: graphql.GraphQLFloat, columnType: Sequelize.DOUBLE},
+  Int: {graphQLType: graphql.GraphQLInt, columnType: Sequelize.INTEGER},
+  Boolean: {graphQLType: graphql.GraphQLBoolean, columnType: Sequelize.BOOLEAN},
+  Date: {graphQLType: Type.Date, columnType: Sequelize.DATE},
+  JSON: {graphQLType: Type.Json, columnType: Sequelize.JSONB}
+} : {[id:string]:ScalarTypeConfig})
 
 GS.Connection = Connection
 
@@ -55,6 +68,10 @@ GS.graphQLInputFieldMap = (name:string,
     if (graphql.isInputType(field)) {
       return {type: field}
     }
+    if (field && field.graphQLType && graphql.isInputType(field.graphQLType)) {
+      return {type: field.graphQLType}
+    }
+
     if (graphql.isCompositeType(field)) {
       return
     }
@@ -178,6 +195,9 @@ GS.graphQLFieldConfig = (name:string,
 
   if (graphql.isOutputType(fieldType)) {
     return {type: fieldType}
+  }
+  if (fieldType && fieldType.graphQLType && graphql.isOutputType(fieldType.graphQLType)) {
+    return {type: fieldType.graphQLType}
   }
   switch (fieldType) {
     case String:
