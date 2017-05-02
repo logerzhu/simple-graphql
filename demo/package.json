@@ -1,0 +1,29 @@
+{
+  "name": "simple-graphql-demo",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "test": "jest",
+    "flow": "flow; test $? -eq 0 -o $? -eq 2",
+    "start": "babel-node src/index"
+  },
+  "dependencies": {
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-es2015": "^6.24.0",
+    "babel-preset-stage-3": "^6.22.0",
+    "body-parser": "^1.17.1",
+    "compression": "^1.6.2",
+    "express": "^4.15.2",
+    "express-graphql": "^0.6.4",
+    "flow-bin": "^0.42.0",
+    "graphql": "^0.9.1",
+    "graphql-relay": "^0.5.1",
+    "jest": "^19.0.2",
+    "lodash": "^4.17.4",
+    "moment": "^2.18.1",
+    "pg": "^6.1.5",
+    "pg-hstore": "^2.3.2",
+    "sequelize": "^3.30.2"
+  }
+}
