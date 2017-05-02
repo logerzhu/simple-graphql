@@ -1,0 +1,8 @@
+[ignore]
+
+[include]
+
+[libs]
+flow-typed/jest_v19.x.x.js
+
+[options]
