@@ -6,8 +6,7 @@ import _ from 'lodash'
 import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
 
-import type {GraphQLInputField, GraphQLOutputType, GraphQLFieldConfig,GraphQLInputFieldMap,GraphQLInputFieldConfig,
-  GraphQLInputFieldConfigMap, GraphQLFieldResolver} from 'graphql'
+import type { GraphQLFieldConfig } from 'graphql'
 
 import Model from './Model'
 import Type from './type'

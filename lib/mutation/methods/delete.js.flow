@@ -24,7 +24,7 @@ export default function deleteMutation(model:Model):MutationConfig {
       ["deleted" + model.name]: GS.modelRef(model.name),
       ["deleted" + model.name + "Id" ]: graphql.GraphQLID
     },
-    mutateAndGetPayload: async function ({id}, info:graphql.GraphQLResolveInfo, models) {
+    mutateAndGetPayload: async function ({id}, context:any, info:graphql.GraphQLResolveInfo, models) {
       const entity = await models[model.name].findOne({where: {id: id}})
       if (entity) {
         await entity.destroy()

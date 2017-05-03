@@ -192,6 +192,7 @@ export default function pluralQuery(model:Model):QueryConfig {
       ...GS.Connection.args
     },
     resolve: async function (args:{[argName: string]: any},
+                             context:any,
                              info:graphql.GraphQLResolveInfo,
                              models:any) {
       conditionFieldKeys.forEach(fieldKey => {

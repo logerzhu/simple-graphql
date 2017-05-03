@@ -42,7 +42,7 @@ export default function updateMutation(model:Model):MutationConfig {
     outputFields: {
       [changedName]: GS.modelRef(model.name)
     },
-    mutateAndGetPayload: async function ({id,values}, info:graphql.GraphQLResolveInfo, models) {
+    mutateAndGetPayload: async function ({id,values}, context:any, info:graphql.GraphQLResolveInfo, models) {
       const instance = await models[model.name].findOne({where: {id: id}})
       if (!instance) {
         throw new Error(model.name + "[" + id + "] not exist.")

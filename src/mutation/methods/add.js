@@ -34,7 +34,7 @@ export default function addMutation(model:Model):MutationConfig {
     outputFields: {
       [addedName]: GS.Connection.edgeType(GS.modelRef(model.name))
     },
-    mutateAndGetPayload: async function (args:any, info:graphql.GraphQLResolveInfo, models) {
+    mutateAndGetPayload: async function (args:any, context:any, info:graphql.GraphQLResolveInfo, models) {
       const instance = await models[model.name].create(args)
       return {
         [addedName]: {

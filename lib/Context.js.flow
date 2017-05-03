@@ -21,6 +21,7 @@ export type QueryConfig ={
   description?:string,
   args?:ArgsType,
   resolve: (args:{[argName: string]: any},
+            context:any,
             info:graphql.GraphQLResolveInfo,
             models:{[id:string]:Sequelize.Model}) => any
 }
@@ -31,6 +32,7 @@ export type MutationConfig ={
   inputFields:ArgsType,
   outputFields:{[string]:BaseLinkedFieldType},
   mutateAndGetPayload:(args:{[argName: string]: any},
+                       context:any,
                        info:graphql.GraphQLResolveInfo,
                        models:{[id:string]:Sequelize.Model}) => any
 }
@@ -42,6 +44,7 @@ export type LinkedFieldConfig ={
   args?:ArgsType,
   resolve: (source:any,
             args:{[argName: string]: any},
+            context:any,
             info:graphql.GraphQLResolveInfo,
             models:{[id:string]:Sequelize.Model}) => any
 }
@@ -181,8 +184,8 @@ export default class Context {
 
     const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
 
-    const invoker = (schema, rootValue, requestString, variableValues) => {
-      return graphql['graphql'](schema, requestString, rootValue, null, variableValues)
+    const invoker = (schema, context, rootValue, requestString, variableValues) => {
+      return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
     }
     let hookFun = ((action, invokeInfo, next) => next())
     this.options.hooks.reverse().forEach(hook => {
@@ -198,11 +201,12 @@ export default class Context {
       }, {
         source: source,
         args: args,
+        context: context,
         info: info,
         models: dbModels()
       },
       () => {
-        return config.resolve(args, info, dbModels(), invoker.bind(null, info.schema, info.rootValue))
+        return config.resolve(args, context, info, dbModels(), invoker.bind(null, info.schema, context, info.rootValue))
       }
     )
   }
@@ -212,8 +216,8 @@ export default class Context {
 
     const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
 
-    const invoker = (schema, rootValue, requestString, variableValues) => {
-      return graphql['graphql'](schema, requestString, rootValue, null, variableValues)
+    const invoker = (schema, context, rootValue, requestString, variableValues) => {
+      return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
     }
     let hookFun = ((action, invokeInfo, next) => next())
     this.options.hooks.reverse().forEach(hook => {
@@ -230,10 +234,11 @@ export default class Context {
       }, {
         source: source,
         args: args,
+        context: context,
         info: info,
         models: dbModels()
       },
-      () => config.resolve(source, args, info, dbModels(), invoker.bind(null, info.schema, info.rootValue))
+      () => config.resolve(source, args, context, info, dbModels(), invoker.bind(null, info.schema, context, info.rootValue))
     )
   }
 
@@ -242,8 +247,8 @@ export default class Context {
 
     const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
 
-    const invoker = (schema, rootValue, requestString, variableValues) => {
-      return graphql['graphql'](schema, requestString, rootValue, null, variableValues)
+    const invoker = (schema, context, rootValue, requestString, variableValues) => {
+      return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
     }
     let hookFun = ((action, invokeInfo, next) => next())
     this.options.hooks.reverse().forEach(hook => {
@@ -259,10 +264,11 @@ export default class Context {
           config: config
         }, {
           args: args,
+          context: context,
           info: info,
           models: dbModels()
         },
-        () => config.mutateAndGetPayload(args, info, dbModels(), invoker.bind(null, info.schema, info.rootValue))
+        () => config.mutateAndGetPayload(args, context, info, dbModels(), invoker.bind(null, info.schema, context, info.rootValue))
       )
     }
   }

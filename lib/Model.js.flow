@@ -11,6 +11,7 @@ export type QueryConfig ={
   description?:string,
   args?:ArgsType,
   resolve: (args:{[argName: string]: any},
+            context:any,
             info:graphql.GraphQLResolveInfo,
             models:{[id:string]:Sequelize.Model}) => any
 }
@@ -99,6 +100,7 @@ export type BaseLinkedFieldType = typeof String | typeof Number | typeof Boolean
   description?:string,
   args?:ArgsType,
   resolve?: (source:any, args:{[argName: string]: any},
+             context:any,
              info:graphql.GraphQLResolveInfo,
              models:{[id:string]:Sequelize.Model}) => any
 }
@@ -110,6 +112,7 @@ type LinkFieldTypeConfig = {
   description?:string,
   args?:ArgsType,
   resolve: (source:any, args:{[argName: string]: any},
+            context:any,
             info:graphql.GraphQLResolveInfo,
             models:{[id:string]:Sequelize.Model}) => any
 }
