@@ -25,8 +25,8 @@ const toGraphQLFieldConfig = function (name:string,
   if (graphql.isOutputType(fieldType)) {
     return {type: fieldType}
   }
-  if (fieldType && fieldType.graphQLType && graphql.isOutputType(fieldType.graphQLType)) {
-    return {type: fieldType.graphQLType}
+  if (fieldType instanceof Type.ScalarFieldType) {
+    return {type: fieldType.graphQLOutputType}
   }
   switch (fieldType) {
     case String:
@@ -36,9 +36,9 @@ const toGraphQLFieldConfig = function (name:string,
     case Boolean:
       return {type: graphql.GraphQLBoolean}
     case Date:
-      return {type: Type.Date}
+      return {type: Type.GraphQLScalarTypes.Date}
     case JSON:
-      return {type: Type.Json}
+      return {type: Type.GraphQLScalarTypes.Json}
   }
 
   if (_.isArray(fieldType)) {

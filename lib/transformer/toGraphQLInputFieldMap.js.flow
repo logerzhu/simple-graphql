@@ -21,8 +21,8 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
     if (graphql.isInputType(field)) {
       return {type: field}
     }
-    if (field && field.graphQLType && graphql.isInputType(field.graphQLType)) {
-      return {type: field.graphQLType}
+    if (field instanceof Type.ScalarFieldType) {
+      return {type: field.graphQLInputType}
     }
 
     if (graphql.isCompositeType(field)) {
@@ -37,9 +37,9 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
       case Boolean:
         return {type: graphql.GraphQLBoolean}
       case Date:
-        return {type: Type.Date}
+        return {type: Type.GraphQLScalarTypes.Date}
       case JSON:
-        return {type: Type.Json}
+        return {type: Type.GraphQLScalarTypes.Json}
     }
 
     if (_.isArray(field)) {
@@ -53,7 +53,7 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
 
     if (field instanceof ModelRef) {
       return {
-        type: Type.globalIdInputType(field.name)
+        type: Type.GraphQLScalarTypes.globalIdInputType(field.name)
       }
     }
     if (field instanceof Object) {

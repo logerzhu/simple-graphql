@@ -5,7 +5,7 @@ import {GraphQLScalarType, GraphQLError, Kind} from 'graphql'
 import {fromGlobalId} from 'graphql-relay'
 
 /**
- * 生产 query or mutation 的inputType,自动把globalId 转换回 mongodb id
+ * 生产 query or mutation 的inputType,自动把globalId 转换回  id
  * @param typeName
  * @returns {"graphql".GraphQLScalarType<string>}
  */

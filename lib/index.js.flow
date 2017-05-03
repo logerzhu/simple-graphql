@@ -17,19 +17,9 @@ import Connection from "./Connection"
 import ModelRef from './ModelRef'
 import Transformer from './transformer'
 
-import type {ScalarTypeConfig} from './Model'
-
 const GS = {}
 
-GS.ScalarTypes = ({
-  Id: {graphQLType: graphql.GraphQLID, columnType: Sequelize.INTEGER},
-  String: {graphQLType: graphql.GraphQLString, columnType: Sequelize.STRING},
-  Float: {graphQLType: graphql.GraphQLFloat, columnType: Sequelize.DOUBLE},
-  Int: {graphQLType: graphql.GraphQLInt, columnType: Sequelize.INTEGER},
-  Boolean: {graphQLType: graphql.GraphQLBoolean, columnType: Sequelize.BOOLEAN},
-  Date: {graphQLType: Type.Date, columnType: Sequelize.DATE},
-  JSON: {graphQLType: Type.Json, columnType: Sequelize.JSONB}
-} : {[id:string]:ScalarTypeConfig})
+GS.ScalarFieldTypes = Type.ScalarFieldTypes
 
 GS.Connection = Connection
 

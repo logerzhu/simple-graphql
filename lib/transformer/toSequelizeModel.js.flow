@@ -2,6 +2,8 @@
 import _ from 'lodash'
 
 import Sequelize from 'sequelize'
+
+import Type from '../type'
 import Model from '../Model'
 import ModelRef from '../ModelRef'
 
@@ -9,7 +11,7 @@ export default function toSequelizeModel(sequelize:Sequelize, model:Model):Seque
   const dbDefinition = {}
 
   const dbType = (fieldType:any) => {
-    if (fieldType && fieldType.graphQLType && fieldType.columnType) {
+    if (fieldType instanceof Type.ScalarFieldType) {
       return fieldType.columnType
     }
     switch (fieldType) {

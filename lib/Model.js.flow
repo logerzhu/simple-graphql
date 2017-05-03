@@ -1,7 +1,10 @@
 //@flow
 import Sequelize from 'sequelize'
 import * as graphql from 'graphql'
-import GS from "./index"
+
+import Type from './type'
+import Connection from "./Connection"
+import ModelRef from './ModelRef'
 
 type QueryConfig ={
   $type: any,
@@ -9,11 +12,6 @@ type QueryConfig ={
   resolve: (args:{[argName: string]: any},
             info:graphql.GraphQLResolveInfo,
             models:any) => any
-}
-
-export type ScalarTypeConfig ={
-  graphQLType:graphql.GraphQLScalarType,
-  columnType:Sequelize.DataType
 }
 
 type ValidateConfig = {
@@ -72,7 +70,7 @@ type ColumnConfig = {
   set?:(any) =>void
 }
 
-type BaseFieldType = typeof String | typeof Number | typeof Boolean | typeof Date | typeof JSON | GS.ModelRef | ScalarTypeConfig | GS.Connection.ConnectionType | GS.Connection.EdgeType
+type BaseFieldType = typeof String | typeof Number | typeof Boolean | typeof Date | typeof JSON | ModelRef | Type.ScalarFieldType | Connection.ConnectionType | Connection.EdgeType
 
 
 type FieldType = BaseFieldType | {

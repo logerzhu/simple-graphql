@@ -23,27 +23,27 @@ const DateConditionType = new graphql.GraphQLInputObjectType({
   name: "DateCondition" + "Input",
   fields: {
     gte: {
-      type: Type.Date,
+      type: Type.GraphQLScalarTypes.Date,
       description: "大于或等于"
     },
     lte: {
-      type: Type.Date,
+      type: Type.GraphQLScalarTypes.Date,
       description: "小于或等于"
     },
     gt: {
-      type: Type.Date,
+      type: Type.GraphQLScalarTypes.Date,
       description: "大于"
     },
     lt: {
-      type: Type.Date,
+      type: Type.GraphQLScalarTypes.Date,
       description: "小于"
     },
     ne: {
-      type: Type.Date,
+      type: Type.GraphQLScalarTypes.Date,
       description: "不等于"
     },
     eq: {
-      type: Type.Date,
+      type: Type.GraphQLScalarTypes.Date,
       description: "等于"
     }
   }
