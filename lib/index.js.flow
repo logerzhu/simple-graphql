@@ -52,7 +52,7 @@ GS.build = (sequelize:Sequelize, models:Array<Model>, options:any):any => {
         "Payload",
         value.$type,
         context).type,
-      resolve: context.wrapResolve("query", value),
+      resolve: context.wrapQueryResolve(value),
       description: value.description
     }
     if (value.args) {
@@ -70,7 +70,7 @@ GS.build = (sequelize:Sequelize, models:Array<Model>, options:any):any => {
         description: 'The ID of an object'
       }
     },
-    resolve: context.wrapResolve("query", {
+    resolve: context.wrapQueryResolve({
       name: "node",
       $type: context.nodeInterface,
       resolve: async function (args, info, models, invoker) {
@@ -133,7 +133,7 @@ GS.build = (sequelize:Sequelize, models:Array<Model>, options:any):any => {
             name: StringHelper.toInitialUpperCase(key),
             inputFields: inputFields,
             outputFields: outputFields,
-            mutateAndGetPayload: context.wrapMutateAndGetPayload('mutation', value),
+            mutateAndGetPayload: context.wrapMutateAndGetPayload(value),
             description: value.doc
           })
         })

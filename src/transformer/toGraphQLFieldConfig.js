@@ -45,8 +45,10 @@ const toGraphQLFieldConfig = function (name:string,
     const elementType = toGraphQLFieldConfig(name, postfix, fieldType[0], context).type
     return {
       type: new graphql.GraphQLList(elementType),
-      resolve: async function () {
-        return null
+      resolve: async function (root) {
+        //TODO check?
+        const fieldName = name.split("\.").slice(-1)[0]
+        return root[fieldName]
       }
     }
   }
@@ -54,7 +56,7 @@ const toGraphQLFieldConfig = function (name:string,
   if (fieldType instanceof ModelRef) {
     return {
       type: context.graphQLObjectType(fieldType.name),
-      resolve: context.wrapResolve('field', {
+      resolve: context.wrapFieldResolve({
         name: name.split("\.").slice(-1)[0],
         path: name,
         $type: context.graphQLObjectType(fieldType.name),

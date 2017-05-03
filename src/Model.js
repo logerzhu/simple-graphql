@@ -6,12 +6,13 @@ import Type from './type'
 import Connection from "./Connection"
 import ModelRef from './ModelRef'
 
-type QueryConfig ={
-  $type: any,
-  args?: any,
+export type QueryConfig ={
+  $type:BaseLinkedFieldType,
+  description?:string,
+  args?:ArgsType,
   resolve: (args:{[argName: string]: any},
             info:graphql.GraphQLResolveInfo,
-            models:any) => any
+            models:{[id:string]:Sequelize.Model}) => any
 }
 
 type ValidateConfig = {
@@ -90,7 +91,7 @@ type FieldTypeConfig = {
 
 type FieldType = BaseFieldType | FieldTypeConfig
 
-type BaseLinkedFieldType = typeof String | typeof Number | typeof Boolean | typeof Date | typeof JSON | ModelRef |
+export type BaseLinkedFieldType = typeof String | typeof Number | typeof Boolean | typeof Date | typeof JSON | ModelRef |
   Type.ScalarFieldType | Connection.ConnectionType | Connection.EdgeType | Array<BaseLinkedFieldType> | {
   [string]:BaseLinkedFieldType,
   $type?:BaseLinkedFieldType,
@@ -102,7 +103,7 @@ type BaseLinkedFieldType = typeof String | typeof Number | typeof Boolean | type
              models:{[id:string]:Sequelize.Model}) => any
 }
 
-type ArgsType = {[id:string]:BaseLinkedFieldType}
+export type ArgsType = {[id:string]:BaseLinkedFieldType}
 
 type LinkFieldTypeConfig = {
   $type:BaseLinkedFieldType,

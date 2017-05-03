@@ -61,6 +61,8 @@ export default function toSequelizeModel(sequelize:Sequelize, model:Model):Seque
         } else {
           dbDefinition[key] = {type: type}
         }
+      } else {
+        throw new Error("Unknown column type for ", fType)
       }
     }
   })

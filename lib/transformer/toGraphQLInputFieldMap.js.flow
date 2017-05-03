@@ -47,6 +47,7 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
       if (!subField) return
 
       return {
+        ...subField,
         type: new graphql.GraphQLList(subField.type)
       }
     }

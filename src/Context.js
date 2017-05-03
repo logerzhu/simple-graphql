@@ -13,22 +13,39 @@ import ModelRef from './ModelRef'
 import StringHelper from "./utils/StringHelper"
 import Transformer from "./transformer"
 
+import type {BaseLinkedFieldType, ArgsType} from './Model'
+
 export type QueryConfig ={
   name:string,
-  $type: any,
-  args?: any,
-  resolve: any
+  $type:BaseLinkedFieldType,
+  description?:string,
+  args?:ArgsType,
+  resolve: (args:{[argName: string]: any},
+            info:graphql.GraphQLResolveInfo,
+            models:{[id:string]:Sequelize.Model}) => any
 }
 
 export type MutationConfig ={
   name:string,
   description?:string,
-  inputFields:any,
-  outputFields:any,
+  inputFields:ArgsType,
+  outputFields:{[string]:BaseLinkedFieldType},
   mutateAndGetPayload:(args:{[argName: string]: any},
                        info:graphql.GraphQLResolveInfo,
                        models:{[id:string]:Sequelize.Model}) => any
 }
+
+export type LinkedFieldConfig ={
+  name:string,
+  $type:BaseLinkedFieldType,
+  description?:string,
+  args?:ArgsType,
+  resolve: (source:any,
+            args:{[argName: string]: any},
+            info:graphql.GraphQLResolveInfo,
+            models:{[id:string]:Sequelize.Model}) => any
+}
+
 
 export default class Context {
   sequelize:Sequelize
@@ -159,7 +176,7 @@ export default class Context {
     return this.dbModels[typeName]
   }
 
-  wrapResolve(type:'field'|'query', config:QueryConfig):any {
+  wrapQueryResolve(config:QueryConfig):any {
     const self = this
 
     const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
@@ -169,43 +186,28 @@ export default class Context {
     }
     let hookFun = ((action, invokeInfo, next) => next())
     this.options.hooks.reverse().forEach(hook => {
-      if (!hook.filter || hook.filter({type, config})) {
+      if (!hook.filter || hook.filter({type: 'query', config})) {
         const preHook = hookFun
         hookFun = (action, invokeInfo, next) => hook.hook(action, invokeInfo, preHook.bind(null, action, invokeInfo, next))
       }
     })
 
-    switch (type) {
-      case 'field':
-        return (source, args, context, info) => hookFun({
-            type: type,
-            config: config
-          }, {
-            source: source,
-            args: args,
-            info: info,
-            models: dbModels()
-          },
-          () => config.resolve(source, args, info, dbModels(), invoker.bind(null, info.schema, info.rootValue))
-        )
-      case 'query':
-        return (source, args, context, info) => hookFun({
-            type: type,
-            config: config
-          }, {
-            source: source,
-            args: args,
-            info: info,
-            models: dbModels()
-          },
-          () => {
-            return config.resolve(args, info, dbModels(), invoker.bind(null, info.schema, info.rootValue))
-          }
-        )
-    }
+    return (source, args, context, info) => hookFun({
+        type: "query",
+        config: config
+      }, {
+        source: source,
+        args: args,
+        info: info,
+        models: dbModels()
+      },
+      () => {
+        return config.resolve(args, info, dbModels(), invoker.bind(null, info.schema, info.rootValue))
+      }
+    )
   }
 
-  wrapMutateAndGetPayload(type:'mutation', config:MutationConfig):any {
+  wrapFieldResolve(config:LinkedFieldConfig):any {
     const self = this
 
     const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
@@ -215,26 +217,53 @@ export default class Context {
     }
     let hookFun = ((action, invokeInfo, next) => next())
     this.options.hooks.reverse().forEach(hook => {
-      if (!hook.filter || hook.filter({type, config})) {
+      if (!hook.filter || hook.filter({type: 'field', config})) {
         const preHook = hookFun
         hookFun = (action, invokeInfo, next) => hook.hook(action, invokeInfo, preHook.bind(null, action, invokeInfo, next))
       }
     })
 
-    switch (type) {
-      case 'mutation':
-        return async function (args, context, info) {
-          return await hookFun({
-              type: type,
-              config: config
-            }, {
-              args: args,
-              info: info,
-              models: dbModels()
-            },
-            () => config.mutateAndGetPayload(args, info, dbModels(), invoker.bind(null, info.schema, info.rootValue))
-          )
-        }
+
+    return (source, args, context, info) => hookFun({
+        type: "field",
+        config: config
+      }, {
+        source: source,
+        args: args,
+        info: info,
+        models: dbModels()
+      },
+      () => config.resolve(source, args, info, dbModels(), invoker.bind(null, info.schema, info.rootValue))
+    )
+  }
+
+  wrapMutateAndGetPayload(config:MutationConfig):any {
+    const self = this
+
+    const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
+
+    const invoker = (schema, rootValue, requestString, variableValues) => {
+      return graphql['graphql'](schema, requestString, rootValue, null, variableValues)
+    }
+    let hookFun = ((action, invokeInfo, next) => next())
+    this.options.hooks.reverse().forEach(hook => {
+      if (!hook.filter || hook.filter({type: 'mutation', config})) {
+        const preHook = hookFun
+        hookFun = (action, invokeInfo, next) => hook.hook(action, invokeInfo, preHook.bind(null, action, invokeInfo, next))
+      }
+    })
+
+    return async function (args, context, info) {
+      return await hookFun({
+          type: "mutation",
+          config: config
+        }, {
+          args: args,
+          info: info,
+          models: dbModels()
+        },
+        () => config.mutateAndGetPayload(args, info, dbModels(), invoker.bind(null, info.schema, info.rootValue))
+      )
     }
   }
 
