@@ -327,6 +327,12 @@ export default class Context {
       model.config.associations.belongsTo.forEach((config => {
         self.dbModel(model.name).belongsTo(self.dbModel(config.target), config.options)
       }))
+      model.config.associations.hasMany.forEach((config => {
+        self.dbModel(model.name).hasMany(self.dbModel(config.target), config.options)
+      }))
+      model.config.associations.belongsToMany.forEach((config => {
+        self.dbModel(model.name).belongsToMany(self.dbModel(config.target), config.options)
+      }))
     })
   }
 

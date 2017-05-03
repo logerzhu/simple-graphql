@@ -14,6 +14,8 @@ import Type from './type'
 import Context from './Context'
 import StringHelper from "./utils/StringHelper"
 import Connection from "./Connection"
+import ModelRef from './ModelRef'
+import Transformer from './transformer'
 
 import type {ScalarTypeConfig} from './Model'
 
@@ -33,157 +35,13 @@ GS.Connection = Connection
 
 GS.Model = Model
 
-GS.ModelRef = class {
-  name:string
-
-  constructor(name:string) {
-    this.name = name
-  }
-}
+GS.ModelRef = ModelRef
 
 GS.model = (name:string, options:{[id:string]: any} = {}):GS.Model => new Model(name, options)
 
-GS.modelRef = (name:string):GS.ModelRef => new GS.ModelRef(name)
+GS.modelRef = (name:string):ModelRef=> new ModelRef(name)
 
-GS.FilterConfig = class {
-  fields:any
-
-  includeFieldFilter:(key:string, value:any) =>boolean
-
-  constructor(fields:any,
-              includeFieldFilter:(key:string, value:any) =>boolean) {
-    this.fields = fields
-    this.includeFieldFilter = includeFieldFilter
-  }
-}
-
-GS.graphQLInputFieldMap = (name:string,
-                           fields:{[id:string]:any},
-                           includeFieldFilter:?(key:string, value:any)=>boolean):GraphQLInputFieldConfigMap => {
-  const typeName = (name:string, path:string) => name + path.replace(/\.\$type/g, '').replace(/\[\d*\]/g, '').split('.').map(v => StringHelper.toInitialUpperCase(v)).join("")
-
-  const convert = (name:string,
-                   path:string,
-                   field:any):?GraphQLInputFieldConfig => {
-    if (graphql.isInputType(field)) {
-      return {type: field}
-    }
-    if (field && field.graphQLType && graphql.isInputType(field.graphQLType)) {
-      return {type: field.graphQLType}
-    }
-
-    if (graphql.isCompositeType(field)) {
-      return
-    }
-
-    switch (field) {
-      case String:
-        return {type: graphql.GraphQLString}
-      case Number:
-        return {type: graphql.GraphQLFloat}
-      case Boolean:
-        return {type: graphql.GraphQLBoolean}
-      case Date:
-        return {type: Type.Date}
-      case JSON:
-        return {type: Type.Json}
-    }
-
-    if (_.isArray(field)) {
-      const subField = convert(name, path, field[0])
-      if (!subField) return
-
-      return {
-        type: new graphql.GraphQLList(subField.type)
-      }
-    }
-
-    if (field instanceof GS.ModelRef) {
-      return {
-        type: Type.globalIdInputType(field.name)
-      }
-    }
-    if (field instanceof Object) {
-      if (field['$type']) {
-        let result:?GraphQLInputFieldConfig
-        if (field['enumValues']) {
-          const values:{[index:string]:any} = {}
-          field['enumValues'].forEach(
-            t => values[t] = {value: t}
-          )
-          result = ({
-            type: new graphql.GraphQLEnumType({
-              name: typeName(name, path),
-              values: values
-            })
-          }:GraphQLInputFieldConfig)
-        } else {
-          result = convert(name, path, field['$type'])
-        }
-        if (result) {
-          result.description = field['description']
-          if (field['default'] != null && !_.isFunction(field['default'])) {
-            result.defaultValue = field['default']
-            result.description = (result.description ? result.description : "") + " 默认值:" + result.defaultValue
-          }
-        }
-        return result
-      } else {
-        const inputType = graphQLInputType(typeName(name, path), field)
-        if (inputType) {
-          return {type: inputType}
-        } else {
-          return
-        }
-      }
-    }
-  }
-
-  const graphQLInputType = (name:string,
-                            config:any):?graphql.GraphQLInputType => {
-    name = StringHelper.toInitialUpperCase(name)
-
-    if (config["$type"]) {
-      const result = convert(name, "", config)
-      if (result && result.type) {
-        return result.type
-      } else {
-        //return null
-      }
-    } else {
-      const fields = GS.graphQLInputFieldMap(name, config, includeFieldFilter)
-      if (_.keys(fields).length === 0) {
-        //return null
-      }
-      return new graphql.GraphQLInputObjectType({
-        name: name + "Input",
-        fields: fields
-      })
-    }
-  }
-
-  const fieldMap:GraphQLInputFieldConfigMap = {}
-
-  _.forOwn(fields, (value, key) => {
-    if (value['$type'] && (value['hidden'] || value['resolve'])) {
-      //Hidden field, ignore
-      //Have resolve method, ignore
-    } else if (!includeFieldFilter || includeFieldFilter(key, value)) {
-      const inputField = convert(name, key, value)
-      if (inputField) {
-        if (value['$type'] && value['required']) {
-          fieldMap[key] = inputField
-          if (fieldMap[key] && !(inputField.type instanceof graphql.GraphQLNonNull)) {
-            fieldMap[key].type = new graphql.GraphQLNonNull(inputField.type)
-          }
-        } else {
-          fieldMap[key] = inputField
-        }
-      }
-    }
-  })
-  return fieldMap
-}
+GS.graphQLInputFieldMap = Transformer.toGraphQLInputFieldMap
 
 GS.graphQLFieldConfig = (name:string,
                          postfix:string,
@@ -222,7 +80,7 @@ GS.graphQLFieldConfig = (name:string,
     }
   }
 
-  if (fieldType instanceof GS.ModelRef) {
+  if (fieldType instanceof ModelRef) {
     return {
       type: context.graphQLObjectType(fieldType.name),
       resolve: context.wrapResolve('field', {
@@ -279,7 +137,7 @@ GS.graphQLFieldConfig = (name:string,
         result['resolve'] = fieldType['resolve']
       }
       if (fieldType['args']) {
-        result['args'] = GS.graphQLInputFieldMap(typeName(name), fieldType['args'], (k, v) => true)
+        result['args'] = GS.graphQLInputFieldMap(typeName(name), fieldType['args'])
       }
       result.description = fieldType['description']
       return result
@@ -333,11 +191,7 @@ GS.build = (sequelize:Sequelize, models:Array<Model>, options:any):any => {
       description: value.description
     }
     if (value.args) {
-      if (value.args instanceof GS.FilterConfig) {
-        finalQueries[key].args = GS.graphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.args.fields, value.args.includeFieldFilter)
-      } else {
-        finalQueries[key].args = GS.graphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.args, (k, v)=>true)
-      }
+      finalQueries[key].args = GS.graphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.args)
     }
   })
 
@@ -397,12 +251,7 @@ GS.build = (sequelize:Sequelize, models:Array<Model>, options:any):any => {
       fields: () => {
         const fields:{[fieldName: string]: graphql.GraphQLFieldConfig<any,any>} = {}
         _.forOwn(context.mutations, (value, key)=> {
-          let inputFields
-          if (value.inputFields instanceof GS.FilterConfig) {
-            inputFields = GS.graphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.inputFields.fields, value.inputFields.includeFieldFilter)
-          } else {
-            inputFields = GS.graphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.inputFields, (k, v)=>true)
-          }
+          const inputFields = GS.graphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.inputFields)
           const outputFields = {viewer: {type: viewerType, resolve: ()=>viewerInstance}}
           _.forOwn(value.outputFields, (fValue, fKey) => {
             outputFields[fKey] = GS.graphQLFieldConfig(

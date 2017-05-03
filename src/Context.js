@@ -9,8 +9,9 @@ import type {GraphQLOutputType} from 'graphql'
 import Query from  './query'
 import Mutation from './mutation'
 import Model from  './Model'
-import GS from './index'
+import ModelRef from './ModelRef'
 import StringHelper from "./utils/StringHelper"
+import Transformer from "./transformer"
 
 export type QueryConfig ={
   name:string,
@@ -137,7 +138,7 @@ export default class Context {
           }
         }
       })
-      this.graphQLObjectTypes[typeName] = GS.graphQLFieldConfig(typeName, "", obj, this, interfaces).type
+      this.graphQLObjectTypes[typeName] = Transformer.toGraphQLFieldConfig(typeName, "", obj, this, interfaces).type
       if (this.graphQLObjectTypes[typeName] instanceof graphql.GraphQLObjectType) {
         this.graphQLObjectTypes[typeName].description = model.config.options.description
       }
@@ -179,7 +180,7 @@ export default class Context {
         if (value && value["$type"]) {
           fType = value["$type"]
         }
-        if (fType instanceof GS.ModelRef) {
+        if (fType instanceof ModelRef) {
           if (value && value["$type"] && value.required) {
             model.belongsTo({target: fType.name, options: {as: key, foreignKey: key + "Id", constraints: true}})
           } else {
@@ -295,7 +296,7 @@ export default class Context {
     }
   }
 
-  connectionDefinition(ref:GS.ModelRef):{connectionType:graphql.GraphQLObjectType,edgeType:graphql.GraphQLObjectType} {
+  connectionDefinition(ref:ModelRef):{connectionType:graphql.GraphQLObjectType,edgeType:graphql.GraphQLObjectType} {
     if (!this.connectionDefinitions[ref.name]) {
       this.connectionDefinitions[ref.name] = relay.connectionDefinitions({
         name: StringHelper.toInitialUpperCase(ref.name),
@@ -310,11 +311,11 @@ export default class Context {
     return this.connectionDefinitions[ref.name]
   }
 
-  connectionType(ref:GS.ModelRef):graphql.GraphQLObjectType {
+  connectionType(ref:ModelRef):graphql.GraphQLObjectType {
     return this.connectionDefinition(ref).connectionType
   }
 
-  edgeType(ref:GS.ModelRef):graphql.GraphQLObjectType {
+  edgeType(ref:ModelRef):graphql.GraphQLObjectType {
     return this.connectionDefinition(ref).edgeType
   }
 
@@ -326,6 +327,12 @@ export default class Context {
       }))
       model.config.associations.belongsTo.forEach((config => {
         self.dbModel(model.name).belongsTo(self.dbModel(config.target), config.options)
+      }))
+      model.config.associations.hasMany.forEach((config => {
+        self.dbModel(model.name).hasMany(self.dbModel(config.target), config.options)
+      }))
+      model.config.associations.belongsToMany.forEach((config => {
+        self.dbModel(model.name).belongsToMany(self.dbModel(config.target), config.options)
       }))
     })
   }

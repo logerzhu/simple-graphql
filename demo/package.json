@@ -17,8 +17,6 @@
     "express": "^4.15.2",
     "express-graphql": "^0.6.4",
     "flow-bin": "^0.42.0",
-    "graphql": "^0.9.1",
-    "graphql-relay": "^0.5.1",
     "jest": "^19.0.2",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
