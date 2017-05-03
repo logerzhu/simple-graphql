@@ -128,7 +128,7 @@ export default class Context {
     const typeName = model.name
 
     if (!this.graphQLObjectTypes[typeName]) {
-      const obj = Object.assign({}, model.config.fields)
+      const obj = Object.assign({}, model.config.fields, model.config.links)
       const interfaces = [this.nodeInterface]
       Object.assign(obj, {
         id: {

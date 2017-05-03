@@ -6,7 +6,7 @@ const UserType = GS.modelRef("User")
 
 export default GS.model("User", {
   description: "用户",
-  addMutation: false
+  addMutation: true
 }).fields({
   firstName: String,
   lastName: {
@@ -14,32 +14,37 @@ export default GS.model("User", {
     description: "姓"
   },
   data: UserDataType
+}).links({
+  name: {
+    $type: {
+      $type: [String],
+      description: '测试'
+    },
+    args: {
+      a: {
+        $type: [String],
+        description: '测试'
+      },
+      b: {
+        $type: [{
+          c: {
+            $type: Number,
+          }, d: [Boolean]
+        }]
+      }
+    },
+    resolve: async function (source, args, info, models) {
+      return source.firstName + source.lastName
+    }
+  }
 }).queries({
   getUser: {
     $type: GS.Connection.connectionType(UserType),
     args: {
       ...GS.Connection.args
     },
-    resolve: async function(args, info, models) {
+    resolve: async function (args, info, models) {
       return await GS.Connection.resolve(models['User'], {condition: {firstName: 'peng'}})
-    }
-  }
-}).mutations({
-  addUser:{
-    inputFields:{
-      firstName: String,
-      lastName: {
-        $type: String,
-        description: "姓"
-      },
-      data: String
-    },
-    outputFields:{
-      userName: String
-    },
-    mutateAndGetPayload: async function(args, info, models) {
-      let userData = await models["UserData"].create({data: "test"})
-      return {userName: "test"}
     }
   }
 })

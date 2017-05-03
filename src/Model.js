@@ -70,11 +70,12 @@ type ColumnConfig = {
   set?:(any) =>void
 }
 
-type BaseFieldType = typeof String | typeof Number | typeof Boolean | typeof Date | typeof JSON | ModelRef | Type.ScalarFieldType | Connection.ConnectionType | Connection.EdgeType
+type BaseFieldType = typeof String | typeof Number | typeof Boolean | typeof Date | typeof JSON | ModelRef |
+  Type.ScalarFieldType | Connection.ConnectionType | Connection.EdgeType
 
-
-type FieldType = BaseFieldType | {
+type FieldTypeConfig = {
   $type:BaseFieldType,
+  description?:string,
   enumValues?:Array<string>,
   defaultValue?:any,
   required?:boolean,
@@ -85,6 +86,31 @@ type FieldType = BaseFieldType | {
   mutable?:boolean,                      // 是否可以在update的Mutation中出现
   validate?: ValidateConfig,
   column?:ColumnConfig
+}
+
+type FieldType = BaseFieldType | FieldTypeConfig
+
+type BaseLinkedFieldType = typeof String | typeof Number | typeof Boolean | typeof Date | typeof JSON | ModelRef |
+  Type.ScalarFieldType | Connection.ConnectionType | Connection.EdgeType | Array<BaseLinkedFieldType> | {
+  [string]:BaseLinkedFieldType,
+  $type?:BaseLinkedFieldType,
+  required?:boolean,
+  description?:string,
+  args?:ArgsType,
+  resolve?: (source:any, args:{[argName: string]: any},
+             info:graphql.GraphQLResolveInfo,
+             models:{[id:string]:Sequelize.Model}) => any
+}
+
+type ArgsType = {[id:string]:BaseLinkedFieldType}
+
+type LinkFieldTypeConfig = {
+  $type:BaseLinkedFieldType,
+  description?:string,
+  args?:ArgsType,
+  resolve: (source:any, args:{[argName: string]: any},
+            info:graphql.GraphQLResolveInfo,
+            models:{[id:string]:Sequelize.Model}) => any
 }
 
 type ModelOption = {
@@ -229,6 +255,7 @@ export default class Model {
 
   config:{
     fields:{[id:string]: FieldType},
+    links:{[id:string]:LinkFieldTypeConfig},
     associations:AssociationConfig,
     options:ModelOption,
     queries:{[id:string]: QueryConfig},
@@ -242,6 +269,7 @@ export default class Model {
     this.name = name
     this.config = {
       fields: {},
+      links: {},
       associations: {
         hasOne: [],
         belongsTo: [],
@@ -259,6 +287,11 @@ export default class Model {
 
   fields(fields:{[id:string]: FieldType}):Model {
     this.config.fields = Object.assign(this.config.fields, fields)
+    return this
+  }
+
+  links(links:{[id:string]: LinkFieldTypeConfig}):Model {
+    this.config.links = Object.assign(this.config.links, links)
     return this
   }
 
