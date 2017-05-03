@@ -9,8 +9,9 @@ import type {GraphQLOutputType} from 'graphql'
 import Query from  './query'
 import Mutation from './mutation'
 import Model from  './Model'
-import GS from './index'
+import ModelRef from './ModelRef'
 import StringHelper from "./utils/StringHelper"
+import Transformer from "./transformer"
 
 export type QueryConfig ={
   name:string,
@@ -137,7 +138,7 @@ export default class Context {
           }
         }
       })
-      this.graphQLObjectTypes[typeName] = GS.graphQLFieldConfig(typeName, "", obj, this, interfaces).type
+      this.graphQLObjectTypes[typeName] = Transformer.toGraphQLFieldConfig(typeName, "", obj, this, interfaces).type
       if (this.graphQLObjectTypes[typeName] instanceof graphql.GraphQLObjectType) {
         this.graphQLObjectTypes[typeName].description = model.config.options.description
       }
@@ -153,65 +154,7 @@ export default class Context {
     const typeName = model.name
 
     if (!this.dbModels[typeName]) {
-
-      const dbDefinition = {}
-
-      const dbType = (fieldType:any) => {
-        if (fieldType && fieldType.graphQLType && fieldType.columnType) {
-          return fieldType.columnType
-        }
-        switch (fieldType) {
-          case String:
-            return Sequelize.STRING
-          case Number:
-            return Sequelize.DOUBLE
-          case Boolean:
-            return Sequelize.BOOLEAN
-          case Date:
-            return Sequelize.DATE
-          case JSON:
-            return Sequelize.JSONB
-        }
-        return null
-      }
-      _.forOwn(model.config.fields, (value, key)=> {
-        let fType = value
-        if (value && value["$type"]) {
-          fType = value["$type"]
-        }
-        if (fType instanceof GS.ModelRef) {
-          if (value && value["$type"] && value.required) {
-            model.belongsTo({target: fType.name, options: {as: key, foreignKey: key + "Id", constraints: true}})
-          } else {
-            model.belongsTo({target: fType.name, options: {as: key, foreignKey: key + "Id", constraints: false}})
-          }
-
-        } else {
-          const type = dbType(fType)
-          if (type) {
-            if (value && value["$type"]) {
-              dbDefinition[key] = {type: type}
-              if (value.required != null) {
-                dbDefinition[key].allowNull = !value.required
-              }
-              if (value.defaultValue != null) {
-                dbDefinition[key].defaultValue = value.defaultValue
-              }
-              if (value.validate != null) {
-                dbDefinition[key].validate = value.validate
-              }
-              if (value.enumValues != null) {
-                dbDefinition[key].type = Sequelize.ENUM(...value.enumValues)
-              }
-              dbDefinition[key] = {...dbDefinition[key], ...value.column}
-            } else {
-              dbDefinition[key] = {type: type}
-            }
-          }
-        }
-      })
-      console.log("Create Sequlize Model with config", typeName, dbDefinition, model.config.options["table"])
-      this.dbModels[typeName] = this.sequelize.define(typeName, dbDefinition, model.config.options["table"])
+      this.dbModels[typeName] = Transformer.toSequelizeModel(this.sequelize, model)
     }
     return this.dbModels[typeName]
   }
@@ -295,7 +238,7 @@ export default class Context {
     }
   }
 
-  connectionDefinition(ref:GS.ModelRef):{connectionType:graphql.GraphQLObjectType,edgeType:graphql.GraphQLObjectType} {
+  connectionDefinition(ref:ModelRef):{connectionType:graphql.GraphQLObjectType,edgeType:graphql.GraphQLObjectType} {
     if (!this.connectionDefinitions[ref.name]) {
       this.connectionDefinitions[ref.name] = relay.connectionDefinitions({
         name: StringHelper.toInitialUpperCase(ref.name),
@@ -310,11 +253,11 @@ export default class Context {
     return this.connectionDefinitions[ref.name]
   }
 
-  connectionType(ref:GS.ModelRef):graphql.GraphQLObjectType {
+  connectionType(ref:ModelRef):graphql.GraphQLObjectType {
     return this.connectionDefinition(ref).connectionType
   }
 
-  edgeType(ref:GS.ModelRef):graphql.GraphQLObjectType {
+  edgeType(ref:ModelRef):graphql.GraphQLObjectType {
     return this.connectionDefinition(ref).edgeType
   }
 

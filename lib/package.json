@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
-    "build": "babel src --optional runtime --out-dir lib/ && cp package.json lib/ && npm run build-dot-flow",
+    "build": "rm -rf lib && babel src --optional runtime --out-dir lib/ && cp package.json lib/ && npm run build-dot-flow",
     "build-dot-flow": "find ./src -name '*.js' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/lib\\//g'`.flow; done"
   },
   "author": "logerzhu",
