@@ -1,4 +1,6 @@
 # simple-graphql
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+
 The simple way to build GraphQL style API with DataBase support.
 
 ## Install
