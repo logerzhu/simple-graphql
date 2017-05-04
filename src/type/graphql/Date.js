@@ -5,7 +5,7 @@ import moment from 'moment'
 export default new GraphQLScalarType({
   name: 'Date',
 
-  serialize(value) {
+  serialize (value) {
     if (!(value instanceof Date)) {
       throw new TypeError('Field error: value is not an instance of Date')
     }
@@ -15,7 +15,7 @@ export default new GraphQLScalarType({
     return value.toJSON()
   },
 
-  parseValue(value) {
+  parseValue (value) {
     if (typeof value === 'string') {
       const result = moment(value)
       if (!result.isValid()) {
@@ -23,12 +23,11 @@ export default new GraphQLScalarType({
       }
       return result.toDate()
     } else {
-      throw new GraphQLError("Query error: Invalid date")
+      throw new GraphQLError('Query error: Invalid date')
     }
-
   },
 
-  parseLiteral(ast) {
+  parseLiteral (ast) {
     if (ast.kind !== Kind.STRING) {
       throw new GraphQLError('Query error: Can only parse strings to dates but got a: ' + ast.kind, [ast])
     }
@@ -38,8 +37,8 @@ export default new GraphQLScalarType({
     }
     return result.toDate()
 
-    //if (ast.value !== result.toJSON()) {
+    // if (ast.value !== result.toJSON()) {
     //  throw new GraphQLError('Query error: Invalid date format, only accepts: YYYY-MM-DDTHH:MM:SS.SSSZ', [ast])
-    //}
+    // }
   }
 })

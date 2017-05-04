@@ -1,10 +1,35 @@
-//@flow
+// @flow
 import Sequelize from 'sequelize'
 import * as graphql from 'graphql'
 
 import Type from './type'
-import Connection from "./Connection"
+import Connection from './Connection'
 import ModelRef from './ModelRef'
+
+export type BaseLinkedFieldType = typeof String | typeof Number | typeof Boolean | typeof Date | typeof JSON | ModelRef |
+  Type.ScalarFieldType | Connection.ConnectionType | Connection.EdgeType | Array<BaseLinkedFieldType> | {
+  [string]:BaseLinkedFieldType,
+  $type?:BaseLinkedFieldType,
+  required?:boolean,
+  description?:string,
+  args?:{[id:string]:BaseLinkedFieldType},
+  resolve?: (source:any, args:{[argName: string]: any},
+             context:any,
+             info:graphql.GraphQLResolveInfo,
+             models:{[id:string]:Sequelize.Model}) => any
+}
+
+export type ArgsType = {[id:string]:BaseLinkedFieldType}
+
+type LinkFieldTypeConfig = {
+  $type:BaseLinkedFieldType,
+  description?:string,
+  args?:ArgsType,
+  resolve: (source:any, args:{[argName: string]: any},
+            context:any,
+            info:graphql.GraphQLResolveInfo,
+            models:{[id:string]:Sequelize.Model}) => any
+}
 
 export type QueryConfig ={
   $type:BaseLinkedFieldType,
@@ -17,8 +42,8 @@ export type QueryConfig ={
 }
 
 type ValidateConfig = {
-  is?: [string,string] | RegExp,
-  not?: [string,string],
+  is?: [string, string] | RegExp,
+  not?: [string, string],
   isEmail?: boolean,
   isUrl?: boolean,
   isIP?: boolean,
@@ -40,7 +65,7 @@ type ValidateConfig = {
   notIn?: [Array<string | boolean |number>],
   isIn?: [Array<string | boolean |number>],
   notContains?: string,
-  len?: [number,number],
+  len?: [number, number],
   isUUID?: number,
   isDate?: boolean,
   isAfter?: string,
@@ -52,7 +77,7 @@ type ValidateConfig = {
 }
 
 type ColumnConfig = {
-  type:Sequelize.DataType | {BINARY:Sequelize.DataType} |  (number) =>Sequelize.DataType |  (number, number) => Sequelize.DataType,
+  type:Sequelize.DataType | {BINARY:Sequelize.DataType} | (number) =>Sequelize.DataType | (number, number) => Sequelize.DataType,
   allowNull?:boolean,
   defaultValue?:any,
   unique?:boolean,
@@ -91,31 +116,6 @@ type FieldTypeConfig = {
 }
 
 type FieldType = BaseFieldType | FieldTypeConfig
-
-export type BaseLinkedFieldType = typeof String | typeof Number | typeof Boolean | typeof Date | typeof JSON | ModelRef |
-  Type.ScalarFieldType | Connection.ConnectionType | Connection.EdgeType | Array<BaseLinkedFieldType> | {
-  [string]:BaseLinkedFieldType,
-  $type?:BaseLinkedFieldType,
-  required?:boolean,
-  description?:string,
-  args?:ArgsType,
-  resolve?: (source:any, args:{[argName: string]: any},
-             context:any,
-             info:graphql.GraphQLResolveInfo,
-             models:{[id:string]:Sequelize.Model}) => any
-}
-
-export type ArgsType = {[id:string]:BaseLinkedFieldType}
-
-type LinkFieldTypeConfig = {
-  $type:BaseLinkedFieldType,
-  description?:string,
-  args?:ArgsType,
-  resolve: (source:any, args:{[argName: string]: any},
-            context:any,
-            info:graphql.GraphQLResolveInfo,
-            models:{[id:string]:Sequelize.Model}) => any
-}
 
 type ModelOption = {
   description?:string,
@@ -231,7 +231,7 @@ type BelongsToManyConfig ={
   target: string,
   options?: {
     hooks?: boolean,
-    through?:string  | {
+    through?:string | {
       model:string,
       scope?:Object,
       unique?:boolean
@@ -268,8 +268,7 @@ export default class Model {
     statics:{[id:string]: any}
   }
 
-
-  constructor(name:string, options:ModelOption = {}) {
+  constructor (name:string, options:ModelOption = {}) {
     this.name = name
     this.config = {
       fields: {},
@@ -288,53 +287,52 @@ export default class Model {
     }
   }
 
-
-  fields(fields:{[id:string]: FieldType}):Model {
+  fields (fields:{[id:string]: FieldType}):Model {
     this.config.fields = Object.assign(this.config.fields, fields)
     return this
   }
 
-  links(links:{[id:string]: LinkFieldTypeConfig}):Model {
+  links (links:{[id:string]: LinkFieldTypeConfig}):Model {
     this.config.links = Object.assign(this.config.links, links)
     return this
   }
 
-  queries(queries:{[id:string]:QueryConfig}):Model {
+  queries (queries:{[id:string]:QueryConfig}):Model {
     this.config.queries = Object.assign(this.config.queries, queries)
     return this
   }
 
-  mutations(mutations:{[id:string]:any}):Model {
+  mutations (mutations:{[id:string]:any}):Model {
     this.config.mutations = Object.assign(this.config.mutations, mutations)
     return this
   }
 
-  methods(methods:{[id:string]:any}):Model {
+  methods (methods:{[id:string]:any}):Model {
     this.config.methods = Object.assign(this.config.methods, methods)
     return this
   }
 
-  statics(statics:{[id:string]:any}):Model {
+  statics (statics:{[id:string]:any}):Model {
     this.config.statics = Object.assign(this.config.statics, statics)
     return this
   }
 
-  hasOne(config:HasOneConfig):Model {
+  hasOne (config:HasOneConfig):Model {
     this.config.associations.hasOne.push(config)
     return this
   }
 
-  belongsTo(config:BelongsToConfig):Model {
+  belongsTo (config:BelongsToConfig):Model {
     this.config.associations.belongsTo.push(config)
     return this
   }
 
-  hasMany(config:HasManyConfig):Model {
+  hasMany (config:HasManyConfig):Model {
     this.config.associations.hasMany.push(config)
     return this
   }
 
-  belongsToMany(config:BelongsToManyConfig):Model {
+  belongsToMany (config:BelongsToManyConfig):Model {
     this.config.associations.belongsToMany.push(config)
     return this
   }

@@ -1,18 +1,16 @@
-//@flow
+// @flow
 import _ from 'lodash'
 import * as graphql from 'graphql'
-import * as relay from 'graphql-relay'
 
 import Model from '../../Model'
 import GS from '../../index'
 import StringHelper from '../../utils/StringHelper'
 
-import type {MutationConfig} from "../../Context"
+import type {MutationConfig} from '../../Context'
 
-
-export default function updateMutation(model:Model):MutationConfig {
-  const name = "update" + StringHelper.toInitialUpperCase(model.name)
-  const changedName = "changed" + StringHelper.toInitialUpperCase(model.name)
+export default function updateMutation (model:Model):MutationConfig {
+  const name = 'update' + StringHelper.toInitialUpperCase(model.name)
+  const changedName = 'changed' + StringHelper.toInitialUpperCase(model.name)
 
   const config = {
     id: {
@@ -21,10 +19,10 @@ export default function updateMutation(model:Model):MutationConfig {
     },
     values: {}
   }
-  _.forOwn(model.config.fields, (value, key)=> {
+  _.forOwn(model.config.fields, (value, key) => {
     if (value instanceof GS.ModelRef || (value && value.$type instanceof GS.ModelRef)) {
-      if (!key.endsWith("Id")) {
-        key = key + "Id"
+      if (!key.endsWith('Id')) {
+        key = key + 'Id'
       }
     }
     if (value && value.$type) {
@@ -42,10 +40,10 @@ export default function updateMutation(model:Model):MutationConfig {
     outputFields: {
       [changedName]: GS.modelRef(model.name)
     },
-    mutateAndGetPayload: async function ({id,values}, context:any, info:graphql.GraphQLResolveInfo, models) {
+    mutateAndGetPayload: async function ({id, values}, context:any, info:graphql.GraphQLResolveInfo, models) {
       const instance = await models[model.name].findOne({where: {id: id}})
       if (!instance) {
-        throw new Error(model.name + "[" + id + "] not exist.")
+        throw new Error(model.name + '[' + id + '] not exist.')
       } else {
         await instance.update(values)
       }
@@ -55,4 +53,3 @@ export default function updateMutation(model:Model):MutationConfig {
     }
   }
 }
-

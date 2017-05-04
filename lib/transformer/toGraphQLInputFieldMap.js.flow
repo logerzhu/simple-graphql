@@ -4,15 +4,15 @@ import _ from 'lodash'
 
 import * as graphql from 'graphql'
 
-import type {GraphQLInputField,GraphQLInputFieldConfig,  GraphQLInputFieldConfigMap} from 'graphql'
+import type {GraphQLInputFieldConfig, GraphQLInputFieldConfigMap} from 'graphql'
 
 import Type from '../type'
 import ModelRef from '../ModelRef'
-import StringHelper from "../utils/StringHelper"
+import StringHelper from '../utils/StringHelper'
 
 const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):GraphQLInputFieldConfigMap {
   const typeName = (name:string, path:string) => {
-    return name + path.replace(/\.\$type/g, '').replace(/\[\d*\]/g, '').split('.').map(v => StringHelper.toInitialUpperCase(v)).join("")
+    return name + path.replace(/\.\$type/g, '').replace(/\[\d*\]/g, '').split('.').map(v => StringHelper.toInitialUpperCase(v)).join('')
   }
 
   const convert = (name:string,
@@ -63,7 +63,9 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
         if (field['enumValues']) {
           const values:{[index:string]:any} = {}
           field['enumValues'].forEach(
-            t => values[t] = {value: t}
+            t => {
+              values[t] = {value: t}
+            }
           )
           result = ({
             type: new graphql.GraphQLEnumType({
@@ -78,7 +80,7 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
           result.description = field['description']
           if (field['default'] != null && !_.isFunction(field['default'])) {
             result.defaultValue = field['default']
-            result.description = (result.description ? result.description : "") + " 默认值:" + result.defaultValue
+            result.description = (result.description ? result.description : '') + ' 默认值:' + result.defaultValue
           }
         }
         return result
@@ -87,7 +89,7 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
         if (inputType) {
           return {type: inputType}
         } else {
-          return
+
         }
       }
     }
@@ -97,20 +99,20 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
                             config:any):?graphql.GraphQLInputType => {
     name = StringHelper.toInitialUpperCase(name)
 
-    if (config["$type"]) {
-      const result = convert(name, "", config)
+    if (config['$type']) {
+      const result = convert(name, '', config)
       if (result && result.type) {
         return result.type
       } else {
-        //return null
+        // return null
       }
     } else {
       const fields = toGraphQLInputFieldMap(name, config)
       if (_.keys(fields).length === 0) {
-        //return null
+        // return null
       }
       return new graphql.GraphQLInputObjectType({
-        name: name + "Input",
+        name: name + 'Input',
         fields: fields
       })
     }
@@ -120,8 +122,8 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
 
   _.forOwn(fields, (value, key) => {
     if (value['$type'] && (value['hidden'] || value['resolve'])) {
-      //Hidden field, ignore
-      //Have resolve method, ignore
+      // Hidden field, ignore
+      // Have resolve method, ignore
     } else {
       const inputField = convert(name, key, value)
       if (inputField) {

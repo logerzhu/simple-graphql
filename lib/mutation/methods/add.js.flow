@@ -1,23 +1,22 @@
-//@flow
+// @flow
 import _ from 'lodash'
 import * as graphql from 'graphql'
-import * as relay from 'graphql-relay'
 
 import Model from '../../Model'
 import GS from '../../index'
 import StringHelper from '../../utils/StringHelper'
 
-import type {MutationConfig} from "../../Context"
+import type {MutationConfig} from '../../Context'
 
-export default function addMutation(model:Model):MutationConfig {
-  const name = "add" + StringHelper.toInitialUpperCase(model.name)
-  const addedName = "added" + StringHelper.toInitialUpperCase(model.name) + "Edge"
+export default function addMutation (model:Model):MutationConfig {
+  const name = 'add' + StringHelper.toInitialUpperCase(model.name)
+  const addedName = 'added' + StringHelper.toInitialUpperCase(model.name) + 'Edge'
 
   const config = {}
-  _.forOwn(model.config.fields, (value, key)=> {
+  _.forOwn(model.config.fields, (value, key) => {
     if (value instanceof GS.ModelRef || (value && value.$type instanceof GS.ModelRef)) {
-      if (!key.endsWith("Id")) {
-        key = key + "Id"
+      if (!key.endsWith('Id')) {
+        key = key + 'Id'
       }
     }
     if (value && value.$type) {
@@ -45,4 +44,3 @@ export default function addMutation(model:Model):MutationConfig {
     }
   }
 }
-

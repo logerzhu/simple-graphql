@@ -1,4 +1,4 @@
-//@flow
+// @flow
 import _ from 'lodash'
 
 import Sequelize from 'sequelize'
@@ -7,7 +7,7 @@ import Type from '../type'
 import Model from '../Model'
 import ModelRef from '../ModelRef'
 
-export default function toSequelizeModel(sequelize:Sequelize, model:Model):Sequelize.Model {
+export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequelize.Model {
   const dbDefinition = {}
 
   const dbType = (fieldType:any) => {
@@ -28,22 +28,21 @@ export default function toSequelizeModel(sequelize:Sequelize, model:Model):Seque
     }
     return null
   }
-  _.forOwn(model.config.fields, (value, key)=> {
+  _.forOwn(model.config.fields, (value, key) => {
     let fType = value
-    if (value && value["$type"]) {
-      fType = value["$type"]
+    if (value && value['$type']) {
+      fType = value['$type']
     }
     if (fType instanceof ModelRef) {
-      if (value && value["$type"] && value.required) {
-        model.belongsTo({target: fType.name, options: {as: key, foreignKey: key + "Id", constraints: true}})
+      if (value && value['$type'] && value.required) {
+        model.belongsTo({target: fType.name, options: {as: key, foreignKey: key + 'Id', constraints: true}})
       } else {
-        model.belongsTo({target: fType.name, options: {as: key, foreignKey: key + "Id", constraints: false}})
+        model.belongsTo({target: fType.name, options: {as: key, foreignKey: key + 'Id', constraints: false}})
       }
-
     } else {
       const type = dbType(fType)
       if (type) {
-        if (value && value["$type"]) {
+        if (value && value['$type']) {
           dbDefinition[key] = {type: type}
           if (value.required != null) {
             dbDefinition[key].allowNull = !value.required
@@ -62,10 +61,10 @@ export default function toSequelizeModel(sequelize:Sequelize, model:Model):Seque
           dbDefinition[key] = {type: type}
         }
       } else {
-        throw new Error("Unknown column type for ", fType)
+        throw new Error('Unknown column type for ', fType)
       }
     }
   })
-  //console.log("Create Sequlize Model with config", model.name, dbDefinition, model.config.options["table"])
-  return sequelize.define(model.name, dbDefinition, model.config.options["table"])
+  // console.log("Create Sequlize Model with config", model.name, dbDefinition, model.config.options["table"])
+  return sequelize.define(model.name, dbDefinition, model.config.options['table'])
 }

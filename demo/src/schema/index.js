@@ -1,15 +1,14 @@
-//@flow
+// @flow
 import Sequelize from 'sequelize'
 import path from 'path'
 import fs from 'fs'
 import GS from '../../../src'
 
-
-import {dbCfg}  from "../config"
+import {dbCfg} from '../config'
 
 const sequelize = new Sequelize(dbCfg.schema, dbCfg.user, dbCfg.password, dbCfg.options)
 
-function listModels(dir:string):Array<GS.Model> {
+function listModels (dir:string):Array<GS.Model> {
   const models:Array<GS.Model> = []
   const handleFile = (d) => fs.readdirSync(path.resolve(__dirname, d)).map(function (file) {
     const stats = fs.statSync(path.resolve(__dirname, dir, file))
@@ -37,7 +36,7 @@ const schema = GS.build(sequelize, models, {})
 sequelize.sync({
   force: false,
   logging: console.log
-}).then(() => console.log("Init DB Done"), (err) => console.log("Init DB Fail", err))
+}).then(() => console.log('Init DB Done'), (err) => console.log('Init DB Fail', err))
 
 sequelize.showAllSchemas()
 export default schema

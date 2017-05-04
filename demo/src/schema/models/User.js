@@ -1,20 +1,17 @@
-//@flow
+// @flow
 import GS from '../../../../src/index'
 
-const UserDataType = GS.modelRef("UserData")
-const UserType = GS.modelRef("User")
+const UserDataType = GS.modelRef('UserData')
+const UserType = GS.modelRef('User')
 
-type ABC = {loginUser:()=>string}
-//
-
-export default GS.model("User", {
-  description: "用户",
+export default GS.model('User', {
+  description: '用户',
   addMutation: true
 }).fields({
   firstName: String,
   lastName: {
     $type: String,
-    description: "姓"
+    description: '姓'
   },
   data: UserDataType
 }).links({
@@ -31,8 +28,9 @@ export default GS.model("User", {
       b: {
         $type: [{
           c: {
-            $type: Number,
-          }, d: [Boolean]
+            $type: Number
+          },
+          d: [Boolean]
         }]
       }
     },
@@ -47,7 +45,7 @@ export default GS.model("User", {
       ...GS.Connection.args
     },
     resolve: async function (args, context, info, models) {
-      return await GS.Connection.resolve(models['User'], {condition: {firstName: 'peng'}})
+      return GS.Connection.resolve(models['User'], {condition: {}})
     }
   }
 })

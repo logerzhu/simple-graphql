@@ -1,5 +1,4 @@
-//@flow
-import _ from 'lodash'
+// @flow
 import Sequelize from 'sequelize'
 
 const sequelize = new Sequelize('test1', 'postgres', 'Welcome1', {
@@ -19,7 +18,7 @@ var UserData = sequelize.define('UserData', {
   data: {
     type: Sequelize.JSONB
   }
-});
+})
 
 var User = sequelize.define('user', {
   firstName: {
@@ -27,8 +26,8 @@ var User = sequelize.define('user', {
   },
   lastName: {
     type: Sequelize.STRING
-  },
-  //dataId: {
+  }
+  // dataId: {
   //  type: Sequelize.INTEGER,
   //  references: {
   //    // This is a reference to another model
@@ -37,18 +36,16 @@ var User = sequelize.define('user', {
   //    // This is the column name of the referenced model
   //    key: 'id'
   //  }
-  //}
+  // }
 });
 
-
-(async function init() {
-
+(async function init () {
   User.belongsTo(UserData, {as: 'data'})
 
   await sequelize.sync({force: true})
   await UserData.create({
     id: 1,
-    data: ["A", "B"]
+    data: ['A', 'B']
   })
 
   await User.create({
@@ -61,12 +58,12 @@ var User = sequelize.define('user', {
     lastName: 'Hancock'
   })
 
-  console.log(( (await User.findAll({
-      where: {
-        firstName: 'John'
-      },
-      include: [{model: UserData,as: 'data'}]
-    }))[0]).data
+  console.log(((await User.findAll({
+    where: {
+      firstName: 'John'
+    },
+    include: [{model: UserData, as: 'data'}]
+  }))[0]).data
   )
 })().then(() => {
 })

@@ -1,7 +1,6 @@
-//@flow
+// @flow
 import Sequelize from 'sequelize'
-import * as graphql from "graphql"
-import  type {GraphQLInputType,GraphQLOutputType} from "graphql"
+import type {GraphQLInputType, GraphQLOutputType} from 'graphql'
 
 export type ScalarFieldTypeConfig ={
   name:string,
@@ -21,7 +20,7 @@ export default class ScalarFieldType {
 
   columnType:string | Sequelize.DataType
 
-  constructor(config:ScalarFieldTypeConfig) {
+  constructor (config:ScalarFieldTypeConfig) {
     this.name = config.name
     this.description = config.description
     this.graphQLInputType = config.graphQLInputType

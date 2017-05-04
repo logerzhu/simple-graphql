@@ -1,4 +1,4 @@
-//@flow
+// @flow
 export const dbCfg = {
   schema: 'test1',
   user: 'postgres',

@@ -1,14 +1,12 @@
-//@flow
+// @flow
 import Sequelize from 'sequelize'
-import GS from "./index"
-import Context from "./Context"
-
+import GS from './index'
 
 export default{
   ConnectionType: class {
     nodeType:GS.ModelRef
 
-    constructor(nodeType:GS.ModelRef) {
+    constructor (nodeType:GS.ModelRef) {
       this.nodeType = nodeType
     }
   },
@@ -16,30 +14,30 @@ export default{
   EdgeType: class {
     nodeType:GS.ModelRef
 
-    constructor(nodeType:GS.ModelRef) {
+    constructor (nodeType:GS.ModelRef) {
       this.nodeType = nodeType
     }
   },
 
-  connectionType(nodeType:GS.ModelRef){
+  connectionType (nodeType:GS.ModelRef) {
     return new this.ConnectionType(nodeType)
   },
 
-  edgeType(nodeType:GS.ModelRef){
+  edgeType (nodeType:GS.ModelRef) {
     return new this.EdgeType(nodeType)
   },
 
   args: {
     after: {
       $type: String,
-      doc: "返回的记录应该在cursor:after之后"
+      doc: '返回的记录应该在cursor:after之后'
     },
     first: {
       $type: Number,
-      doc: "指定最多返回记录的数量"
+      doc: '指定最多返回记录的数量'
     },
     before: {
-      $type: String,
+      $type: String
     },
     last: {
       $type: Number
@@ -54,10 +52,10 @@ export default{
     condition?:any,
     sort?: Array<{field: string, order: "ASC"|"DESC"}>
   }) {
-    let { after, first = 100,before,last, condition = {}, sort= [{field: "id", order: "ASC"}]} = args
+    let {after, first = 100, before, last, condition = {}, sort = [{field: 'id', order: 'ASC'}]} = args
     let reverse = false
 
-    const count = await  model.count({
+    const count = await model.count({
       $where: condition
     })
 
@@ -68,12 +66,11 @@ export default{
       sort = sort.map(s => {
         return {
           field: s.field,
-          order: ( s.order == "ASC" ? "DESC" : "ASC")
+          order: (s.order === 'ASC' ? 'DESC' : 'ASC')
         }
       })
     }
     const offset = Math.max(after != null ? parseInt(after) : 0, 0)
-
 
     const result = await model.findAll({
       where: condition,

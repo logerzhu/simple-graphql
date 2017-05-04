@@ -1,4 +1,4 @@
-//@flow
+// @flow
 import Sequelize from 'sequelize'
 import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
@@ -6,12 +6,12 @@ import _ from 'lodash'
 
 import type {GraphQLOutputType} from 'graphql'
 
-import Query from  './query'
+import Query from './query'
 import Mutation from './mutation'
-import Model from  './Model'
+import Model from './Model'
 import ModelRef from './ModelRef'
-import StringHelper from "./utils/StringHelper"
-import Transformer from "./transformer"
+import StringHelper from './utils/StringHelper'
+import Transformer from './transformer'
 
 import type {BaseLinkedFieldType, ArgsType} from './Model'
 
@@ -49,7 +49,6 @@ export type LinkedFieldConfig ={
             models:{[id:string]:Sequelize.Model}) => any
 }
 
-
 export default class Context {
   sequelize:Sequelize
 
@@ -67,9 +66,9 @@ export default class Context {
 
   mutations:{[id:string]:MutationConfig}
 
-  connectionDefinitions:{[id:string]:{connectionType:graphql.GraphQLObjectType,edgeType:graphql.GraphQLObjectType}}
+  connectionDefinitions:{[id:string]:{connectionType:graphql.GraphQLObjectType, edgeType:graphql.GraphQLObjectType}}
 
-  constructor(sequelize:Sequelize) {
+  constructor (sequelize:Sequelize) {
     this.sequelize = sequelize
     this.options = {
       hooks: []
@@ -89,15 +88,15 @@ export default class Context {
     }).nodeInterface
   }
 
-  addModel(model:Model) {
+  addModel (model:Model) {
     if (this.models[model.name]) {
-      throw new Error("Model " + model.name + " already define.")
+      throw new Error('Model ' + model.name + ' already define.')
     }
     this.models[model.name] = model
 
-    _.forOwn(model.config.queries, (value, key)=> {
-      if (!value["name"]) {
-        value["name"] = key
+    _.forOwn(model.config.queries, (value, key) => {
+      if (!value['name']) {
+        value['name'] = key
       }
       this.addQuery(value)
     })
@@ -108,9 +107,9 @@ export default class Context {
       this.addQuery(Query.pluralQuery(model))
     }
 
-    _.forOwn(model.config.mutations, (value, key)=> {
-      if (!value["name"]) {
-        value["name"] = key
+    _.forOwn(model.config.mutations, (value, key) => {
+      if (!value['name']) {
+        value['name'] = key
       }
       this.addMutation(value)
     })
@@ -126,24 +125,24 @@ export default class Context {
     this.dbModel(model.name)
   }
 
-  addQuery(config:QueryConfig) {
+  addQuery (config:QueryConfig) {
     if (this.queries[config.name]) {
-      throw new Error("Query " + config.name + " already define.")
+      throw new Error('Query ' + config.name + ' already define.')
     }
     this.queries[config.name] = config
   }
 
-  addMutation(config:MutationConfig) {
+  addMutation (config:MutationConfig) {
     if (this.mutations[config.name]) {
-      throw new Error("Mutation " + config.name + " already define.")
+      throw new Error('Mutation ' + config.name + ' already define.')
     }
     this.mutations[config.name] = config
   }
 
-  graphQLObjectType(name:string):GraphQLOutputType {
+  graphQLObjectType (name:string):GraphQLOutputType {
     const model = this.models[name]
     if (!model) {
-      throw new Error("Model " + name + " not define.")
+      throw new Error('Model ' + name + ' not define.')
     }
     const typeName = model.name
 
@@ -158,7 +157,7 @@ export default class Context {
           }
         }
       })
-      this.graphQLObjectTypes[typeName] = Transformer.toGraphQLFieldConfig(typeName, "", obj, this, interfaces).type
+      this.graphQLObjectTypes[typeName] = Transformer.toGraphQLFieldConfig(typeName, '', obj, this, interfaces).type
       if (this.graphQLObjectTypes[typeName] instanceof graphql.GraphQLObjectType) {
         this.graphQLObjectTypes[typeName].description = model.config.options.description
       }
@@ -166,10 +165,10 @@ export default class Context {
     return this.graphQLObjectTypes[typeName]
   }
 
-  dbModel(name:string):Sequelize.Model {
+  dbModel (name:string):Sequelize.Model {
     const model = this.models[name]
     if (!model) {
-      throw new Error("Model " + name + " not define.")
+      throw new Error('Model ' + name + ' not define.')
     }
     const typeName = model.name
 
@@ -179,7 +178,7 @@ export default class Context {
     return this.dbModels[typeName]
   }
 
-  wrapQueryResolve(config:QueryConfig):any {
+  wrapQueryResolve (config:QueryConfig):any {
     const self = this
 
     const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
@@ -187,7 +186,7 @@ export default class Context {
     const invoker = (schema, context, rootValue, requestString, variableValues) => {
       return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
     }
-    let hookFun = ((action, invokeInfo, next) => next())
+    let hookFun = (action, invokeInfo, next) => next()
     this.options.hooks.reverse().forEach(hook => {
       if (!hook.filter || hook.filter({type: 'query', config})) {
         const preHook = hookFun
@@ -196,22 +195,22 @@ export default class Context {
     })
 
     return (source, args, context, info) => hookFun({
-        type: "query",
-        config: config
-      }, {
-        source: source,
-        args: args,
-        context: context,
-        info: info,
-        models: dbModels()
-      },
+      type: 'query',
+      config: config
+    }, {
+      source: source,
+      args: args,
+      context: context,
+      info: info,
+      models: dbModels()
+    },
       () => {
         return config.resolve(args, context, info, dbModels(), invoker.bind(null, info.schema, context, info.rootValue))
       }
     )
   }
 
-  wrapFieldResolve(config:LinkedFieldConfig):any {
+  wrapFieldResolve (config:LinkedFieldConfig):any {
     const self = this
 
     const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
@@ -219,7 +218,7 @@ export default class Context {
     const invoker = (schema, context, rootValue, requestString, variableValues) => {
       return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
     }
-    let hookFun = ((action, invokeInfo, next) => next())
+    let hookFun = (action, invokeInfo, next) => next()
     this.options.hooks.reverse().forEach(hook => {
       if (!hook.filter || hook.filter({type: 'field', config})) {
         const preHook = hookFun
@@ -227,22 +226,21 @@ export default class Context {
       }
     })
 
-
     return (source, args, context, info) => hookFun({
-        type: "field",
-        config: config
-      }, {
-        source: source,
-        args: args,
-        context: context,
-        info: info,
-        models: dbModels()
-      },
+      type: 'field',
+      config: config
+    }, {
+      source: source,
+      args: args,
+      context: context,
+      info: info,
+      models: dbModels()
+    },
       () => config.resolve(source, args, context, info, dbModels(), invoker.bind(null, info.schema, context, info.rootValue))
     )
   }
 
-  wrapMutateAndGetPayload(config:MutationConfig):any {
+  wrapMutateAndGetPayload (config:MutationConfig):any {
     const self = this
 
     const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
@@ -250,7 +248,7 @@ export default class Context {
     const invoker = (schema, context, rootValue, requestString, variableValues) => {
       return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
     }
-    let hookFun = ((action, invokeInfo, next) => next())
+    let hookFun = (action, invokeInfo, next) => next()
     this.options.hooks.reverse().forEach(hook => {
       if (!hook.filter || hook.filter({type: 'mutation', config})) {
         const preHook = hookFun
@@ -258,22 +256,20 @@ export default class Context {
       }
     })
 
-    return async function (args, context, info) {
-      return await hookFun({
-          type: "mutation",
-          config: config
-        }, {
-          args: args,
-          context: context,
-          info: info,
-          models: dbModels()
-        },
-        () => config.mutateAndGetPayload(args, context, info, dbModels(), invoker.bind(null, info.schema, context, info.rootValue))
-      )
-    }
+    return (args, context, info) => hookFun({
+      type: 'mutation',
+      config: config
+    }, {
+      args: args,
+      context: context,
+      info: info,
+      models: dbModels()
+    },
+      () => config.mutateAndGetPayload(args, context, info, dbModels(), invoker.bind(null, info.schema, context, info.rootValue))
+    )
   }
 
-  connectionDefinition(ref:ModelRef):{connectionType:graphql.GraphQLObjectType,edgeType:graphql.GraphQLObjectType} {
+  connectionDefinition (ref:ModelRef):{connectionType:graphql.GraphQLObjectType, edgeType:graphql.GraphQLObjectType} {
     if (!this.connectionDefinitions[ref.name]) {
       this.connectionDefinitions[ref.name] = relay.connectionDefinitions({
         name: StringHelper.toInitialUpperCase(ref.name),
@@ -288,30 +284,29 @@ export default class Context {
     return this.connectionDefinitions[ref.name]
   }
 
-  connectionType(ref:ModelRef):graphql.GraphQLObjectType {
+  connectionType (ref:ModelRef):graphql.GraphQLObjectType {
     return this.connectionDefinition(ref).connectionType
   }
 
-  edgeType(ref:ModelRef):graphql.GraphQLObjectType {
+  edgeType (ref:ModelRef):graphql.GraphQLObjectType {
     return this.connectionDefinition(ref).edgeType
   }
 
-  buildModelAssociations():void {
+  buildModelAssociations ():void {
     const self = this
-    _.forOwn(self.models, (model, key)=> {
-      model.config.associations.hasOne.forEach((config => {
+    _.forOwn(self.models, (model, key) => {
+      model.config.associations.hasOne.forEach(config => {
         self.dbModel(model.name).hasOne(self.dbModel(config.target), config.options)
-      }))
-      model.config.associations.belongsTo.forEach((config => {
+      })
+      model.config.associations.belongsTo.forEach(config => {
         self.dbModel(model.name).belongsTo(self.dbModel(config.target), config.options)
-      }))
-      model.config.associations.hasMany.forEach((config => {
+      })
+      model.config.associations.hasMany.forEach(config => {
         self.dbModel(model.name).hasMany(self.dbModel(config.target), config.options)
-      }))
-      model.config.associations.belongsToMany.forEach((config => {
+      })
+      model.config.associations.belongsToMany.forEach(config => {
         self.dbModel(model.name).belongsToMany(self.dbModel(config.target), config.options)
-      }))
+      })
     })
   }
-
 }
