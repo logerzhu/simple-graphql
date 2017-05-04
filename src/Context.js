@@ -174,6 +174,8 @@ export default class Context {
 
     if (!this.dbModels[typeName]) {
       this.dbModels[typeName] = Transformer.toSequelizeModel(this.sequelize, model)
+      Object.assign(this.dbModels[typeName], model.config.statics)
+      Object.assign(this.dbModels[typeName].Instance.prototype, model.config.methods)
     }
     return this.dbModels[typeName]
   }

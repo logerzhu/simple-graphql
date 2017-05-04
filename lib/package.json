@@ -1,6 +1,6 @@
 {
   "name": "simple-graphql",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "The simple way to build GraphQL style API with MySQL/PostreSQL",
   "main": "lib/index.js",
   "scripts": {
