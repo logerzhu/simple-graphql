@@ -41,6 +41,16 @@ export type QueryConfig ={
             models:{[id:string]:Sequelize.Model}) => any
 }
 
+export type MutationConfig ={
+  description?:string,
+  inputFields:ArgsType,
+  outputFields:{[string]:BaseLinkedFieldType},
+  mutateAndGetPayload:(args:{[argName: string]: any},
+                       context:any,
+                       info:graphql.GraphQLResolveInfo,
+                       models:{[id:string]:Sequelize.Model}) => any
+}
+
 type ValidateConfig = {
   is?: [string, string] | RegExp,
   not?: [string, string],
@@ -263,7 +273,7 @@ export default class Model {
     associations:AssociationConfig,
     options:ModelOption,
     queries:{[id:string]: QueryConfig},
-    mutations:{[id:string]: any},
+    mutations:{[id:string]: MutationConfig},
     methods:{[id:string]: any},
     statics:{[id:string]: any}
   }
@@ -302,7 +312,7 @@ export default class Model {
     return this
   }
 
-  mutations (mutations:{[id:string]:any}):Model {
+  mutations (mutations:{[id:string]:MutationConfig}):Model {
     this.config.mutations = Object.assign(this.config.mutations, mutations)
     return this
   }
