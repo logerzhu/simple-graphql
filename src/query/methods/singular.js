@@ -3,7 +3,7 @@ import * as _ from 'lodash'
 import * as graphql from 'graphql'
 
 import Model from '../../Model'
-import GS from '../../index'
+import SG from '../../index'
 import StringHelper from '../../utils/StringHelper'
 
 import type {QueryConfig} from '../../Context'
@@ -12,7 +12,7 @@ export default function singularQuery (model:Model):QueryConfig {
   const name = StringHelper.toInitialLowerCase(model.name)
   const searchFields = {
     id: {
-      $type: GS.modelRef(model.name),
+      $type: SG.modelRef(model.name),
       doc: 'Id of Model ' + model.name
     }
   }
@@ -26,7 +26,7 @@ export default function singularQuery (model:Model):QueryConfig {
 
   return {
     name: name,
-    $type: GS.modelRef(model.name),
+    $type: SG.modelRef(model.name),
     args: searchFields,
     resolve: async function (args:{[argName: string]: any}, context:any, info:graphql.GraphQLResolveInfo, models) {
       return models[model.name].findOne({

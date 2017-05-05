@@ -124,7 +124,9 @@ type FieldTypeConfig = {
   validate?: ValidateConfig,
   column?:ColumnConfig
 }
-
+/**
+ *
+ */
 type FieldType = BaseFieldType | FieldTypeConfig
 
 type ModelOption = {
@@ -264,6 +266,9 @@ type AssociationConfig ={
   belongsToMany:Array<BelongsToManyConfig>,
 }
 
+/**
+ * dd
+ */
 export default class Model {
   name:string
 
@@ -297,6 +302,11 @@ export default class Model {
     }
   }
 
+  /**
+   *
+   * @param fields
+   * @returns {Model}
+   */
   fields (fields:{[id:string]: FieldType}):Model {
     this.config.fields = Object.assign(this.config.fields, fields)
     return this

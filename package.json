@@ -59,7 +59,8 @@
     "parser": "babel-eslint",
     "ignore": [
       "/lib/",
-      "/flow-typed/"
+      "/flow-typed/",
+      "/docs/"
     ]
   },
   "pre-commit": [

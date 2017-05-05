@@ -3,7 +3,7 @@ import _ from 'lodash'
 import * as graphql from 'graphql'
 
 import Model from '../../Model'
-import GS from '../../index'
+import SG from '../../index'
 import StringHelper from '../../utils/StringHelper'
 
 import type {MutationConfig} from '../../Context'
@@ -14,7 +14,7 @@ export default function addMutation (model:Model):MutationConfig {
 
   const config = {}
   _.forOwn(model.config.fields, (value, key) => {
-    if (value instanceof GS.ModelRef || (value && value.$type instanceof GS.ModelRef)) {
+    if (value instanceof SG.ModelRef || (value && value.$type instanceof SG.ModelRef)) {
       if (!key.endsWith('Id')) {
         key = key + 'Id'
       }
@@ -31,7 +31,7 @@ export default function addMutation (model:Model):MutationConfig {
     name: name,
     inputFields: config,
     outputFields: {
-      [addedName]: GS.Connection.edgeType(GS.modelRef(model.name))
+      [addedName]: SG.Connection.edgeType(SG.modelRef(model.name))
     },
     mutateAndGetPayload: async function (args:any, context:any, info:graphql.GraphQLResolveInfo, models) {
       const instance = await models[model.name].create(args)
