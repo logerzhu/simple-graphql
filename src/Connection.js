@@ -2,35 +2,49 @@
 import Sequelize from 'sequelize'
 import ModelRef from './ModelRef'
 
+export class ConnectionType {
+  nodeType:ModelRef
+
+  constructor (nodeType:ModelRef) {
+    this.nodeType = nodeType
+  }
+}
+
+export class EdgeType {
+  nodeType:ModelRef
+
+  constructor (nodeType:ModelRef) {
+    this.nodeType = nodeType
+  }
+}
+
 /**
- *dd
+ * Relay Connection Helper
  */
 export default{
-  ConnectionType: class {
-    nodeType:ModelRef
 
-    constructor (nodeType:ModelRef) {
-      this.nodeType = nodeType
-    }
-  },
+  ConnectionType: ConnectionType,
 
-  EdgeType: class {
-    nodeType:ModelRef
+  EdgeType: EdgeType,
 
-    constructor (nodeType:ModelRef) {
-      this.nodeType = nodeType
-    }
-  },
-
-  connectionType (nodeType:ModelRef) {
+  /**
+   * Reference to relay ConnectionType with specify node
+   */
+  connectionType (nodeType:ModelRef): ConnectionType {
     return new this.ConnectionType(nodeType)
   },
 
-  edgeType (nodeType:ModelRef) {
+  /**
+   * Reference to Relay EdgeType with specify node
+   */
+  edgeType (nodeType:ModelRef): EdgeType {
     return new this.EdgeType(nodeType)
   },
 
-  args: {
+  /**
+   * Return Relay Connection args definition.
+   */
+  args: ({
     after: {
       $type: String,
       description: '返回的记录应该在cursor:after之后'
@@ -45,8 +59,11 @@ export default{
     last: {
       $type: Number
     }
-  },
+  }),
 
+  /**
+   * Query the model with specify args and return the connection data
+   */
   resolve: async function (model:Sequelize.Model, args:{
     after?: string,
     first?: number,
@@ -54,7 +71,17 @@ export default{
     last?: number,
     condition?:any,
     sort?: Array<{field: string, order: "ASC"|"DESC"}>
-  }) {
+  }):Promise<{
+    pageInfo: {
+      hasPreviousPage: boolean,
+      hasNextPage: boolean
+    },
+    edges:Array<{
+      node:any,
+      cursor:string|number
+    }>,
+    count: number
+  } > {
     let {after, first = 100, before, last, condition = {}, sort = [{field: 'id', order: 'ASC'}]} = args
     let reverse = false
 

@@ -59,7 +59,7 @@ const toGraphQLFieldConfig = function (name:string,
         name: name.split('.').slice(-1)[0],
         path: name,
         $type: context.graphQLObjectType(fieldType.name),
-        resolve: async function (root, args, info, models) {
+        resolve: async function (root, args, context, info, models) {
           const fieldName = name.split('.').slice(-1)[0]
           // 判断是否只有model Id, 如果只有model Id, 通过ID 查找相关的model
           if (root && _.isFunction(root['get' + StringHelper.toInitialUpperCase(fieldName)])) {
