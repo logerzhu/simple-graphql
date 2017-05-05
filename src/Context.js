@@ -13,11 +13,11 @@ import ModelRef from './ModelRef'
 import StringHelper from './utils/StringHelper'
 import Transformer from './transformer'
 
-import type {BaseLinkedFieldType, ArgsType} from './Definition'
+import type {LinkedFieldType, ArgsType} from './Definition'
 
 export type QueryConfig ={
   name:string,
-  $type:BaseLinkedFieldType,
+  $type:LinkedFieldType,
   description?:string,
   args?:ArgsType,
   resolve: (args:{[argName: string]: any},
@@ -30,7 +30,7 @@ export type MutationConfig ={
   name:string,
   description?:string,
   inputFields:ArgsType,
-  outputFields:{[string]:BaseLinkedFieldType},
+  outputFields:{[string]:LinkedFieldType},
   mutateAndGetPayload:(args:{[argName: string]: any},
                        context:any,
                        info:graphql.GraphQLResolveInfo,
@@ -202,7 +202,7 @@ export default class Context {
 
   wrapFieldResolve (config:{
     name:string,
-    $type:BaseLinkedFieldType,
+    $type:LinkedFieldType,
     description?:string,
     args?:ArgsType,
     resolve: (source:any,

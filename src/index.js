@@ -14,6 +14,8 @@ import Connection from './Connection'
 import ModelRef from './ModelRef'
 import Transformer from './transformer'
 
+import type {ModelOptionConfig} from './Definition'
+
 /**
  */
 export default {
@@ -46,7 +48,7 @@ export default {
    * @param name
    * @param options
    */
-  model: (name:string, options:{[id:string]: any} = {}):Model => new Model(name, options),
+  model: (name:string, options:ModelOptionConfig = {}):Model => new Model(name, options),
 
   /**
    * @public

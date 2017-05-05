@@ -1,6 +1,6 @@
 {
   "name": "simple-graphql",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "The simple way to build GraphQL style API with MySQL/PostreSQL",
   "main": "lib/index.js",
   "scripts": {
@@ -9,7 +9,8 @@
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "build": "rm -rf lib && babel src --optional runtime --out-dir lib/ && cp package.json lib/ && npm run build-dot-flow",
     "build-dot-flow": "find ./src -name '*.js' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/lib\\//g'`.flow; done",
-    "buildAndPublish": "npm run flow && npm run format && npm run build && npm publish"
+    "buildAndPublish": "npm run flow && npm run format && npm run build && npm publish",
+    "doc": "documentation build  -g -f html -o docs src/index.js src/Definition.js"
   },
   "author": "logerzhu",
   "repository": {
