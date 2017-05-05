@@ -15,14 +15,27 @@ import ModelRef from './ModelRef'
 import Transformer from './transformer'
 
 /**
- * @public
- * 入口
- * TODO
  */
 export default {
 
-  ScalarFieldTypes: Type.ScalarFieldTypes,
+  /** Available values:
+   * <table style='text-align: left'>
+   *   <tr><th>Name</th><th>GraphQL Type</th><th>DB Type</th></tr>
+   *   <tr><td>Id</td><td>GraphQLID</td><td>Sequelize.INTEGER</td></tr>
+   *   <tr><td>String</td><td>GraphQLString</td><td>Sequelize.STRING</td></tr>
+   *   <tr><td>Float</td><td>GraphQLFloat</td><td>Sequelize.DOUBLE</td></tr>
+   *   <tr><td>Int</td><td>GraphQLInt</td><td>Sequelize.INTEGER</td></tr>
+   *   <tr><td>Boolean</td><td>GraphQLBoolean</td><td>Sequelize.BOOLEAN</td></tr>
+   *   <tr><td>Date</td><td>GraphQLScalarTypes.Date</td><td>Sequelize.DATE</td></tr>
+   *   <tr><td>JSON</td><td>GraphQLScalarTypes.Json</td><td>Sequelize.JSONB</td></tr>
+   * </table>
+   *
+   */
+  ScalarFieldTypes: (Type.ScalarFieldTypes:{
+    Id:Type.ScalarFieldType
+  }),
 
+  /**/
   Connection: Connection,
 
   Model: Model,
