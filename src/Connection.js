@@ -1,31 +1,32 @@
 // @flow
 import Sequelize from 'sequelize'
-import SG from './index'
+import ModelRef from './ModelRef'
+
 /**
  *dd
  */
 export default{
   ConnectionType: class {
-    nodeType:SG.ModelRef
+    nodeType:ModelRef
 
-    constructor (nodeType:SG.ModelRef) {
+    constructor (nodeType:ModelRef) {
       this.nodeType = nodeType
     }
   },
 
   EdgeType: class {
-    nodeType:SG.ModelRef
+    nodeType:ModelRef
 
-    constructor (nodeType:SG.ModelRef) {
+    constructor (nodeType:ModelRef) {
       this.nodeType = nodeType
     }
   },
 
-  connectionType (nodeType:SG.ModelRef) {
+  connectionType (nodeType:ModelRef) {
     return new this.ConnectionType(nodeType)
   },
 
-  edgeType (nodeType:SG.ModelRef) {
+  edgeType (nodeType:ModelRef) {
     return new this.EdgeType(nodeType)
   },
 

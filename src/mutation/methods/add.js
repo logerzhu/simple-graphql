@@ -3,6 +3,7 @@ import _ from 'lodash'
 import * as graphql from 'graphql'
 
 import Model from '../../Model'
+import ModelRef from '../../ModelRef'
 import SG from '../../index'
 import StringHelper from '../../utils/StringHelper'
 
@@ -14,7 +15,7 @@ export default function addMutation (model:Model):MutationConfig {
 
   const config = {}
   _.forOwn(model.config.fields, (value, key) => {
-    if (value instanceof SG.ModelRef || (value && value.$type instanceof SG.ModelRef)) {
+    if (value instanceof ModelRef || (value && value.$type instanceof ModelRef)) {
       if (!key.endsWith('Id')) {
         key = key + 'Id'
       }

@@ -4,6 +4,7 @@ import * as graphql from 'graphql'
 
 import Model from '../../Model'
 import SG from '../../index'
+import ModelRef from '../../ModelRef'
 import StringHelper from '../../utils/StringHelper'
 
 import type {MutationConfig} from '../../Context'
@@ -20,7 +21,7 @@ export default function updateMutation (model:Model):MutationConfig {
     values: {}
   }
   _.forOwn(model.config.fields, (value, key) => {
-    if (value instanceof SG.ModelRef || (value && value.$type instanceof SG.ModelRef)) {
+    if (value instanceof ModelRef || (value && value.$type instanceof ModelRef)) {
       if (!key.endsWith('Id')) {
         key = key + 'Id'
       }

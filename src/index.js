@@ -19,16 +19,12 @@ import Transformer from './transformer'
  * TODO
  */
 const SimpleGraphQL = {
+
   ScalarFieldTypes: Type.ScalarFieldTypes,
 
   Connection: Connection,
 
-  /**
-   *
-   */
   Model: Model,
-
-  ModelRef: ModelRef,
 
   model: (name:string, options:{[id:string]: any} = {}):Model => new Model(name, options),
 
