@@ -11,6 +11,9 @@ export const dbCfg = {
       max: 5,
       min: 0,
       idle: 10000
+    },
+    define: {
+      underscoredAll: true
     }
   }
 }

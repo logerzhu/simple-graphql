@@ -18,7 +18,7 @@ import Transformer from './transformer'
  * 入口
  * TODO
  */
-const SimpleGraphQL = {
+export default {
 
   ScalarFieldTypes: Type.ScalarFieldTypes,
 
@@ -26,11 +26,23 @@ const SimpleGraphQL = {
 
   Model: Model,
 
+  /**
+   * Define a Model
+   * @param name
+   * @param options
+   */
   model: (name:string, options:{[id:string]: any} = {}):Model => new Model(name, options),
 
+  /**
+   * Create a model reference, which can be using on the field type definition.
+   * @param name
+   */
   modelRef: (name:string):ModelRef => new ModelRef(name),
 
-  build: (sequelize:Sequelize, models:Array<Model>, options:any):any => {
+  /**
+   * Build the GraphQL Schema
+   */
+  build: (sequelize:Sequelize, models:Array<Model>, options:any):graphql.GraphQLSchema => {
     const context = new Context(sequelize)
 
     // 添加Model
@@ -143,5 +155,3 @@ const SimpleGraphQL = {
     })
   }
 }
-
-export default SimpleGraphQL

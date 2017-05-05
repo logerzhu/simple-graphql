@@ -4,7 +4,7 @@ import * as graphql from 'graphql'
 
 import Model from '../../Model'
 import Type from '../../type'
-import GS from '../../index'
+import SG from '../../index'
 import StringHelper from '../../utils/StringHelper'
 
 import type {QueryConfig} from '../../Context'
@@ -158,7 +158,7 @@ export default function pluralQuery (model:Model):QueryConfig {
   // 生产
   return {
     name: name,
-    $type: GS.Connection.connectionType(GS.modelRef(model.name)),
+    $type: SG.Connection.connectionType(SG.modelRef(model.name)),
     args: {
       condition: {
         $type: _.mapValues(searchFields, (value) => {
@@ -178,13 +178,13 @@ export default function pluralQuery (model:Model):QueryConfig {
           }
           return type
         }),
-        doc: 'Query Condition'
+        description: 'Query Condition'
       },
       sort: {
         $type: [{field: String, order: SortEnumType}],
-        doc: 'Define the sort field'
+        description: 'Define the sort field'
       },
-      ...GS.Connection.args
+      ...SG.Connection.args
     },
     resolve: async function (args:{[argName: string]: any},
                              context:any,
@@ -198,7 +198,7 @@ export default function pluralQuery (model:Model):QueryConfig {
         }
       })
 
-      return GS.Connection.resolve(models[model.name], args)
+      return SG.Connection.resolve(models[model.name], args)
     }
   }
 }

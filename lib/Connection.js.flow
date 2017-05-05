@@ -1,40 +1,43 @@
 // @flow
 import Sequelize from 'sequelize'
-import GS from './index'
+import ModelRef from './ModelRef'
 
+/**
+ *dd
+ */
 export default{
   ConnectionType: class {
-    nodeType:GS.ModelRef
+    nodeType:ModelRef
 
-    constructor (nodeType:GS.ModelRef) {
+    constructor (nodeType:ModelRef) {
       this.nodeType = nodeType
     }
   },
 
   EdgeType: class {
-    nodeType:GS.ModelRef
+    nodeType:ModelRef
 
-    constructor (nodeType:GS.ModelRef) {
+    constructor (nodeType:ModelRef) {
       this.nodeType = nodeType
     }
   },
 
-  connectionType (nodeType:GS.ModelRef) {
+  connectionType (nodeType:ModelRef) {
     return new this.ConnectionType(nodeType)
   },
 
-  edgeType (nodeType:GS.ModelRef) {
+  edgeType (nodeType:ModelRef) {
     return new this.EdgeType(nodeType)
   },
 
   args: {
     after: {
       $type: String,
-      doc: '返回的记录应该在cursor:after之后'
+      description: '返回的记录应该在cursor:after之后'
     },
     first: {
       $type: Number,
-      doc: '指定最多返回记录的数量'
+      description: '指定最多返回记录的数量'
     },
     before: {
       $type: String

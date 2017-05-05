@@ -13,7 +13,7 @@ import ModelRef from './ModelRef'
 import StringHelper from './utils/StringHelper'
 import Transformer from './transformer'
 
-import type {BaseLinkedFieldType, ArgsType} from './Model'
+import type {BaseLinkedFieldType, ArgsType} from './Definition'
 
 export type QueryConfig ={
   name:string,
@@ -35,18 +35,6 @@ export type MutationConfig ={
                        context:any,
                        info:graphql.GraphQLResolveInfo,
                        models:{[id:string]:Sequelize.Model}) => any
-}
-
-export type LinkedFieldConfig ={
-  name:string,
-  $type:BaseLinkedFieldType,
-  description?:string,
-  args?:ArgsType,
-  resolve: (source:any,
-            args:{[argName: string]: any},
-            context:any,
-            info:graphql.GraphQLResolveInfo,
-            models:{[id:string]:Sequelize.Model}) => any
 }
 
 export default class Context {
@@ -175,7 +163,6 @@ export default class Context {
     if (!this.dbModels[typeName]) {
       this.dbModels[typeName] = Transformer.toSequelizeModel(this.sequelize, model)
       Object.assign(this.dbModels[typeName], model.config.statics)
-      console.log(this.dbModels[typeName])
       Object.assign(this.dbModels[typeName].Instance.prototype, model.config.methods)
     }
     return this.dbModels[typeName]
@@ -213,7 +200,17 @@ export default class Context {
     )
   }
 
-  wrapFieldResolve (config:LinkedFieldConfig):any {
+  wrapFieldResolve (config:{
+    name:string,
+    $type:BaseLinkedFieldType,
+    description?:string,
+    args?:ArgsType,
+    resolve: (source:any,
+              args:{[argName: string]: any},
+              context:any,
+              info:graphql.GraphQLResolveInfo,
+              models:{[id:string]:Sequelize.Model}) => any
+  }):any {
     const self = this
 
     const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))

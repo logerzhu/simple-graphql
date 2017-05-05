@@ -34,10 +34,14 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
       fType = value['$type']
     }
     if (fType instanceof ModelRef) {
+      let foreignKey = key + 'Id'
+      if (sequelize.options.define.underscoredAll) {
+        foreignKey = foreignKey.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
+      }
       if (value && value['$type'] && value.required) {
-        model.belongsTo({target: fType.name, options: {as: key, foreignKey: key + 'Id', constraints: true}})
+        model.belongsTo({target: fType.name, options: {as: key, foreignKey: foreignKey, constraints: true}})
       } else {
-        model.belongsTo({target: fType.name, options: {as: key, foreignKey: key + 'Id', constraints: false}})
+        model.belongsTo({target: fType.name, options: {as: key, foreignKey: foreignKey, constraints: false}})
       }
     } else {
       const type = dbType(fType)
@@ -59,6 +63,9 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
           dbDefinition[key] = {...dbDefinition[key], ...value.column}
         } else {
           dbDefinition[key] = {type: type}
+        }
+        if (sequelize.options.define.underscoredAll && dbDefinition[key].field == null) {
+          dbDefinition[key].field = key.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
         }
       } else {
         throw new Error('Unknown column type for ', fType)

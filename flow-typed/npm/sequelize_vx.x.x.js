@@ -25,6 +25,8 @@ declare class Sequelize {
   static BLOB:DataType & (string) => DataType;
   static UUID:DataType;
 
+  options:any;
+
   constructor:(string,?string,?string,?{
     dialect:'mysql' | 'postgres' | 'sqlite' | 'mssql',
     dialectModulePath?:string,
