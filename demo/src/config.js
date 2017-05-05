@@ -13,6 +13,7 @@ export const dbCfg = {
       idle: 10000
     },
     define: {
+      underscored: true,
       underscoredAll: true
     }
   }
