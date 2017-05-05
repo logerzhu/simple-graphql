@@ -28,12 +28,14 @@ export default {
 
   /**
    * Define a Model
+   * @access public
    * @param name
    * @param options
    */
   model: (name:string, options:{[id:string]: any} = {}):Model => new Model(name, options),
 
   /**
+   * @public
    * Create a model reference, which can be using on the field type definition.
    * @param name
    */

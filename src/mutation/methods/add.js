@@ -35,7 +35,27 @@ export default function addMutation (model:Model):MutationConfig {
       [addedName]: SG.Connection.edgeType(SG.modelRef(model.name))
     },
     mutateAndGetPayload: async function (args:any, context:any, info:graphql.GraphQLResolveInfo, models) {
-      const instance = await models[model.name].create(args)
+      const dbModel = models[model.name]
+      const attrs = {}
+
+      _.forOwn(model.config.fields, (value, key) => {
+        if (value instanceof ModelRef || (value && value.$type instanceof ModelRef)) {
+          if (!key.endsWith('Id')) {
+            key = key + 'Id'
+          }
+          if (typeof args[key] !== 'undefined') {
+            if (dbModel.options.underscored) {
+              attrs[key.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()] = args[key]
+            } else {
+              attrs[key] = args[key]
+            }
+          }
+        } else if (typeof args[key] !== 'undefined') {
+          attrs[key] = args[key]
+        }
+      })
+
+      const instance = await dbModel.create(attrs)
       return {
         [addedName]: {
           node: instance,

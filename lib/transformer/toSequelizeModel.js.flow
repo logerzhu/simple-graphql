@@ -35,7 +35,7 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
     }
     if (fType instanceof ModelRef) {
       let foreignKey = key + 'Id'
-      if (sequelize.options.define.underscoredAll) {
+      if (sequelize.options.define.underscored) {
         foreignKey = foreignKey.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
       }
       if (value && value['$type'] && value.required) {
@@ -64,7 +64,7 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
         } else {
           dbDefinition[key] = {type: type}
         }
-        if (sequelize.options.define.underscoredAll && dbDefinition[key].field == null) {
+        if (sequelize.options.define.underscored && dbDefinition[key].field == null) {
           dbDefinition[key].field = key.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
         }
       } else {
