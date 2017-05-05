@@ -60,7 +60,7 @@ export default class Model {
   /**
    * Add the GraphQL query methods.
    */
-  queries (queries:{[id:string]:QueryConfig}):Model {
+  queries (queries:{[string]:QueryConfig}):Model {
     this.config.queries = Object.assign(this.config.queries, queries)
     return this
   }
@@ -68,7 +68,7 @@ export default class Model {
   /**
    * Add the GraphQL mutataion methods.
    */
-  mutations (mutations:{[id:string]:MutationConfig}):Model {
+  mutations (mutations:{[string]:MutationConfig}):Model {
     this.config.mutations = Object.assign(this.config.mutations, mutations)
     return this
   }
@@ -76,7 +76,7 @@ export default class Model {
   /**
    * Add instance method to current Model.
    */
-  methods (methods:{[id:string]:any}):Model {
+  methods (methods:{[string]:any}):Model {
     this.config.methods = Object.assign(this.config.methods, methods)
     return this
   }
@@ -84,7 +84,7 @@ export default class Model {
   /**
    * Add statics method to current Model.
    */
-  statics (statics:{[id:string]:any}):Model {
+  statics (statics:{[string]:any}):Model {
     this.config.statics = Object.assign(this.config.statics, statics)
     return this
   }
