@@ -178,11 +178,11 @@ export default function pluralQuery (model:Model):QueryConfig {
           }
           return type
         }),
-        doc: 'Query Condition'
+        description: 'Query Condition'
       },
       sort: {
         $type: [{field: String, order: SortEnumType}],
-        doc: 'Define the sort field'
+        description: 'Define the sort field'
       },
       ...SG.Connection.args
     },

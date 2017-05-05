@@ -13,7 +13,7 @@ import ModelRef from './ModelRef'
 import StringHelper from './utils/StringHelper'
 import Transformer from './transformer'
 
-import type {BaseLinkedFieldType, ArgsType} from './Model'
+import type {BaseLinkedFieldType, ArgsType} from './Definition'
 
 export type QueryConfig ={
   name:string,
@@ -35,18 +35,6 @@ export type MutationConfig ={
                        context:any,
                        info:graphql.GraphQLResolveInfo,
                        models:{[id:string]:Sequelize.Model}) => any
-}
-
-export type LinkedFieldConfig ={
-  name:string,
-  $type:BaseLinkedFieldType,
-  description?:string,
-  args?:ArgsType,
-  resolve: (source:any,
-            args:{[argName: string]: any},
-            context:any,
-            info:graphql.GraphQLResolveInfo,
-            models:{[id:string]:Sequelize.Model}) => any
 }
 
 export default class Context {
@@ -212,7 +200,17 @@ export default class Context {
     )
   }
 
-  wrapFieldResolve (config:LinkedFieldConfig):any {
+  wrapFieldResolve (config:{
+    name:string,
+    $type:BaseLinkedFieldType,
+    description?:string,
+    args?:ArgsType,
+    resolve: (source:any,
+              args:{[argName: string]: any},
+              context:any,
+              info:graphql.GraphQLResolveInfo,
+              models:{[id:string]:Sequelize.Model}) => any
+  }):any {
     const self = this
 
     const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))

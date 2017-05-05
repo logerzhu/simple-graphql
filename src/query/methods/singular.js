@@ -13,7 +13,7 @@ export default function singularQuery (model:Model):QueryConfig {
   const searchFields = {
     id: {
       $type: SG.modelRef(model.name),
-      doc: 'Id of Model ' + model.name
+      description: 'Id of Model ' + model.name
     }
   }
   _.forOwn(model.config.fields, (value, key) => {

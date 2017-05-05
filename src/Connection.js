@@ -32,11 +32,11 @@ export default{
   args: {
     after: {
       $type: String,
-      doc: '返回的记录应该在cursor:after之后'
+      description: '返回的记录应该在cursor:after之后'
     },
     first: {
       $type: Number,
-      doc: '指定最多返回记录的数量'
+      description: '指定最多返回记录的数量'
     },
     before: {
       $type: String
