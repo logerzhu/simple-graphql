@@ -1,4 +1,5 @@
 // @flow
+
 export default class ModelRef {
   name:string
 

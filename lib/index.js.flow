@@ -15,6 +15,7 @@ import ModelRef from './ModelRef'
 import Transformer from './transformer'
 
 /**
+ * @public
  * 入口
  * TODO
  */
@@ -28,7 +29,7 @@ export default {
 
   /**
    * Define a Model
-   * @access public
+   *
    * @param name
    * @param options
    */
@@ -84,9 +85,9 @@ export default {
       resolve: context.wrapQueryResolve({
         name: 'node',
         $type: context.nodeInterface,
-        resolve: async function (args, info, models, invoker) {
+        resolve: async function (args, context, info, models, invoker) {
           const id = relay.fromGlobalId(args.id)
-          if (!context.models[id.type]) return null
+          if (!models[id.type]) return null
           const record = await models[id.type].findOne({where: {id: id.id}})
           if (record) {
             record._type = id.type
