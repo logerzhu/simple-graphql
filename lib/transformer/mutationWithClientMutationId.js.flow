@@ -6,7 +6,6 @@ import type {GraphQLFieldConfig} from 'graphql'
  * Returns a GraphQLFieldConfig for the mutation described by the
  * provided MutationConfig.
  */
-
 export default function mutationWithClientMutationId (config:{
   name:string,
   description:?string,

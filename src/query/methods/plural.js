@@ -196,33 +196,34 @@ export default function pluralQuery (model:Model):QueryConfig {
                              context:any,
                              info:graphql.GraphQLResolveInfo,
                              models:any) {
-      conditionFieldKeys.forEach(fieldKey => {
-        if (args.condition && args.condition[fieldKey]) {
-          args.condition[fieldKey] = _.mapKeys(args.condition[fieldKey], function (value, key) {
-            return '$' + key
-          })
-        }
-      })
-
       const dbModel = models[model.name]
-      const condition = {}
-      _.forOwn(model.config.fields, (value, key) => {
-        if (value instanceof ModelRef || (value && value.$type instanceof ModelRef)) {
-          if (!key.endsWith('Id')) {
-            key = key + 'Id'
+      if (args && args.condition) {
+        conditionFieldKeys.forEach(fieldKey => {
+          if (args.condition && args.condition[fieldKey]) {
+            args.condition[fieldKey] = _.mapKeys(args.condition[fieldKey], function (value, key) {
+              return '$' + key
+            })
           }
-          if (typeof args.condition[key] !== 'undefined') {
-            if (dbModel.options.underscored) {
-              condition[key.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()] = args.condition[key]
-            } else {
-              condition[key] = args.condition[key]
+        })
+        const condition = {}
+        _.forOwn(model.config.fields, (value, key) => {
+          if (value instanceof ModelRef || (value && value.$type instanceof ModelRef)) {
+            if (!key.endsWith('Id')) {
+              key = key + 'Id'
             }
+            if (typeof args.condition[key] !== 'undefined') {
+              if (dbModel.options.underscored) {
+                condition[key.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()] = args.condition[key]
+              } else {
+                condition[key] = args.condition[key]
+              }
+            }
+          } else if (typeof args.condition[key] !== 'undefined') {
+            condition[key] = args.condition[key]
           }
-        } else if (typeof args.condition[key] !== 'undefined') {
-          condition[key] = args.condition[key]
-        }
-      })
-      args.condition = condition
+        })
+        args.condition = condition
+      }
 
       return SG.Connection.resolve(dbModel, args)
     }
