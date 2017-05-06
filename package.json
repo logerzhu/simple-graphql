@@ -10,7 +10,7 @@
     "build": "rm -rf lib && babel src --optional runtime --out-dir lib/ && cp package.json lib/ && npm run build-dot-flow",
     "build-dot-flow": "find ./src -name '*.js' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/lib\\//g'`.flow; done",
     "buildAndPublish": "npm run flow && npm run format && npm run build && npm publish",
-    "doc": "documentation build  -g -f html -o docs src/index.js src/Definition.js"
+    "docs": "documentation readme --section=API -c documentation.yml src/index.js && documentation readme --section='Type Definition' --sort-order alpha src/Definition.js"
   },
   "author": "logerzhu",
   "repository": {

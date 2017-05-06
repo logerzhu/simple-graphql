@@ -17,6 +17,7 @@ import Transformer from './transformer'
 import type {ModelOptionConfig} from './Definition'
 
 /**
+ * TODO
  */
 export default {
 
@@ -37,7 +38,9 @@ export default {
     Id:Type.ScalarFieldType
   }),
 
-  /**/
+  /**
+   * Get the Relay Connction helper
+   */
   Connection: Connection,
 
   Model: Model,

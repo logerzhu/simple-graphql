@@ -5,6 +5,7 @@ import type { LinkedFieldConfig, QueryConfig, MutationConfig,
   BelongsToManyConfig, AssociationConfig} from './Definition'
 
 /**
+ * TODO
  * @example
  */
 export default class Model {
