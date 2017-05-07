@@ -26,9 +26,8 @@ This library support [FlowType](https://flow.org/) (a static typechecker for Jav
 
 **Examples**
 
+### Define the model
 ```javascript
-1.Define the model
-
 // @flow
 import SG from 'simple-graphql'
 
@@ -91,9 +90,10 @@ export default SG.model('Todo').fields({
     }
   }
 })
+```
 
-2. Config the Sequelize database connection.
-
+### Config the Sequelize database connection.
+```javascript
 import Sequelize from 'sequelize'
 const sequelize = new Sequelize('test1', 'postgres', 'Password', {
   host: 'localhost',
@@ -107,9 +107,11 @@ const sequelize = new Sequelize('test1', 'postgres', 'Password', {
   }
 })
 export default sequelize
+```
 
-3. Generate the GraphQL Schema
+### Generate the GraphQL Schema
 
+```javascript
 import SG from 'simple-graphql'
 
 //import Todo model and sequlize config ...
@@ -123,9 +125,10 @@ sequelize.sync({
 }).then(() => console.log('Init DB Done'), (err) => console.log('Init DB Fail', err))
 
 export default
+```
 
-4. Start the GraphQL server
-
+### Start the GraphQL server
+```javascript
 const express = require('express');
 const graphqlHTTP = require('express-graphql');
 
