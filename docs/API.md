@@ -2,28 +2,28 @@
 
 ### Table of Contents
 
--   [index](#index)
-    -   [modelRef](#modelref)
-    -   [ScalarFieldTypes](#scalarfieldtypes)
-    -   [Connection](#connection)
-    -   [model](#model)
+-   [SimpleGraphQL](#simplegraphql)
     -   [build](#build)
+    -   [modelRef](#modelref)
+    -   [Connection](#connection)
+    -   [ScalarFieldTypes](#scalarfieldtypes)
+    -   [model](#model)
 -   [Model](#model-1)
-    -   [hasMany](#hasmany)
-    -   [queries](#queries)
-    -   [links](#links)
-    -   [fields](#fields)
-    -   [mutations](#mutations)
-    -   [belongsToMany](#belongstomany)
-    -   [methods](#methods)
-    -   [belongsTo](#belongsto)
-    -   [hasOne](#hasone)
     -   [statics](#statics)
+    -   [hasOne](#hasone)
+    -   [links](#links)
+    -   [belongsTo](#belongsto)
+    -   [hasMany](#hasmany)
+    -   [belongsToMany](#belongstomany)
+    -   [fields](#fields)
+    -   [queries](#queries)
+    -   [mutations](#mutations)
+    -   [methods](#methods)
 -   [Connection](#connection-1)
     -   [resolve](#resolve)
     -   [connectionType](#connectiontype)
-    -   [edgeType](#edgetype)
     -   [args](#args)
+    -   [edgeType](#edgetype)
 -   [ArgsType](#argstype)
 -   [AssociationConfig](#associationconfig)
 -   [BaseFieldType](#basefieldtype)
@@ -39,9 +39,135 @@
 -   [QueryConfig](#queryconfig)
 -   [ValidateConfig](#validateconfig)
 
-## index
+## SimpleGraphQL
 
-TODO
+Usage:
+
+**Examples**
+
+```javascript
+1.Define the model
+
+// @flow
+import SG from 'simple-graphql'
+
+const TodoType = SG.modelRef('Todo')
+
+export default SG.model('Todo').fields({
+  title: {
+    $type: String,
+    required: true
+  },
+  description: String,
+  completed: {
+    $type: Boolean,
+    required: true
+  },
+  dueAt: Date
+}).queries({
+  dueTodos: {
+    description: "Find all due todos",
+    $type: [TodoType],
+    args: {
+      dueBefore: {
+        $type: Date,
+        required: true
+      }
+    },
+    resolve: async function ({ dueBefore}, context, info, {Todo}) {
+      return Todo.find({
+        where: {
+          completed: false,
+          dueAt: {
+            $lt: dueBefore
+          }
+        }
+      })
+    }
+  }
+}).mutations({
+  cpmpletedTodo: {
+    description: "Mark the todo task completed.",
+    inputFields: {
+      todoId: {
+        $type: TodoType,
+        required: true
+      }
+    },
+    outputFields: {
+      changedTodo: TodoType
+    },
+    mutateAndGetPayload: async function ({todoId}, context, info, {Todo}) {
+      const todo = await Todo.findOne({where: {id: todoId}})
+      if (!todo) {
+        throw new Error("Todo entity not found.")
+      }
+      if (!todo.completed) {
+        todo.completed = true
+        await todo.save()
+      }
+      return {changedTodo: todo}
+    }
+  }
+})
+
+2. Config the Sequelize database connection.
+
+import Sequelize from 'sequelize'
+const sequelize = new Sequelize('test1', 'postgres', 'Password', {
+  host: 'localhost',
+  port: 5432,
+  dialect: 'postgres',
+
+  pool: {
+    max: 5,
+    min: 0,
+    idle: 10000
+  }
+})
+export default sequelize
+
+3. Generate the GraphQL Schema
+
+import SG from 'simple-graphql'
+
+//import Todo model and sequlize config ...
+
+const schema = GS.build(sequelize, [Todo], {})
+
+//After bulid, all sequelize models have defined, then call sequelize.sync will automatic create the schema in database.
+sequelize.sync({
+  force: false,
+  logging: console.log
+}).then(() => console.log('Init DB Done'), (err) => console.log('Init DB Fail', err))
+
+export default
+
+4. Start the GraphQL server
+
+const express = require('express');
+const graphqlHTTP = require('express-graphql');
+
+const app = express();
+
+app.use('/graphql', graphqlHTTP({
+ schema: MyGraphQLSchema,
+ graphiql: true
+}));
+app.listen(4000);
+```
+
+### build
+
+Build the GraphQL Schema
+
+**Parameters**
+
+-   `sequelize` **Sequelize** 
+-   `models` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[Model](#model)>** 
+-   `options` **any** 
+
+Returns **graphql.GraphQLSchema** 
 
 ### modelRef
 
@@ -50,6 +176,10 @@ TODO
 -   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 
 Returns **ModelRef** 
+
+### Connection
+
+Get the Relay Connction helper
 
 ### ScalarFieldTypes
 
@@ -66,10 +196,6 @@ Available values:
   <tr><td>JSON</td><td>GraphQLScalarTypes.Json</td><td>Sequelize.JSONB</td></tr>
 </table>
 
-### Connection
-
-Get the Relay Connction helper
-
 ### model
 
 Define a Model
@@ -81,18 +207,6 @@ Define a Model
 
 Returns **[Model](#model)** 
 
-### build
-
-Build the GraphQL Schema
-
-**Parameters**
-
--   `sequelize` **Sequelize** 
--   `models` **[Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)&lt;[Model](#model)>** 
--   `options` **any** 
-
-Returns **graphql.GraphQLSchema** 
-
 ## Model
 
 TODO
@@ -101,6 +215,46 @@ TODO
 
 -   `name` **[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** 
 -   `options` **[ModelOptionConfig](#modeloptionconfig)**  (optional, default `{}`)
+
+### statics
+
+Add statics method to current Model.
+
+**Parameters**
+
+-   `statics` **{}** 
+
+Returns **[Model](#model)** 
+
+### hasOne
+
+Add [HasOne](http://docs.sequelizejs.com/en/latest/docs/associations/#hasone) relations to current Model.
+
+**Parameters**
+
+-   `config` **[HasOneConfig](#hasoneconfig)** 
+
+Returns **[Model](#model)** 
+
+### links
+
+Add the model link fields, and each link generate a GraphQL field but no corresponding database column.
+
+**Parameters**
+
+-   `links` **{}** 
+
+Returns **[Model](#model)** 
+
+### belongsTo
+
+Add [BelongsTo](http://docs.sequelizejs.com/en/latest/docs/associations/#belongsto) relations to current Model.
+
+**Parameters**
+
+-   `config` **[BelongsToConfig](#belongstoconfig)** 
+
+Returns **[Model](#model)** 
 
 ### hasMany
 
@@ -112,23 +266,13 @@ Add [HasMany](http://docs.sequelizejs.com/en/latest/docs/associations/#one-to-ma
 
 Returns **[Model](#model)** 
 
-### queries
+### belongsToMany
 
-Add the GraphQL query methods.
-
-**Parameters**
-
--   `queries` **{}** 
-
-Returns **[Model](#model)** 
-
-### links
-
-Add the model link fields, and each link generate a GraphQL field but no corresponding database column.
+Add [BelongsToMany](http://docs.sequelizejs.com/en/latest/docs/associations/#belongs-to-many-associations) relations to current Model.
 
 **Parameters**
 
--   `links` **{}** 
+-   `config` **[BelongsToManyConfig](#belongstomanyconfig)** 
 
 Returns **[Model](#model)** 
 
@@ -143,6 +287,16 @@ In default, each field generate a GraphQL field, unless it config with "hidden:t
 
 Returns **[Model](#model)** 
 
+### queries
+
+Add the GraphQL query methods.
+
+**Parameters**
+
+-   `queries` **{}** 
+
+Returns **[Model](#model)** 
+
 ### mutations
 
 Add the GraphQL mutataion methods.
@@ -153,16 +307,6 @@ Add the GraphQL mutataion methods.
 
 Returns **[Model](#model)** 
 
-### belongsToMany
-
-Add [BelongsToMany](http://docs.sequelizejs.com/en/latest/docs/associations/#belongs-to-many-associations) relations to current Model.
-
-**Parameters**
-
--   `config` **[BelongsToManyConfig](#belongstomanyconfig)** 
-
-Returns **[Model](#model)** 
-
 ### methods
 
 Add instance method to current Model.
@@ -170,36 +314,6 @@ Add instance method to current Model.
 **Parameters**
 
 -   `methods` **{}** 
-
-Returns **[Model](#model)** 
-
-### belongsTo
-
-Add [BelongsTo](http://docs.sequelizejs.com/en/latest/docs/associations/#belongsto) relations to current Model.
-
-**Parameters**
-
--   `config` **[BelongsToConfig](#belongstoconfig)** 
-
-Returns **[Model](#model)** 
-
-### hasOne
-
-Add [HasOne](http://docs.sequelizejs.com/en/latest/docs/associations/#hasone) relations to current Model.
-
-**Parameters**
-
--   `config` **[HasOneConfig](#hasoneconfig)** 
-
-Returns **[Model](#model)** 
-
-### statics
-
-Add statics method to current Model.
-
-**Parameters**
-
--   `statics` **{}** 
 
 Returns **[Model](#model)** 
 
@@ -253,6 +367,10 @@ Reference to relay ConnectionType with specify node
 
 Returns **ConnectionType** 
 
+### args
+
+Return Relay Connection args definition.
+
 ### edgeType
 
 Reference to Relay EdgeType with specify node
@@ -262,10 +380,6 @@ Reference to Relay EdgeType with specify node
 -   `nodeType` **ModelRef** 
 
 Returns **EdgeType** 
-
-### args
-
-Return Relay Connection args definition.
 
 ## ArgsType
 

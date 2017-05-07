@@ -17,9 +17,121 @@ import Transformer from './transformer'
 import type {ModelOptionConfig} from './Definition'
 
 /**
- * TODO
+ * Usage:
+ *
+ * @example
+ *
+ * 1.Define the model
+ *
+ * // @flow
+ * import SG from 'simple-graphql'
+ *
+ * const TodoType = SG.modelRef('Todo')
+ *
+ * export default SG.model('Todo').fields({
+ *   title: {
+ *     $type: String,
+ *     required: true
+ *   },
+ *   description: String,
+ *   completed: {
+ *     $type: Boolean,
+ *     required: true
+ *   },
+ *   dueAt: Date
+ * }).queries({
+ *   dueTodos: {
+ *     description: "Find all due todos",
+ *     $type: [TodoType],
+ *     args: {
+ *       dueBefore: {
+ *         $type: Date,
+ *         required: true
+ *       }
+ *     },
+ *     resolve: async function ({ dueBefore}, context, info, {Todo}) {
+ *       return Todo.find({
+ *         where: {
+ *           completed: false,
+ *           dueAt: {
+ *             $lt: dueBefore
+ *           }
+ *         }
+ *       })
+ *     }
+ *   }
+ * }).mutations({
+ *   cpmpletedTodo: {
+ *     description: "Mark the todo task completed.",
+ *     inputFields: {
+ *       todoId: {
+ *         $type: TodoType,
+ *         required: true
+ *       }
+ *     },
+ *     outputFields: {
+ *       changedTodo: TodoType
+ *     },
+ *     mutateAndGetPayload: async function ({todoId}, context, info, {Todo}) {
+ *       const todo = await Todo.findOne({where: {id: todoId}})
+ *       if (!todo) {
+ *         throw new Error("Todo entity not found.")
+ *       }
+ *       if (!todo.completed) {
+ *         todo.completed = true
+ *         await todo.save()
+ *       }
+ *       return {changedTodo: todo}
+ *     }
+ *   }
+ * })
+ *
+ * 2. Config the Sequelize database connection.
+ *
+ * import Sequelize from 'sequelize'
+ * const sequelize = new Sequelize('test1', 'postgres', 'Password', {
+ *   host: 'localhost',
+ *   port: 5432,
+ *   dialect: 'postgres',
+ *
+ *   pool: {
+ *     max: 5,
+ *     min: 0,
+ *     idle: 10000
+ *   }
+ * })
+ * export default sequelize
+ *
+ * 3. Generate the GraphQL Schema
+ *
+ * import SG from 'simple-graphql'
+ *
+ * //import Todo model and sequlize config ...
+ *
+ * const schema = GS.build(sequelize, [Todo], {})
+ *
+ * //After bulid, all sequelize models have defined, then call sequelize.sync will automatic create the schema in database.
+ * sequelize.sync({
+ *   force: false,
+ *   logging: console.log
+ * }).then(() => console.log('Init DB Done'), (err) => console.log('Init DB Fail', err))
+ *
+ * export default
+ *
+ * 4. Start the GraphQL server
+ *
+ * const express = require('express');
+ * const graphqlHTTP = require('express-graphql');
+ *
+ * const app = express();
+ *
+ * app.use('/graphql', graphqlHTTP({
+ *  schema: MyGraphQLSchema,
+ *  graphiql: true
+ * }));
+ * app.listen(4000);
  */
-export default {
+const SimpleGraphQL = {
 
   /** Available values:
    * <table style='text-align: left'>
@@ -176,3 +288,5 @@ export default {
     })
   }
 }
+
+export default SimpleGraphQL
