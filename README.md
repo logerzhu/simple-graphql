@@ -1,8 +1,14 @@
-# simple-graphql
+# Simple-GraphQL
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
-The simple way to build GraphQL style API with DataBase support.
+`Simple-GraphQL` generates [GraphQL](https://github.com/graphql/graphql-js) schemas and [Sequelize](http://docs.sequelizejs.com/en/latest/) models from your models definition(support [FlowType](https://flow.org/) static type check), that's how simple it is. The generated GraphQL schema is compatible with [Relay](https://facebook.github.io/relay/).
+
+>[GraphQL](https://github.com/graphql/graphql-js) is a query language for your API, and a server-side runtime for executing queries by using a type system you define for your data. 
+
+>[Sequelize](http://docs.sequelizejs.com/en/latest/) is a promise-based ORM for Node.js. It supports the dialects `PostgreSQL`, `MySQL`, `SQLite` and `MSSQL` and features solid transaction support, relations, read replication and more.
+
+>[FlowType](https://flow.org/) is a static type checker for your JavaScript code. It does a lot of work to make you more productive. Making you code faster, smarter, more confidently, and to a bigger scale.
 
 ## Install
 
@@ -17,12 +23,12 @@ Check out the project code (<https://github.com/logerzhu/simple-graphql>).
 ```shell
 cd simple-graphql
 npm install # install dependencies in the main folder
-npm run demo # run the demo and open your browser: http://localhost:9413/graphql
+npm run start # run the demo and open your browser: http://localhost:9413/graphql
 ```
 
 ## Usage
 
-This library support [FlowType](https://flow.org/) (a static typechecker for JavaScript), which can help to check you model defintion.
+`Simple-GraphQL` 
 
 **Examples**
 
