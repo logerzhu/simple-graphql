@@ -28,16 +28,15 @@ npm run start # run the demo and open your browser: http://localhost:9413/graphq
 
 ## Usage
 
-`Simple-GraphQL` 
-
-**Examples**
-
 ### Define the model
+
+Todo.js
+
 ```javascript
 // @flow
 import SG from 'simple-graphql'
 
-const TodoType = SG.modelRef('Todo')
+const TodoType = SG.modelRef('Todo') // Reference to Todo model type
 
 export default SG.model('Todo').fields({
   title: {
@@ -98,9 +97,18 @@ export default SG.model('Todo').fields({
 })
 ```
 
-### Config the Sequelize database connection.
+### Generate the GraphQL Schema and start the server
+
 ```javascript
 import Sequelize from 'sequelize'
+import SG from 'simple-graphql'
+import express from 'express'
+import graphqlHTTP from 'express-graphql'
+
+
+import Todo from './Todo'
+
+// Config the Sequelize database connection.
 const sequelize = new Sequelize('test1', 'postgres', 'Password', {
   host: 'localhost',
   port: 5432,
@@ -112,39 +120,26 @@ const sequelize = new Sequelize('test1', 'postgres', 'Password', {
     idle: 10000
   }
 })
-export default sequelize
-```
 
-### Generate the GraphQL Schema
 
-```javascript
-import SG from 'simple-graphql'
+const schema = GS.build(sequelize, [Todo], {}) //Generate the GraphQL Schema
 
-//import Todo model and sequlize config ...
-
-const schema = GS.build(sequelize, [Todo], {})
-
-//After bulid, all sequelize models have defined, then call sequelize.sync will automatic create the schema in database.
+// After GS.bulid completed, all sequelize models have defined, and call sequelize.sync will automatic create the schema in database.
 sequelize.sync({
-  force: false,
+  force: false, // if true, it will drop all existing table and recreate all.
   logging: console.log
 }).then(() => console.log('Init DB Done'), (err) => console.log('Init DB Fail', err))
 
-export default
-```
 
-### Start the GraphQL server
-```javascript
-const express = require('express');
-const graphqlHTTP = require('express-graphql');
-
-const app = express();
+// Start the GraphQL server
+const app = express()
 
 app.use('/graphql', graphqlHTTP({
- schema: MyGraphQLSchema,
+ schema: schema,
  graphiql: true
-}));
-app.listen(4000);
+}))
+app.listen(4000)
+
 ```
 
 ## Document
