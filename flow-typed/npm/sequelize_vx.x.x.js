@@ -25,6 +25,10 @@ declare class Sequelize {
   static BLOB:DataType & (string) => DataType;
   static UUID:DataType;
 
+  static cls:any;
+
+  transaction:any;
+
   options:any;
 
   constructor:(string,?string,?string,?{

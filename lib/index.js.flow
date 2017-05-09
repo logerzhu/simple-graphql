@@ -174,7 +174,7 @@ const SimpleGraphQL = {
    * Build the GraphQL Schema
    */
   build: (sequelize:Sequelize, models:Array<Model>, options:any):graphql.GraphQLSchema => {
-    const context = new Context(sequelize)
+    const context = new Context(sequelize, options)
 
     // 添加Model
     models.forEach(model => {

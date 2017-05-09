@@ -26,7 +26,7 @@ export default SG.model('User', {
   target: 'Todo',
   options: {
     as: 'dueTodos',
-    foreignKey: 'owner_id',
+    foreignKey: 'ownerId',
     scope: {
       completed: false
     }

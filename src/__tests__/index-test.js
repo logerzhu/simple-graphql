@@ -1,16 +1,18 @@
 // @flow
 import Sequelize from 'sequelize'
 
-const sequelize = new Sequelize('test1', 'postgres', 'Welcome1', {
+const sequelize = new Sequelize('test1', 'test', 'Welcome1', {
   host: 'localhost',
   port: 5432,
-  dialect: 'postgres',
+  dialect: 'sqlite',
 
   pool: {
     max: 5,
     min: 0,
     idle: 10000
-  }
+  },
+  // SQLite only
+  storage: 'test.sqlite'
 })
 
 var UserData = sequelize.define('UserData', {
@@ -57,13 +59,5 @@ var User = sequelize.define('user', {
     firstName: 'John2',
     lastName: 'Hancock'
   })
-
-  console.log(((await User.findAll({
-    where: {
-      firstName: 'John'
-    },
-    include: [{model: UserData, as: 'data'}]
-  }))[0]).data
-  )
 })().then(() => {
 })

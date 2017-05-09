@@ -1,10 +1,15 @@
 // @flow
 import Sequelize from 'sequelize'
+import cls from 'continuation-local-storage'
+
 import path from 'path'
 import fs from 'fs'
 import GS from '../../../src'
 
 import {dbCfg} from '../config'
+
+const namespace = cls.createNamespace('my-db-namespace')
+Sequelize.cls = namespace
 
 const sequelize = new Sequelize(dbCfg.schema, dbCfg.user, dbCfg.password, dbCfg.options)
 
@@ -31,7 +36,17 @@ function listModels (dir:string):Array<GS.Model> {
 
 const models = listModels('models')
 
-const schema = GS.build(sequelize, models, {})
+const schema = GS.build(sequelize, models, {
+  hooks: [{
+    description: 'Enable transaction on mutations',
+    filter: ({type, config}) => type === 'mutation',
+    hook: async function ({type, config}, {source, args, context, info, models}, next) {
+      return sequelize.transaction(function (t) {
+        return next()
+      })
+    }
+  }]
+})
 
 sequelize.sync({
   force: true,

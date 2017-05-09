@@ -56,10 +56,10 @@ export default class Context {
 
   connectionDefinitions:{[id:string]:{connectionType:graphql.GraphQLObjectType, edgeType:graphql.GraphQLObjectType}}
 
-  constructor (sequelize:Sequelize) {
+  constructor (sequelize:Sequelize, options:any) {
     this.sequelize = sequelize
     this.options = {
-      hooks: []
+      hooks: _.get(options, 'hooks', [])
     }
     this.dbModels = {}
     this.models = {}
