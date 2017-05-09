@@ -34,7 +34,7 @@ const models = listModels('models')
 const schema = GS.build(sequelize, models, {})
 
 sequelize.sync({
-  force: false,
+  force: true,
   logging: console.log
 }).then(() => console.log('Init DB Done'), (err) => console.log('Init DB Fail', err))
 

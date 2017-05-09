@@ -1,51 +1,34 @@
 // @flow
-import GS from '../../../../src/index'
+import SG from '../../../../src/index'
 
-const UserDataType = GS.modelRef('UserData')
-const UserType = GS.modelRef('User')
-
-export default GS.model('User', {
-  description: '用户',
-  addMutation: true
+export default SG.model('User', {
+  description: '用户'
 }).fields({
-  firstName: String,
-  lastName: {
+  userName: {
     $type: String,
-    description: '姓'
+    required: true
   },
-  data: UserDataType
-}).links({
-  name: {
-    $type: {
-      $type: [String],
-      description: '测试'
-    },
-    args: {
-      a: {
-        $type: [String],
-        description: '测试'
-      },
-      b: {
-        $type: [{
-          c: {
-            $type: Number
-          },
-          d: [Boolean]
-        }]
-      }
-    },
-    resolve: async function (source, args, context, info, models) {
-      return source.firstName + source.lastName
-    }
-  }
-}).queries({
-  getUser: {
-    $type: GS.Connection.connectionType(UserType),
-    args: {
-      ...GS.Connection.args
-    },
-    resolve: async function (args, context, info, models) {
-      return GS.Connection.resolve(models['User'], {condition: {}})
+  password: {
+    $type: String,
+    required: true
+  },
+  age: SG.ScalarFieldTypes.Int,
+  genderAS: {
+    $type: String,
+    enumValues: ['Male', 'Female']
+  },
+  blocked: {
+    $type: Boolean,
+    default: false
+  },
+  registerAt: Date
+}).hasMany({
+  target: 'Todo',
+  options: {
+    as: 'dueTodos',
+    foreignKey: 'owner_id',
+    scope: {
+      completed: false
     }
   }
 })

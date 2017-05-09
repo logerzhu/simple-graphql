@@ -145,6 +145,9 @@ export default class Context {
           }
         }
       })
+
+      Object.assign(obj, Query.hasManyQueryFields(model))
+
       this.graphQLObjectTypes[typeName] = Transformer.toGraphQLFieldConfig(typeName, '', obj, this, interfaces).type
       if (this.graphQLObjectTypes[typeName] instanceof graphql.GraphQLObjectType) {
         this.graphQLObjectTypes[typeName].description = model.config.options.description

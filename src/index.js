@@ -146,9 +146,7 @@ const SimpleGraphQL = {
    * </table>
    *
    */
-  ScalarFieldTypes: (Type.ScalarFieldTypes:{
-    Id:Type.ScalarFieldType
-  }),
+  ScalarFieldTypes: Type.ScalarFieldTypes,
 
   /**
    * Get the Relay Connction helper

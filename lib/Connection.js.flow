@@ -20,6 +20,28 @@ export class EdgeType {
 
 /**
  * Relay Connection Helper
+ *
+ * @example
+ * import SG from 'simple-graphql'
+ * const UserType = GS.modelRef('User')
+ * export default GS.model('User', {}).fields({
+ *   firstName: String,
+ *   lastName: String
+ * }).queries({
+ *   searchUsers: {
+ *     description: 'Search users by firstName',
+ *     $type: GS.Connection.connectionType(UserType),
+ *     args: {
+ *       ...GS.Connection.args,
+ *       condition: {
+ *         firstName: String
+ *       }
+ *     },
+ *     resolve: async function (args, context, info, {User}) {
+ *       return GS.Connection.resolve(User, args)
+ *     }
+ *   }
+ * })
  */
 export default{
 

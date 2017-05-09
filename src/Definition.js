@@ -234,6 +234,7 @@ export type ModelOptionConfig = {
  */
 export type HasOneConfig ={
   target: string,
+  hidden?: boolean,
   options?: {
     hooks?: boolean,
     as?:string|Object,
@@ -249,6 +250,7 @@ export type HasOneConfig ={
  */
 export type BelongsToConfig = {
   target: string,
+  hidden?: boolean,
   options?: {
     hooks?: boolean,
     as?:string|Object,
@@ -261,6 +263,7 @@ export type BelongsToConfig = {
 
 export type HasManyConfig = {
   target: string,
+  hidden?: boolean,
   options?: {
     hooks?: boolean,
     as?:string|Object,
@@ -277,6 +280,7 @@ export type HasManyConfig = {
  */
 export type BelongsToManyConfig ={
   target: string,
+  hidden?: boolean,
   options?: {
     hooks?: boolean,
     through?:string | {

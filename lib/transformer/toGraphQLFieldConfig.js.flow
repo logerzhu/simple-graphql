@@ -41,14 +41,19 @@ const toGraphQLFieldConfig = function (name:string,
   }
 
   if (_.isArray(fieldType)) {
-    const elementType = toGraphQLFieldConfig(name, postfix, fieldType[0], context).type
+    const elementType = new graphql.GraphQLList(toGraphQLFieldConfig(name, postfix, fieldType[0], context).type)
     return {
-      type: new graphql.GraphQLList(elementType),
-      resolve: async function (root) {
-        // TODO check?
-        const fieldName = name.split('.').slice(-1)[0]
-        return root[fieldName]
-      }
+      type: elementType,
+      resolve: context.wrapFieldResolve({
+        name: name.split('.').slice(-1)[0],
+        path: name,
+        $type: elementType,
+        resolve: async function (root) {
+          // TODO check?
+          const fieldName = name.split('.').slice(-1)[0]
+          return root[fieldName]
+        }
+      })
     }
   }
 
@@ -108,7 +113,12 @@ const toGraphQLFieldConfig = function (name:string,
         result.type = new graphql.GraphQLNonNull(result.type)
       }
       if (fieldType['resolve']) {
-        result['resolve'] = fieldType['resolve']
+        result['resolve'] = context.wrapFieldResolve({
+          name: name.split('.').slice(-1)[0],
+          path: name,
+          $type: result.type,
+          resolve: fieldType['resolve']
+        })
       }
       if (fieldType['args']) {
         result['args'] = toGraphQLInputFieldMap(typeName(name), fieldType['args'])
@@ -116,24 +126,30 @@ const toGraphQLFieldConfig = function (name:string,
       result.description = fieldType['description']
       return result
     } else {
-      return {
-        type: new graphql.GraphQLObjectType({
-          name: typeName(name) + postfix,
-          interfaces: interfaces,
-          fields: () => {
-            const fields = {}
-            _.forOwn(fieldType, (value, key) => {
-              if (value['$type'] && value['hidden']) {
-              } else {
-                fields[key] = toGraphQLFieldConfig(name + postfix + '.' + key, '', value, context)
-              }
-            })
-            return fields
-          }
-        }),
-        resolve: async function (root) {
-          return root[name.split('.').slice(-1)[0]]
+      const objType = new graphql.GraphQLObjectType({
+        name: typeName(name) + postfix,
+        interfaces: interfaces,
+        fields: () => {
+          const fields = {}
+          _.forOwn(fieldType, (value, key) => {
+            if (value['$type'] && value['hidden']) {
+            } else {
+              fields[key] = toGraphQLFieldConfig(name + postfix + '.' + key, '', value, context)
+            }
+          })
+          return fields
         }
+      })
+      return {
+        type: objType,
+        resolve: context.wrapFieldResolve({
+          name: name.split('.').slice(-1)[0],
+          path: name,
+          $type: objType,
+          resolve: async function (root) {
+            return root[name.split('.').slice(-1)[0]]
+          }
+        })
       }
     }
   }

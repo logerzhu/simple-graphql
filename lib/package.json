@@ -1,7 +1,7 @@
 {
   "name": "simple-graphql",
-  "version": "0.2.1",
-  "description": "The simple way to build GraphQL style API with MySQL/PostreSQL",
+  "version": "0.2.3",
+  "description": "The simple way to generates GraphQL schemas and Sequelize models from your models definition.",
   "main": "lib/index.js",
   "scripts": {
     "format": "standard --fix",
@@ -9,7 +9,8 @@
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "build": "rm -rf lib && babel src --optional runtime --out-dir lib/ && cp package.json lib/ && npm run build-dot-flow",
     "build-dot-flow": "find ./src -name '*.js' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/lib\\//g'`.flow; done",
-    "buildAndPublish": "npm run flow && npm run format && npm run build && npm publish"
+    "buildAndPublish": "npm run flow && npm run format && npm run build && npm publish",
+    "docs": "documentation build -c documentation.yml --sort-order alpha -f md -o docs/API.md src/index.js src/Definition.js"
   },
   "author": "logerzhu",
   "repository": {
@@ -25,9 +26,11 @@
     "GraphQL",
     "ORM",
     "Relay",
-    "sequelize",
+    "Sequelize",
     "MySQL",
-    "PostgreSQL"
+    "PostgreSQL",
+    "SQLite",
+    "MSSQL"
   ],
   "dependencies": {
     "lodash": "^4.17.4",
