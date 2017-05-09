@@ -28,16 +28,15 @@ npm run start # run the demo and open your browser: http://localhost:9413/graphq
 
 ## Usage
 
-`Simple-GraphQL` 
-
-**Examples**
-
 ### Define the model
+
+Todo.js
+
 ```javascript
 // @flow
 import SG from 'simple-graphql'
 
-const TodoType = SG.modelRef('Todo')
+const TodoType = SG.modelRef('Todo') // Reference to Todo model type
 
 export default SG.model('Todo').fields({
   title: {
@@ -98,9 +97,17 @@ export default SG.model('Todo').fields({
 })
 ```
 
-### Config the Sequelize database connection.
+### Generate the GraphQL Schema and start the server
+
 ```javascript
 import Sequelize from 'sequelize'
+import SG from 'simple-graphql'
+import express from 'express'
+import graphqlHTTP from 'express-graphql'
+
+import Todo from './Todo'
+
+// Config the Sequelize database connection.
 const sequelize = new Sequelize('test1', 'postgres', 'Password', {
   host: 'localhost',
   port: 5432,
@@ -112,40 +119,130 @@ const sequelize = new Sequelize('test1', 'postgres', 'Password', {
     idle: 10000
   }
 })
-export default sequelize
-```
 
-### Generate the GraphQL Schema
 
-```javascript
-import SG from 'simple-graphql'
+// Generate the GraphQL Schema
+const schema = GS.build(sequelize, [Todo], {}) 
 
-//import Todo model and sequlize config ...
-
-const schema = GS.build(sequelize, [Todo], {})
-
-//After bulid, all sequelize models have defined, then call sequelize.sync will automatic create the schema in database.
+// After GS.bulid completed, all sequelize models have defined, and call sequelize.sync will automatic create the schema in database.
 sequelize.sync({
-  force: false,
+  force: false, // if true, it will drop all existing table and recreate all.
   logging: console.log
 }).then(() => console.log('Init DB Done'), (err) => console.log('Init DB Fail', err))
 
-export default
-```
 
-### Start the GraphQL server
-```javascript
-const express = require('express');
-const graphqlHTTP = require('express-graphql');
-
-const app = express();
+// Start the GraphQL server
+const app = express()
 
 app.use('/graphql', graphqlHTTP({
- schema: MyGraphQLSchema,
+ schema: schema,
  graphiql: true
-}));
-app.listen(4000);
+}))
+app.listen(4000)
+
 ```
+## Model Definition
+```
+Const model = SimpleGraphQL
+  .model(#name: string, #option: ModelOptionConfig)                   // Define a Model
+  .fields(#fields: {[string]:FieldType | FieldTypeConfig})            // Add fields to current model
+  .links(#links: {[string]:LinkFieldType | LinkFieldTypeConfig})      // Add link fields to current model
+  .queries(#queries: {[string]: QueryConfig})                         // Add GraphQL queries to current model
+  .mutations(#queries: {[string]: MutationConfig})                    // Add GraphQL mutations to current model
+  .methods(#methods: {[string]:any}                                   // Add instance method to current Model
+  .statics(#methods: {[string]:any}                                   // Add statics method to current Model
+  .hasOne(#config: HasOneConfig)                                    
+  .belongsTo(#config: BelongsToConfig)
+  .hasMany(#config: HasManyConfig)
+  .belongsToMany(#config: BelongsToManyConfig)
+```
+
+
+## Configutation
+- [ModelOptionConfig](modeloptionconfig)
+- [ModelTableOptionConfig](modeltableoptionconfig)
+
+### ModelOptionConfig
+Attribute|Description
+------------ | -------------
+description?:string | Model description, using on GraphQL Type description. 
+singularQuery?:string | if false, the sigular GraphQL query will not be genereated. 
+pluralQuery?:boolean\|Object | if false, the plural GraphQL query will not be genereated.
+addMutation?:boolean\|Object | if false, the add GraphQL mutation will not be genereated.
+deleteMutation?:boolean\|Object | if false, the delete GraphQL mutation will not be genereated.
+updateMutation?:boolean\|Object | if false, the update GraphQL mutation will not be genereated.
+table?:[ModelTableOptionConfig](modeltableoptionconfig) | Reference to [Options](http://docs.sequelizejs.com/en/latest/api/sequelize/#definemodelname-attributes-options-model) of model define [sequelize.define]
+
+### ModelTableOptionConfig
+```
+type ModelTableOptionConfig = {
+
+  defaultScope?:Object,
+  scopes?:Object,
+  omitNull?:boolean,
+  timestamps?:boolean,
+  createdAt?:string|boolean,
+  updatedAt?:string|boolean,
+  paranoid?:boolean,
+  deletedAt?:string|boolean,
+  underscored?:boolean,
+  underscoredAll?:boolean,
+  freezeTableName?:boolean,
+  name?:{
+    singular?:string,
+    plural?:string,
+  },
+  indexes?:Array<{
+    name?:string,
+    type?:'UNIQUE' | 'FULLTEXT' | 'SPATIAL',
+    method?:'USING' | 'USING' | 'HASH' | 'GIST' | 'GIN',
+    unique?:boolean,
+    concurrently?:boolean,
+    fields?:Array<string | {
+      attribute?:string,
+      length?:number,
+      order?:'ASC' | 'DESC',
+      collate?:string
+    }>
+  }>,
+  tableName?:string,
+  getterMethods?:{[string]:() => any},
+  setterMethods?:{[string]:(any) => void},
+  instanceMethods?:{[string]:any},
+  classMethods?:{[string]:any},
+  schema?:string,
+  engine?:string,
+  charset?:string,
+  comment?:string,
+  collate?:string,
+  rowFormat?:string,
+  initialAutoIncrement?:string,
+  validate?: ValidateConfig,
+  hooks?:{
+    beforeBulkCreate?:(Object, Object) => void | Array<(Object, Object) => void>,
+    beforeBulkDestroy?:(Object) => void | Array<(Object) => void>,
+    beforeBulkUpdate?:(Object) => void | Array<(Object) => void>,
+    beforeValidate?:(Object, Object) => void | Array<(Object, Object) => void>,
+    afterValidate?:(Object, Object) => void | Array<(Object, Object) => void>,
+    validationFailed?:(Object, Object, Object) => void | Array<(Object, Object, Object) => void>,
+    beforeCreate?:(Object, Object) => void | Array<(Object, Object) => void>,
+    beforeDestroy?:(Object, Object) => void | Array<(Object, Object) => void>,
+    beforeUpdate?:(Object, Object) => void | Array<(Object, Object) => void>,
+    beforeSave?:(Object, Object) => void | Array<(Object, Object) => void>,
+    beforeUpsert?:(Object, Object) => void | Array<(Object, Object) => void>,
+    afterCreate?:(Object, Object) => void | Array<(Object, Object) => void>,
+    afterDestroy?:(Object, Object) => void | Array<(Object, Object) => void>,
+    afterUpdate?:(Object, Object) => void | Array<(Object, Object) => void>,
+    afterSave?:(Object, Object) => void | Array<(Object, Object) => void>,
+    afterUpsert?:(Object, Object) => void | Array<(Object, Object) => void>,
+    afterBulkCreate?:(Object, Object) => void | Array<(Object, Object) => void>,
+    afterBulkDestroy?:(Object) => void | Array<(Object) => void>,
+    afterBulkUpdate?:(Object) => void | Array<(Object) => void>,
+  }
+}
+```
+
+
 
 ## Document
 
