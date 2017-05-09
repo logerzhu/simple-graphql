@@ -10,6 +10,11 @@
 
 >[FlowType](https://flow.org/) is a static type checker for your JavaScript code. It does a lot of work to make you more productive. Making you code faster, smarter, more confidently, and to a bigger scale.
 
+## Document
+
+-   [API](docs/API.md)
+-   [Transaction](docs/Transaction.md)
+
 ## Install
 
 ```shell
@@ -241,12 +246,6 @@ type ModelTableOptionConfig = {
   }
 }
 ```
-
-
-
-## Document
-
--   [API](docs/API.md)
 
 ## License
 
