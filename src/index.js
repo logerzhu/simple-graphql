@@ -200,6 +200,11 @@ const SimpleGraphQL = {
       }
     })
 
+    const viewerInstance = {
+      _type: 'Viewer',
+      id: relay.toGlobalId('Viewer', 'viewer')
+    }
+
     const nodeConfig = {
       name: 'node',
       description: 'Fetches an object given its ID',
@@ -215,6 +220,9 @@ const SimpleGraphQL = {
         $type: context.nodeInterface,
         resolve: async function (args, context, info, models, invoker) {
           const id = relay.fromGlobalId(args.id)
+          if (id.type === 'Viewer') {
+            return viewerInstance
+          }
           if (!models[id.type]) return null
           const record = await models[id.type].findOne({where: {id: id.id}})
           if (record) {
@@ -223,11 +231,6 @@ const SimpleGraphQL = {
           return record
         }
       })
-    }
-
-    const viewerInstance = {
-      _type: 'Viewer',
-      id: relay.toGlobalId('Viewer', 'viewer')
     }
 
     const viewerType = new graphql.GraphQLObjectType({
@@ -240,6 +243,7 @@ const SimpleGraphQL = {
         }, finalQueries)
       }
     })
+    context.graphQLObjectTypes['Viewer'] = viewerType
 
     return new graphql.GraphQLSchema({
       query: new graphql.GraphQLObjectType({
