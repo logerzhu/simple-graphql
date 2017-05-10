@@ -108,7 +108,7 @@ export default{
     let reverse = false
 
     const count = await model.count({
-      $where: condition
+      where: condition
     })
 
     if (last || before) {
