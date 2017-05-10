@@ -92,7 +92,8 @@ export default{
     before?: string,
     last?: number,
     condition?:any,
-    sort?: Array<{field: string, order: "ASC"|"DESC"}>
+    sort?: Array<{field: string, order: "ASC"|"DESC"}>,
+    keywords?:{fields:Array<string>, value:string}
   }):Promise<{
     pageInfo: {
       hasPreviousPage: boolean,
@@ -104,8 +105,15 @@ export default{
     }>,
     count: number
   } > {
-    let {after, first = 100, before, last, condition = {}, sort = [{field: 'id', order: 'ASC'}]} = args
+    let {after, first = 100, before, last, condition = {}, sort = [{field: 'id', order: 'ASC'}], keywords} = args
     let reverse = false
+
+    if (keywords) {
+      const {fields, value} = keywords
+      for (let field of fields) {
+        condition[field] = {$like: '%' + value + '%'}
+      }
+    }
 
     const count = await model.count({
       where: condition

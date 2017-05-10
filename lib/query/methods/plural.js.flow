@@ -190,6 +190,16 @@ export default function pluralQuery (model:Model):QueryConfig {
         $type: [{field: String, order: SortEnumType}],
         description: 'Define the sort field'
       },
+      keywords: {
+        fields: {
+          $type: [String],
+          required: true
+        },
+        value: {
+          $type: String,
+          required: true
+        }
+      },
       ...SG.Connection.args
     },
     resolve: async function (args:{[argName: string]: any},
@@ -223,6 +233,9 @@ export default function pluralQuery (model:Model):QueryConfig {
           }
         })
         args.condition = condition
+      }
+      if (args && args.keywords && dbModel.options.underscored) {
+        args.keywords.fields = args.keywords.fields.map(field => field.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase())
       }
 
       return SG.Connection.resolve(dbModel, args)

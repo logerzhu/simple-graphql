@@ -39,9 +39,17 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
         foreignKey = foreignKey.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
       }
       if (value && value['$type'] && value.required) {
-        model.belongsTo({target: fType.name, options: {as: key, foreignKey: foreignKey, constraints: true}})
+        model.belongsTo({
+          target: fType.name,
+          hidden: true,
+          options: {as: key, foreignKey: foreignKey, constraints: true}
+        })
       } else {
-        model.belongsTo({target: fType.name, options: {as: key, foreignKey: foreignKey, constraints: false}})
+        model.belongsTo({
+          target: fType.name,
+          hidden: true,
+          options: {as: key, foreignKey: foreignKey, constraints: false}
+        })
       }
     } else {
       const type = dbType(fType)
