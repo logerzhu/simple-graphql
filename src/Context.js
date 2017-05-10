@@ -147,6 +147,7 @@ export default class Context {
       })
 
       Object.assign(obj, Query.hasManyQueryFields(model))
+      Object.assign(obj, Query.hasOneQueryFields(model))
 
       this.graphQLObjectTypes[typeName] = Transformer.toGraphQLFieldConfig(typeName, '', obj, this, interfaces).type
       if (this.graphQLObjectTypes[typeName] instanceof graphql.GraphQLObjectType) {
@@ -299,6 +300,7 @@ export default class Context {
     const self = this
     _.forOwn(self.models, (model, key) => {
       model.config.associations.hasOne.forEach(config => {
+        console.log('*****', config)
         self.dbModel(model.name).hasOne(self.dbModel(config.target), config.options)
       })
       model.config.associations.belongsTo.forEach(config => {
