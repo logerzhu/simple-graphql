@@ -25,7 +25,8 @@ export default function hasManyFieldsConfig (model:Model):{[string]:LinkedFieldC
       resolve: async function (root, args, context, info, models) {
         const condition = {..._.get(hasManyCfg, 'options.scope', {})}
         condition[_.get(hasManyCfg, 'options.foreignKey', name + 'Id')] = root.id
-        return Connection.resolve(models[hasManyCfg.target], {...args, condition})
+        const sort = _.get(hasManyCfg, 'options.sort', [{field: 'id', order: 'ASC'}])
+        return Connection.resolve(models[hasManyCfg.target], {...args, condition, sort})
       }
     }
   }

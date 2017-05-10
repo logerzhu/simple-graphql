@@ -271,7 +271,8 @@ export type HasManyConfig = {
     scope?:Object,
     onDelete?: 'SET NULL' | 'CASCADE',
     onUpdate?: 'CASCADE',
-    constraints?:boolean
+    constraints?:boolean,
+    sort?:Array<{field:string, order:'ASC'|'DESC'}>
   }
 }
 

@@ -12,11 +12,7 @@ export default SG.model('User', {
     $type: String,
     required: true
   },
-  age: SG.ScalarFieldTypes.Int,
-  genderAS: {
-    $type: String,
-    enumValues: ['Male', 'Female']
-  },
+
   blocked: {
     $type: Boolean,
     default: false
@@ -29,6 +25,13 @@ export default SG.model('User', {
     foreignKey: 'ownerId',
     scope: {
       completed: false
-    }
+    },
+    sort: [{field: 'createdAt', order: 'DESC'}]
+  }
+}).hasOne({
+  target: 'Profile',
+  options: {
+    as: 'profile',
+    foreignKey: 'ownerId'
   }
 })

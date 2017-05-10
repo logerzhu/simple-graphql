@@ -300,7 +300,6 @@ export default class Context {
     const self = this
     _.forOwn(self.models, (model, key) => {
       model.config.associations.hasOne.forEach(config => {
-        console.log('*****', config)
         self.dbModel(model.name).hasOne(self.dbModel(config.target), config.options)
       })
       model.config.associations.belongsTo.forEach(config => {
