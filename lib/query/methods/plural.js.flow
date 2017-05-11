@@ -212,7 +212,7 @@ export default function pluralQuery (model:Model):QueryConfig {
       const sort = args != null ? args.sort : [{field: 'id', order: 'ASC'}]
       if (dbModel.options.underscored) {
         for (let item of sort) {
-          item.field = item.field.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
+          item.field = StringHelper.toUnderscoredName(item.field)
         }
       }
 
@@ -233,7 +233,7 @@ export default function pluralQuery (model:Model):QueryConfig {
           }
           if (typeof condition[key] !== 'undefined') {
             if (dbModel.options.underscored) {
-              const underscoredKey = key.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
+              const underscoredKey = StringHelper.toUnderscoredName(key)
               if (underscoredKey !== key) {
                 condition[underscoredKey] = condition[key]
                 delete condition[key]
@@ -272,7 +272,7 @@ export default function pluralQuery (model:Model):QueryConfig {
               })
               let colFieldName = field
               if (dbModel.options.underscored) {
-                colFieldName = fieldName + field.substr(field.indexOf('.')).replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
+                colFieldName = fieldName + StringHelper.toUnderscoredName(field.substr(field.indexOf('.')))
               }
               keywordsCondition.push(Sequelize.where(Sequelize.col(colFieldName), {$like: '%' + value + '%'}))
             } else {
@@ -283,8 +283,6 @@ export default function pluralQuery (model:Model):QueryConfig {
           }
         }
         condition.$or = keywordsCondition
-
-        // args.keywords.fields = args.keywords.fields.map(field => field.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase())
       }
 
       return SG.Connection.resolve(dbModel, {...args, condition, include})

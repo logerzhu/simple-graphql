@@ -9,7 +9,7 @@ export default SG.model('UserProfile', {}).fields({
   },
   realName: String,
   age: SG.ScalarFieldTypes.Int,
-  genderAS: {
+  gender: {
     $type: String,
     enumValues: ['Male', 'Female']
   }

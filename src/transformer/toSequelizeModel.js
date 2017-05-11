@@ -6,6 +6,7 @@ import Sequelize from 'sequelize'
 import Type from '../type'
 import Model from '../Model'
 import ModelRef from '../ModelRef'
+import StringHelper from '../utils/StringHelper'
 
 export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequelize.Model {
   const dbDefinition = {}
@@ -36,7 +37,7 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
     if (fType instanceof ModelRef) {
       let foreignKey = key + 'Id'
       if (sequelize.options.define.underscored) {
-        foreignKey = foreignKey.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
+        foreignKey = StringHelper.toUnderscoredName(foreignKey)
       }
       if (value && value['$type'] && value.required) {
         model.belongsTo({
@@ -73,7 +74,7 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
           dbDefinition[key] = {type: type}
         }
         if (sequelize.options.define.underscored && dbDefinition[key].field == null) {
-          dbDefinition[key].field = key.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
+          dbDefinition[key].field = StringHelper.toUnderscoredName(key)
         }
       } else {
         throw new Error('Unknown column type for ', fType)

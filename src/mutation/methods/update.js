@@ -55,7 +55,7 @@ export default function updateMutation (model:Model):MutationConfig {
           }
           if (typeof args.values[key] !== 'undefined') {
             if (dbModel.options.underscored) {
-              values[key.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()] = args.values[key]
+              values[StringHelper.toUnderscoredName(key)] = args.values[key]
             } else {
               values[key] = args.values[key]
             }

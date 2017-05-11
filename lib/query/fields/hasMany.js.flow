@@ -26,9 +26,9 @@ export default function hasManyFieldsConfig (model:Model):{[string]:LinkedFieldC
         const condition = {..._.get(hasManyCfg, 'options.scope', {})}
         const sort = _.get(hasManyCfg, 'options.sort', [{field: 'id', order: 'ASC'}])
         if (models[hasManyCfg.target].options.underscored) {
-          condition[_.get(hasManyCfg, 'options.foreignKey', name + 'Id').replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()] = root.id
+          condition[StringHelper.toUnderscoredName(_.get(hasManyCfg, 'options.foreignKey', name + 'Id'))] = root.id
           for (let item of sort) {
-            item.field = item.field.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
+            item.field = StringHelper.toUnderscoredName(item.field)
           }
         } else {
           condition[_.get(hasManyCfg, 'options.foreignKey', name + 'Id')] = root.id
