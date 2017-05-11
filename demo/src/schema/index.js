@@ -11,7 +11,7 @@ import {dbCfg} from '../config'
 const namespace = cls.createNamespace('my-db-namespace')
 Sequelize.cls = namespace
 
-const sequelize = new Sequelize(dbCfg.schema, dbCfg.user, dbCfg.password, dbCfg.options)
+export const sequelize = new Sequelize(dbCfg.schema, dbCfg.user, dbCfg.password, dbCfg.options)
 
 function listModels (dir:string):Array<GS.Model> {
   const models:Array<GS.Model> = []

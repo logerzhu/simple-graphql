@@ -29,7 +29,7 @@ export default SG.model('User', {
     sort: [{field: 'createdAt', order: 'DESC'}]
   }
 }).hasOne({
-  target: 'Profile',
+  target: 'UserProfile',
   options: {
     as: 'profile',
     foreignKey: 'ownerId'

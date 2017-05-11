@@ -13,6 +13,10 @@ export const dbCfg = {
       idle: 10000
     },
     // SQLite only
-    storage: 'demo.sqlite'
+    storage: 'demo.sqlite',
+    define: {
+      underscored: true,
+      underscoredAll: true
+    }
   }
 }

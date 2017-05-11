@@ -66,9 +66,12 @@ const toGraphQLFieldConfig = function (name:string,
         $type: context.graphQLObjectType(fieldType.name),
         resolve: async function (root, args, context, info, models) {
           const fieldName = name.split('.').slice(-1)[0]
-          // 判断是否只有model Id, 如果只有model Id, 通过ID 查找相关的model
-          if (root && _.isFunction(root['get' + StringHelper.toInitialUpperCase(fieldName)])) {
-            return root['get' + StringHelper.toInitialUpperCase(fieldName)]()
+          if (_.isFunction(root['get' + StringHelper.toInitialUpperCase(fieldName)])) {
+            if (root[fieldName] != null && root[fieldName].id != null) {
+              return root[fieldName]
+            } else {
+              return root['get' + StringHelper.toInitialUpperCase(fieldName)]()
+            }
           }
           if (root && root[fieldName] && (
               typeof root[fieldName] === 'number' ||

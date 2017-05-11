@@ -1,6 +1,7 @@
 // @flow
 import * as _ from 'lodash'
 import * as graphql from 'graphql'
+import Sequelize from 'sequelize'
 
 import Model from '../../Model'
 import ModelRef from '../../ModelRef'
@@ -207,38 +208,86 @@ export default function pluralQuery (model:Model):QueryConfig {
                              info:graphql.GraphQLResolveInfo,
                              models:any) {
       const dbModel = models[model.name]
-      if (args && args.condition) {
-        conditionFieldKeys.forEach(fieldKey => {
-          if (args.condition && args.condition[fieldKey]) {
-            args.condition[fieldKey] = _.mapKeys(args.condition[fieldKey], function (value, key) {
-              return '$' + key
-            })
-          }
-        })
-        const condition = {}
-        _.forOwn(model.config.fields, (value, key) => {
-          if (value instanceof ModelRef || (value && value.$type instanceof ModelRef)) {
-            if (!key.endsWith('Id')) {
-              key = key + 'Id'
-            }
-            if (typeof args.condition[key] !== 'undefined') {
-              if (dbModel.options.underscored) {
-                condition[key.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()] = args.condition[key]
-              } else {
-                condition[key] = args.condition[key]
-              }
-            }
-          } else if (typeof args.condition[key] !== 'undefined') {
-            condition[key] = args.condition[key]
-          }
-        })
-        args.condition = condition
-      }
-      if (args && args.keywords && dbModel.options.underscored) {
-        args.keywords.fields = args.keywords.fields.map(field => field.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase())
+
+      const sort = args != null ? args.sort : [{field: 'id', order: 'ASC'}]
+      if (dbModel.options.underscored) {
+        for (let item of sort) {
+          item.field = item.field.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
+        }
       }
 
-      return SG.Connection.resolve(dbModel, args)
+      const condition = args != null ? {...args.condition} : {}
+
+      conditionFieldKeys.forEach(fieldKey => {
+        if (condition[fieldKey]) {
+          condition[fieldKey] = _.mapKeys(condition[fieldKey], function (value, key) {
+            return '$' + key
+          })
+        }
+      })
+
+      _.forOwn(model.config.fields, (value, key) => {
+        if (value instanceof ModelRef || (value && value.$type instanceof ModelRef)) {
+          if (!key.endsWith('Id')) {
+            key = key + 'Id'
+          }
+          if (typeof condition[key] !== 'undefined') {
+            if (dbModel.options.underscored) {
+              const underscoredKey = key.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
+              if (underscoredKey !== key) {
+                condition[underscoredKey] = condition[key]
+                delete condition[key]
+              }
+            }
+          }
+        }
+      })
+
+      const include = []
+      if (args && args.keywords) {
+        const {fields, value} = args.keywords
+        const keywordsCondition = []
+        const associationType = (model, fieldName):?string => {
+          for (let config of model.config.associations.hasOne) {
+            if (_.get(config, 'options.as') === fieldName) {
+              return config.target
+            }
+          }
+          for (let config of model.config.associations.belongsTo) {
+            if (_.get(config, 'options.as') === fieldName) {
+              return config.target
+            }
+          }
+          return null
+        }
+        for (let field of fields) {
+          if (field.indexOf('.') !== -1) {
+            const fieldName = field.split('.')[0]
+            const type = associationType(model, fieldName)
+            if (type) {
+              include.push({
+                model: dbModel.sequelize.models[type],
+                as: fieldName,
+                required: false
+              })
+              let colFieldName = field
+              if (dbModel.options.underscored) {
+                colFieldName = fieldName + field.substr(field.indexOf('.')).replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
+              }
+              keywordsCondition.push(Sequelize.where(Sequelize.col(colFieldName), {$like: '%' + value + '%'}))
+            } else {
+              keywordsCondition.push({[field]: {$like: '%' + value + '%'}})
+            }
+          } else {
+            keywordsCondition.push({[field]: {$like: '%' + value + '%'}})
+          }
+        }
+        condition.$or = keywordsCondition
+
+        // args.keywords.fields = args.keywords.fields.map(field => field.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase())
+      }
+
+      return SG.Connection.resolve(dbModel, {...args, condition, include})
     }
   }
 }

@@ -86,14 +86,14 @@ export default{
   /**
    * Query the model with specify args and return the connection data
    */
-  resolve: async function (model:Sequelize.Model, args:{
+  resolve: async function (dbModel:Sequelize.Model, args:{
     after?: string,
     first?: number,
     before?: string,
     last?: number,
+    include?:Array<any>,
     condition?:any,
-    sort?: Array<{field: string, order: "ASC"|"DESC"}>,
-    keywords?:{fields:Array<string>, value:string}
+    sort?: Array<{field: string, order: "ASC"|"DESC"}>
   }):Promise<{
     pageInfo: {
       hasPreviousPage: boolean,
@@ -105,17 +105,14 @@ export default{
     }>,
     count: number
   } > {
-    let {after, first = 100, before, last, condition = {}, sort = [{field: 'id', order: 'ASC'}], keywords} = args
+    let {after, first = 100, before, last, include = [], condition = {}, sort = [{
+      field: 'id',
+      order: 'ASC'
+    }]} = args
     let reverse = false
 
-    if (keywords) {
-      const {fields, value} = keywords
-      for (let field of fields) {
-        condition[field] = {$like: '%' + value + '%'}
-      }
-    }
-
-    const count = await model.count({
+    const count = await dbModel.count({
+      include: include,
       where: condition
     })
 
@@ -132,7 +129,8 @@ export default{
     }
     const offset = Math.max(after != null ? parseInt(after) : 0, 0)
 
-    const result = await model.findAll({
+    const result = await dbModel.findAll({
+      include: include,
       where: condition,
       order: sort.map(s => [s.field, s.order]),
       limit: first,

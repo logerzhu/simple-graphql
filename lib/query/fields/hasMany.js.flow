@@ -24,8 +24,17 @@ export default function hasManyFieldsConfig (model:Model):{[string]:LinkedFieldC
       },
       resolve: async function (root, args, context, info, models) {
         const condition = {..._.get(hasManyCfg, 'options.scope', {})}
-        condition[_.get(hasManyCfg, 'options.foreignKey', name + 'Id')] = root.id
-        return Connection.resolve(models[hasManyCfg.target], {...args, condition})
+        const sort = _.get(hasManyCfg, 'options.sort', [{field: 'id', order: 'ASC'}])
+        if (models[hasManyCfg.target].options.underscored) {
+          condition[_.get(hasManyCfg, 'options.foreignKey', name + 'Id').replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()] = root.id
+          for (let item of sort) {
+            item.field = item.field.replace(/([A-Z])/g, '_$1').replace(/^_/, '').toLocaleLowerCase()
+          }
+        } else {
+          condition[_.get(hasManyCfg, 'options.foreignKey', name + 'Id')] = root.id
+        }
+
+        return Connection.resolve(models[hasManyCfg.target], {...args, condition, sort})
       }
     }
   }

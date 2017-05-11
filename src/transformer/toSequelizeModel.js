@@ -81,5 +81,6 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
     }
   })
   // console.log("Create Sequlize Model with config", model.name, dbDefinition, model.config.options["table"])
-  return sequelize.define(model.name, dbDefinition, model.config.options['table'])
+  const dbModel = sequelize.define(model.name, dbDefinition, model.config.options['table'])
+  return dbModel
 }

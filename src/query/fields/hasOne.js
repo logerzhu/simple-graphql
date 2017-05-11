@@ -18,7 +18,11 @@ export default function hasOneFieldsConfig (model:Model):{[string]:LinkedFieldCo
     config[fieldName] = {
       $type: new ModelRef(hasOneCfg.target),
       resolve: async function (root, args, context, info, models) {
-        return root['get' + StringHelper.toInitialUpperCase(fieldName)]()
+        if (root[fieldName] != null) {
+          return root[fieldName]
+        } else {
+          return root['get' + StringHelper.toInitialUpperCase(fieldName)]()
+        }
       }
     }
   }

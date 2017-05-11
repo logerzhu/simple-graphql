@@ -20,7 +20,6 @@
     "jest": "^19.0.2",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
-    "sequelize": "^3.30.2",
     "continuation-local-storage": "^3.2.0",
     "sqlite3": "^3.1.8"
   }
