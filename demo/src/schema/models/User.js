@@ -15,7 +15,7 @@ export default SG.model('User', {
 
   blocked: {
     $type: Boolean,
-    default: false
+    defaultValue: false
   },
   registerAt: Date
 }).hasMany({
