@@ -209,14 +209,13 @@ export default function pluralQuery (model:Model):QueryConfig {
                              models:any) {
       const dbModel = models[model.name]
 
-      const sort = args != null ? args.sort : [{field: 'id', order: 'ASC'}]
+      let {sort = [{field: 'id', order: 'ASC'}], condition = {}} = (args != null ? args : {})
+
       if (dbModel.options.underscored) {
         for (let item of sort) {
           item.field = StringHelper.toUnderscoredName(item.field)
         }
       }
-
-      const condition = args != null ? {...args.condition} : {}
 
       conditionFieldKeys.forEach(fieldKey => {
         if (condition[fieldKey]) {
