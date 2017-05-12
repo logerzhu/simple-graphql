@@ -45,7 +45,10 @@ const schema = GS.build(sequelize, models, {
         return next()
       })
     }
-  }]
+  }],
+  mutation:{
+    payloadFields:['viewer']
+  }
 })
 
 sequelize.sync({

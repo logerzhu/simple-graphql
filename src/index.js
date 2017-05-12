@@ -14,7 +14,7 @@ import Connection from './Connection'
 import ModelRef from './ModelRef'
 import Transformer from './transformer'
 
-import type {ModelOptionConfig} from './Definition'
+import type {ModelOptionConfig, BuildOptionConfig} from './Definition'
 
 /**
  * Usage:
@@ -173,7 +173,7 @@ const SimpleGraphQL = {
   /**
    * Build the GraphQL Schema
    */
-  build: (sequelize:Sequelize, models:Array<Model>, options:any):graphql.GraphQLSchema => {
+  build: (sequelize:Sequelize, models:Array<Model>, options:BuildOptionConfig = {}):graphql.GraphQLSchema => {
     const context = new Context(sequelize, options)
 
     // 添加Model
@@ -184,6 +184,84 @@ const SimpleGraphQL = {
     context.buildModelAssociations()
 
     const finalQueries:{[fieldName: string]: graphql.GraphQLFieldConfig<any, any>} = {}
+
+    const viewerConfig = _.get(options, 'query.viewer', 'AllQuery')
+    if (viewerConfig === 'AllQuery') {
+      context.graphQLObjectTypes['Viewer'] = new graphql.GraphQLObjectType({
+        name: 'Viewer',
+        interfaces: [context.nodeInterface],
+        fields: () => {
+          const fields = {
+            id: {type: new graphql.GraphQLNonNull(graphql.GraphQLID)}
+          }
+          _.forOwn(finalQueries, (value, key) => {
+            if (key !== 'viewer' && key !== 'relay') fields[key] = value
+          })
+          return fields
+        }
+      })
+      finalQueries['viewer'] = {
+        description: 'Default Viewer implement to include all queries.',
+        type: context.graphQLObjectTypes['Viewer'],
+        resolve: () => {
+          return {
+            _type: 'Viewer',
+            id: relay.toGlobalId('Viewer', 'viewer')
+          }
+        }
+      }
+    } else if (viewerConfig === 'FromModelQuery') {
+      if (!finalQueries['viewer']) {
+        throw new Error('Build option has config "query.view=FromModelQuery" but query "viewer" not defined.')
+      }
+    } else {
+      finalQueries['viewer'] = viewerConfig
+    }
+
+    finalQueries['node'] = {
+      name: 'node',
+      description: 'Fetches an object given its ID',
+      type: context.nodeInterface,
+      args: {
+        id: {
+          type: new graphql.GraphQLNonNull(graphql.GraphQLID),
+          description: 'The ID of an object'
+        }
+      },
+      resolve: context.wrapQueryResolve({
+        name: 'node',
+        $type: context.nodeInterface,
+        resolve: async function (args, context, info, models, invoker) {
+          const id = relay.fromGlobalId(args.id)
+          if (id.type === 'Viewer') {
+            if (finalQueries['viewer'] && finalQueries['viewer'].resolve) {
+              return finalQueries['viewer'].resolve(null, args, context, info)
+            }
+          }
+          if (!models[id.type]) return null
+          const record = await models[id.type].findOne({where: {id: id.id}})
+          if (record) {
+            record._type = id.type
+          }
+          return record
+        }
+      })
+    }
+
+    const rootQuery = new graphql.GraphQLObjectType({
+      name: 'RootQuery',
+      fields: () => {
+        return finalQueries
+      }
+    })
+
+    finalQueries['relay'] = {
+      description: 'Hack to workaround https://github.com/facebook/relay/issues/112 re-exposing the root query object',
+      type: new graphql.GraphQLNonNull(rootQuery),
+      resolve: () => {
+        return {}
+      }
+    }
 
     _.forOwn(context.queries, (value, key) => {
       finalQueries[key] = {
@@ -200,71 +278,26 @@ const SimpleGraphQL = {
       }
     })
 
-    const viewerInstance = {
-      _type: 'Viewer',
-      id: relay.toGlobalId('Viewer', 'viewer')
-    }
-
-    const nodeConfig = {
-      name: 'node',
-      description: 'Fetches an object given its ID',
-      type: context.nodeInterface,
-      args: {
-        id: {
-          type: new graphql.GraphQLNonNull(graphql.GraphQLID),
-          description: 'The ID of an object'
-        }
-      },
-      resolve: context.wrapQueryResolve({
-        name: 'node',
-        $type: context.nodeInterface,
-        resolve: async function (args, context, info, models, invoker) {
-          const id = relay.fromGlobalId(args.id)
-          if (id.type === 'Viewer') {
-            return viewerInstance
-          }
-          if (!models[id.type]) return null
-          const record = await models[id.type].findOne({where: {id: id.id}})
-          if (record) {
-            record._type = id.type
-          }
-          return record
-        }
-      })
-    }
-
-    const viewerType = new graphql.GraphQLObjectType({
-      name: 'Viewer',
-      interfaces: [context.nodeInterface],
-      fields: () => {
-        return Object.assign({
-          id: {type: new graphql.GraphQLNonNull(graphql.GraphQLID)},
-          node: nodeConfig
-        }, finalQueries)
-      }
-    })
-    context.graphQLObjectTypes['Viewer'] = viewerType
-
     return new graphql.GraphQLSchema({
-      query: new graphql.GraphQLObjectType({
-        name: 'RootQuery',
-        fields: () => {
-          return Object.assign({
-            viewer: {
-              type: viewerType,
-              resolve: () => viewerInstance
-            },
-            node: nodeConfig
-          }, finalQueries)
-        }
-      }),
+      query: rootQuery,
       mutation: new graphql.GraphQLObjectType({
         name: 'RootMutation',
         fields: () => {
           const fields:{[fieldName: string]: graphql.GraphQLFieldConfig<any, any>} = {}
           _.forOwn(context.mutations, (value, key) => {
             const inputFields = Transformer.toGraphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.inputFields)
-            const outputFields = {viewer: {type: viewerType, resolve: () => viewerInstance}}
+            const outputFields = {}
+            const payloadFields = _.get(options, 'mutation.payloadFields', [])
+            for (let field of payloadFields) {
+              if (typeof field === 'string') {
+                if (!finalQueries[field]) {
+                  throw new Error('Incorrect buildOption. Query[' + field + '] not exist.')
+                }
+                outputFields[field] = finalQueries[field]
+              } else {
+                outputFields[field.name] = field
+              }
+            }
             _.forOwn(value.outputFields, (fValue, fKey) => {
               outputFields[fKey] = Transformer.toGraphQLFieldConfig(
                 key + '.' + fKey,

@@ -17,6 +17,7 @@ app.use(compression({
   }
 }))
 
+app.use(express.static(__dirname + "/../public"))
 app.use('/graphql', GraphQLRouter)
 
 const SERVER_PORT = 9413
