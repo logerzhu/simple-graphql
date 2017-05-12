@@ -30,6 +30,10 @@ cd simple-graphql
 npm install # install dependencies in the main folder
 npm run start # run the demo and open your browser: http://localhost:9413/graphql
 ```
+## Roadmap
+  - [ ] Detail usage document
+  - [ ] Test
+  - [ ] [ < place for your ideas > ](https://github.com/logerzhu/simple-graphql/issues/new)
 
 ## Usage
 
