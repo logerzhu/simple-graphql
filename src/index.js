@@ -185,6 +185,21 @@ const SimpleGraphQL = {
 
     const finalQueries:{[fieldName: string]: graphql.GraphQLFieldConfig<any, any>} = {}
 
+    _.forOwn(context.queries, (value, key) => {
+      finalQueries[key] = {
+        type: Transformer.toGraphQLFieldConfig(
+          key,
+          'Payload',
+          value.$type,
+          context).type,
+        resolve: context.wrapQueryResolve(value),
+        description: value.description
+      }
+      if (value.args) {
+        finalQueries[key].args = Transformer.toGraphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.args)
+      }
+    })
+
     const viewerConfig = _.get(options, 'query.viewer', 'AllQuery')
     if (viewerConfig === 'AllQuery') {
       context.graphQLObjectTypes['Viewer'] = new graphql.GraphQLObjectType({
@@ -214,8 +229,10 @@ const SimpleGraphQL = {
       if (!finalQueries['viewer']) {
         throw new Error('Build option has config "query.view=FromModelQuery" but query "viewer" not defined.')
       }
+      // TODO check whether viewer.type is a Node
     } else {
       finalQueries['viewer'] = viewerConfig
+      // TODO check whether viewer.type is a Node
     }
 
     finalQueries['node'] = {
@@ -262,21 +279,6 @@ const SimpleGraphQL = {
         return {}
       }
     }
-
-    _.forOwn(context.queries, (value, key) => {
-      finalQueries[key] = {
-        type: Transformer.toGraphQLFieldConfig(
-          key,
-          'Payload',
-          value.$type,
-          context).type,
-        resolve: context.wrapQueryResolve(value),
-        description: value.description
-      }
-      if (value.args) {
-        finalQueries[key].args = Transformer.toGraphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.args)
-      }
-    })
 
     return new graphql.GraphQLSchema({
       query: rootQuery,

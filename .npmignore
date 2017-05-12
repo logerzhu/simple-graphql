@@ -1,2 +1,5 @@
+.idea
 demo
 src
+simple-graphql.iml
+*.sqlite
