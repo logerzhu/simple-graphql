@@ -309,3 +309,27 @@ export type AssociationConfig ={
   hasMany:Array<HasManyConfig>,
   belongsToMany:Array<BelongsToManyConfig>,
 }
+
+export type BuildOptionConfig = {
+  hooks?:Array<{
+    description?: string,
+    filter: (action:{type:'field'|'query'|'mutation', config:any})=>boolean,
+    hook: (action:{type:'field'|'query'|'mutation', config:any},
+           invokeInfo:{source?:any, args:any, context:any, info:GraphQLResolveInfo, models:{[string]:Sequelize.Model}},
+           next:()=>any)=>any
+  }>,
+  query?:{
+    viewer?:'AllQuery' | 'FromModelQuery' | QueryConfig,
+  },
+  mutation?:{
+    payloadFields?:Array<string|{
+      name:string,
+      $type:LinkedFieldType,
+      description?:string,
+      args?:ArgsType,
+      resolve: (args:{[argName: string]: any},
+                context:any,
+                info:GraphQLResolveInfo,
+                models:{[id:string]:Sequelize.Model}) => any}>
+  }
+}

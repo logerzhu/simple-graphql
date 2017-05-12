@@ -13,7 +13,7 @@ import ModelRef from './ModelRef'
 import StringHelper from './utils/StringHelper'
 import Transformer from './transformer'
 
-import type {LinkedFieldType, ArgsType} from './Definition'
+import type {LinkedFieldType, ArgsType, BuildOptionConfig} from './Definition'
 
 export type QueryConfig ={
   name:string,
@@ -40,7 +40,7 @@ export type MutationConfig ={
 export default class Context {
   sequelize:Sequelize
 
-  options:any
+  options:BuildOptionConfig
 
   dbModels:{[id:string]:Sequelize.Model}
 
@@ -56,11 +56,10 @@ export default class Context {
 
   connectionDefinitions:{[id:string]:{connectionType:graphql.GraphQLObjectType, edgeType:graphql.GraphQLObjectType}}
 
-  constructor (sequelize:Sequelize, options:any) {
+  constructor (sequelize:Sequelize, options:BuildOptionConfig) {
     this.sequelize = sequelize
-    this.options = {
-      hooks: _.get(options, 'hooks', [])
-    }
+    this.options = {...options}
+
     this.dbModels = {}
     this.models = {}
     this.graphQLObjectTypes = {}
@@ -181,12 +180,15 @@ export default class Context {
       return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
     }
     let hookFun = (action, invokeInfo, next) => next()
-    this.options.hooks.reverse().forEach(hook => {
-      if (!hook.filter || hook.filter({type: 'query', config})) {
-        const preHook = hookFun
-        hookFun = (action, invokeInfo, next) => hook.hook(action, invokeInfo, preHook.bind(null, action, invokeInfo, next))
-      }
-    })
+
+    if (this.options.hooks != null) {
+      this.options.hooks.reverse().forEach(hook => {
+        if (!hook.filter || hook.filter({type: 'query', config})) {
+          const preHook = hookFun
+          hookFun = (action, invokeInfo, next) => hook.hook(action, invokeInfo, preHook.bind(null, action, invokeInfo, next))
+        }
+      })
+    }
 
     return (source, args, context, info) => hookFun({
       type: 'query',
@@ -223,12 +225,14 @@ export default class Context {
       return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
     }
     let hookFun = (action, invokeInfo, next) => next()
-    this.options.hooks.reverse().forEach(hook => {
-      if (!hook.filter || hook.filter({type: 'field', config})) {
-        const preHook = hookFun
-        hookFun = (action, invokeInfo, next) => hook.hook(action, invokeInfo, preHook.bind(null, action, invokeInfo, next))
-      }
-    })
+    if (this.options.hooks != null) {
+      this.options.hooks.reverse().forEach(hook => {
+        if (!hook.filter || hook.filter({type: 'field', config})) {
+          const preHook = hookFun
+          hookFun = (action, invokeInfo, next) => hook.hook(action, invokeInfo, preHook.bind(null, action, invokeInfo, next))
+        }
+      })
+    }
 
     return (source, args, context, info) => hookFun({
       type: 'field',
@@ -253,12 +257,14 @@ export default class Context {
       return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
     }
     let hookFun = (action, invokeInfo, next) => next()
-    this.options.hooks.reverse().forEach(hook => {
-      if (!hook.filter || hook.filter({type: 'mutation', config})) {
-        const preHook = hookFun
-        hookFun = (action, invokeInfo, next) => hook.hook(action, invokeInfo, preHook.bind(null, action, invokeInfo, next))
-      }
-    })
+    if (this.options.hooks != null) {
+      this.options.hooks.reverse().forEach(hook => {
+        if (!hook.filter || hook.filter({type: 'mutation', config})) {
+          const preHook = hookFun
+          hookFun = (action, invokeInfo, next) => hook.hook(action, invokeInfo, preHook.bind(null, action, invokeInfo, next))
+        }
+      })
+    }
 
     return (args, context, info) => hookFun({
       type: 'mutation',
