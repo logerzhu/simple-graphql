@@ -243,6 +243,7 @@ export default function pluralQuery (model:Model):QueryConfig {
       })
 
       const include = []
+      const includeFields = {}
       if (args && args.keywords) {
         const {fields, value} = args.keywords
         const keywordsCondition = []
@@ -264,11 +265,14 @@ export default function pluralQuery (model:Model):QueryConfig {
             const fieldName = field.split('.')[0]
             const type = associationType(model, fieldName)
             if (type) {
-              include.push({
-                model: dbModel.sequelize.models[type],
-                as: fieldName,
-                required: false
-              })
+              if (!includeFields[fieldName]) {
+                includeFields[fieldName] = true
+                include.push({
+                  model: dbModel.sequelize.models[type],
+                  as: fieldName,
+                  required: false
+                })
+              }
               let colFieldName = field
               if (dbModel.options.underscored) {
                 colFieldName = fieldName + StringHelper.toUnderscoredName(field.substr(field.indexOf('.')))
