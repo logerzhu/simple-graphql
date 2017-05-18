@@ -12,7 +12,7 @@
 
 ## Document
 
--   [API](docs/API.md)
+-   [API](https://github.com/logerzhu/simple-graphql/wiki/API)
 -   [Transaction](docs/Transaction.md)
 
 ## Install
@@ -149,106 +149,6 @@ app.use('/graphql', graphqlHTTP({
 }))
 app.listen(4000)
 
-```
-## Model Definition
-```
-Const model = SimpleGraphQL
-  .model(#name: string, #option: ModelOptionConfig)                   // Define a Model
-  .fields(#fields: {[string]:FieldType | FieldTypeConfig})            // Add fields to current model
-  .links(#links: {[string]:LinkFieldType | LinkFieldTypeConfig})      // Add link fields to current model
-  .queries(#queries: {[string]: QueryConfig})                         // Add GraphQL queries to current model
-  .mutations(#queries: {[string]: MutationConfig})                    // Add GraphQL mutations to current model
-  .methods(#methods: {[string]:any}                                   // Add instance method to current Model
-  .statics(#methods: {[string]:any}                                   // Add statics method to current Model
-  .hasOne(#config: HasOneConfig)                                    
-  .belongsTo(#config: BelongsToConfig)
-  .hasMany(#config: HasManyConfig)
-  .belongsToMany(#config: BelongsToManyConfig)
-```
-
-
-## Configutation
-- [ModelOptionConfig](modeloptionconfig)
-- [ModelTableOptionConfig](modeltableoptionconfig)
-
-### ModelOptionConfig
-Attribute|Description
------------- | -------------
-description?:string | Model description, using on GraphQL Type description. 
-singularQuery?:string | if false, the sigular GraphQL query will not be genereated. 
-pluralQuery?:boolean\|Object | if false, the plural GraphQL query will not be genereated.
-addMutation?:boolean\|Object | if false, the add GraphQL mutation will not be genereated.
-deleteMutation?:boolean\|Object | if false, the delete GraphQL mutation will not be genereated.
-updateMutation?:boolean\|Object | if false, the update GraphQL mutation will not be genereated.
-table?:[ModelTableOptionConfig](modeltableoptionconfig) | Reference to [Options](http://docs.sequelizejs.com/en/v3/api/sequelize/#definemodelname-attributes-options-model) of model define [sequelize.define]
-
-### ModelTableOptionConfig
-```
-type ModelTableOptionConfig = {
-
-  defaultScope?:Object,
-  scopes?:Object,
-  omitNull?:boolean,
-  timestamps?:boolean,
-  createdAt?:string|boolean,
-  updatedAt?:string|boolean,
-  paranoid?:boolean,
-  deletedAt?:string|boolean,
-  underscored?:boolean,
-  underscoredAll?:boolean,
-  freezeTableName?:boolean,
-  name?:{
-    singular?:string,
-    plural?:string,
-  },
-  indexes?:Array<{
-    name?:string,
-    type?:'UNIQUE' | 'FULLTEXT' | 'SPATIAL',
-    method?:'USING' | 'USING' | 'HASH' | 'GIST' | 'GIN',
-    unique?:boolean,
-    concurrently?:boolean,
-    fields?:Array<string | {
-      attribute?:string,
-      length?:number,
-      order?:'ASC' | 'DESC',
-      collate?:string
-    }>
-  }>,
-  tableName?:string,
-  getterMethods?:{[string]:() => any},
-  setterMethods?:{[string]:(any) => void},
-  instanceMethods?:{[string]:any},
-  classMethods?:{[string]:any},
-  schema?:string,
-  engine?:string,
-  charset?:string,
-  comment?:string,
-  collate?:string,
-  rowFormat?:string,
-  initialAutoIncrement?:string,
-  validate?: ValidateConfig,
-  hooks?:{
-    beforeBulkCreate?:(Object, Object) => void | Array<(Object, Object) => void>,
-    beforeBulkDestroy?:(Object) => void | Array<(Object) => void>,
-    beforeBulkUpdate?:(Object) => void | Array<(Object) => void>,
-    beforeValidate?:(Object, Object) => void | Array<(Object, Object) => void>,
-    afterValidate?:(Object, Object) => void | Array<(Object, Object) => void>,
-    validationFailed?:(Object, Object, Object) => void | Array<(Object, Object, Object) => void>,
-    beforeCreate?:(Object, Object) => void | Array<(Object, Object) => void>,
-    beforeDestroy?:(Object, Object) => void | Array<(Object, Object) => void>,
-    beforeUpdate?:(Object, Object) => void | Array<(Object, Object) => void>,
-    beforeSave?:(Object, Object) => void | Array<(Object, Object) => void>,
-    beforeUpsert?:(Object, Object) => void | Array<(Object, Object) => void>,
-    afterCreate?:(Object, Object) => void | Array<(Object, Object) => void>,
-    afterDestroy?:(Object, Object) => void | Array<(Object, Object) => void>,
-    afterUpdate?:(Object, Object) => void | Array<(Object, Object) => void>,
-    afterSave?:(Object, Object) => void | Array<(Object, Object) => void>,
-    afterUpsert?:(Object, Object) => void | Array<(Object, Object) => void>,
-    afterBulkCreate?:(Object, Object) => void | Array<(Object, Object) => void>,
-    afterBulkDestroy?:(Object) => void | Array<(Object) => void>,
-    afterBulkUpdate?:(Object) => void | Array<(Object) => void>,
-  }
-}
 ```
 
 ## License
