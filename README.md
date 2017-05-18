@@ -13,7 +13,7 @@
 ## Document
 
 -   [API](https://github.com/logerzhu/simple-graphql/wiki/API)
--   [Transaction](docs/Transaction.md)
+-   [Transaction](https://github.com/logerzhu/simple-graphql/wiki/Transaction)
 
 ## Install
 
