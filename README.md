@@ -2,7 +2,7 @@
 
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
-`Simple-GraphQL` generates [GraphQL](https://github.com/graphql/graphql-js) schemas and [Sequelize](http://docs.sequelizejs.com/en/v3/) models from your models definition(support [FlowType](https://flow.org/) static type check), that's how simple it is. The generated GraphQL schema is compatible with [Relay](https://facebook.github.io/relay/).
+`Simple-GraphQL` generates [GraphQL](https://github.com/graphql/graphql-js) schemas and [Sequelize](http://docs.sequelizejs.com/en/v3/) models from your models definition(support [FlowType](https://flow.org/) static type check). The generated GraphQL schema is compatible with [Relay](https://facebook.github.io/relay/).
 
 >[GraphQL](https://github.com/graphql/graphql-js) is a query language for your API, and a server-side runtime for executing queries by using a type system you define for your data. 
 
