@@ -29,6 +29,9 @@ export default function singularQuery (model:Model):QueryConfig {
     $type: SG.modelRef(model.name),
     args: searchFields,
     resolve: async function (args:{[argName: string]: any}, context:any, info:graphql.GraphQLResolveInfo, models) {
+      if (args === null || Object.keys(args).length === 0) {
+        return null
+      }
       return models[model.name].findOne({
         where: {
           ...args
