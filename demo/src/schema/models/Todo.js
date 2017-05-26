@@ -4,7 +4,16 @@ import SG from '../../../../src/index'
 const UserType = SG.modelRef('User')
 const TodoType = SG.modelRef('Todo')
 
-export default SG.model('Todo').fields({
+export default SG.model('Todo', {
+  pluralQuery: {
+    conditionArgs: {
+      owner: {
+        userName: String,
+        password: String
+      }
+    }
+  }
+}).fields({
   owner: UserType,
   title: {
     $type: String,

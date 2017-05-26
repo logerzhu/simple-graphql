@@ -142,7 +142,10 @@ export default class Context {
           resolve: async function (root) {
             return relay.toGlobalId(StringHelper.toInitialUpperCase(model.name), root.id)
           }
-        }
+        },
+        // TODO
+        createdAt: Date,
+        updatedAt: Date
       })
 
       Object.assign(obj, Query.hasManyQueryFields(model))

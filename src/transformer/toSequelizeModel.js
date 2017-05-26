@@ -60,8 +60,8 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
           if (value.required != null) {
             dbDefinition[key].allowNull = !value.required
           }
-          if (value.defaultValue != null) {
-            dbDefinition[key].defaultValue = value.defaultValue
+          if (value.default != null) {
+            dbDefinition[key].defaultValue = value.default
           }
           if (value.validate != null) {
             dbDefinition[key].validate = value.validate

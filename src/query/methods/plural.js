@@ -162,6 +162,10 @@ export default function pluralQuery (model:Model):QueryConfig {
   }
   )
 
+  if (model.config.options.pluralQuery && model.config.options.pluralQuery.conditionArgs) {
+    Object.assign(searchFields, (model.config.options.pluralQuery.conditionArgs:any))
+  }
+
   // 生产
   return {
     name: name,
@@ -225,8 +229,48 @@ export default function pluralQuery (model:Model):QueryConfig {
         }
       })
 
+      const include = []
+      const includeFields = {}
+
+      const associationType = (model, fieldName):?string => {
+        for (let config of model.config.associations.hasOne) {
+          if (_.get(config, 'options.as') === fieldName) {
+            return config.target
+          }
+        }
+        for (let config of model.config.associations.belongsTo) {
+          if (_.get(config, 'options.as') === fieldName) {
+            return config.target
+          }
+        }
+        return null
+      }
+
       _.forOwn(model.config.fields, (value, key) => {
         if (value instanceof ModelRef || (value && value.$type instanceof ModelRef)) {
+          if (typeof condition[key] !== 'undefined') {
+            if (!includeFields[key]) {
+              const type = associationType(model, key)
+              includeFields[key] = true
+              include.push({
+                model: dbModel.sequelize.models[type],
+                as: key,
+                required: true
+              })
+            }
+            if (!condition.$and) {
+              condition.$and = []
+            }
+            Object.keys(condition[key]).forEach(f => {
+              if (dbModel.options.underscored) {
+                condition.$and.push(Sequelize.where(Sequelize.col(key + '.' + StringHelper.toUnderscoredName(f)), {$eq: condition[key][f]}))
+              } else {
+                condition.$and.push(Sequelize.where(Sequelize.col(key + '.' + f), {$eq: condition[key][f]}))
+              }
+            })
+            delete condition[key]
+          }
+
           if (!key.endsWith('Id')) {
             key = key + 'Id'
           }
@@ -242,24 +286,10 @@ export default function pluralQuery (model:Model):QueryConfig {
         }
       })
 
-      const include = []
-      const includeFields = {}
       if (args && args.keywords) {
         const {fields, value} = args.keywords
         const keywordsCondition = []
-        const associationType = (model, fieldName):?string => {
-          for (let config of model.config.associations.hasOne) {
-            if (_.get(config, 'options.as') === fieldName) {
-              return config.target
-            }
-          }
-          for (let config of model.config.associations.belongsTo) {
-            if (_.get(config, 'options.as') === fieldName) {
-              return config.target
-            }
-          }
-          return null
-        }
+
         for (let field of fields) {
           if (field.indexOf('.') !== -1) {
             const fieldName = field.split('.')[0]

@@ -17,6 +17,7 @@ export type LinkedFieldType = Class<String> | Class<Number> | Class<Boolean> | C
   [string]:LinkedFieldType,
   $type?:LinkedFieldType,
   required?:boolean,
+  default?:any,
   description?:string,
   args?:{[string]:LinkedFieldType},
   resolve?: (source:any, args:{[string]: any},
@@ -142,7 +143,7 @@ export type FieldType = BaseFieldType | {
   $type:BaseFieldType,
   description?:string,
   enumValues?:Array<string>,
-  defaultValue?:any,
+  default?:any,
   required?:boolean,
   hidden?: boolean,                     // hidden为true, 对应的field将不会出现在graphql schema中
   searchable?: boolean,                 // 是否可以在plural的Query中出现
