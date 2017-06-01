@@ -81,6 +81,19 @@ export default class Context {
     }
     this.models[model.name] = model
 
+    model.fields({
+      createdAt: {
+        $type: Date,
+        initializable: false,
+        mutable: false
+      },
+      updatedAt: {
+        $type: Date,
+        initializable: false,
+        mutable: false
+      }
+    })
+
     _.forOwn(model.config.queries, (value, key) => {
       if (!value['name']) {
         value['name'] = key
@@ -142,10 +155,7 @@ export default class Context {
           resolve: async function (root) {
             return relay.toGlobalId(StringHelper.toInitialUpperCase(model.name), root.id)
           }
-        },
-        // TODO
-        createdAt: Date,
-        updatedAt: Date
+        }
       })
 
       Object.assign(obj, Query.hasManyQueryFields(model))

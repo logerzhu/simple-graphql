@@ -18,6 +18,7 @@ export type LinkedFieldType = Class<String> | Class<Number> | Class<Boolean> | C
   $type?:LinkedFieldType,
   required?:boolean,
   default?:any,
+  enumValues?:Array<string>,
   description?:string,
   args?:{[string]:LinkedFieldType},
   resolve?: (source:any, args:{[string]: any},
