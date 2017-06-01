@@ -45,9 +45,18 @@ const schema = GS.build(sequelize, models, {
         return next()
       })
     }
+  }, {
+    description: 'ACL hook example',
+    filter: ({type, config}) => type === 'query' || type === 'mutation',
+    hook: async function ({type, config}, {source, args, context, info, models}, next) {
+      if (config.config && config.config.acl) {
+        console.log("ACL config for " + config.name + ":" + config.config.acl)
+      }
+      return next()
+    }
   }],
-  mutation:{
-    payloadFields:['viewer']
+  mutation: {
+    payloadFields: ['viewer']
   }
 })
 

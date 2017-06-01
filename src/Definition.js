@@ -51,6 +51,7 @@ export type LinkedFieldConfig = {
 export type QueryConfig ={
   $type:LinkedFieldType,
   description?:string,
+  config?:any,
   args?:ArgsType,
   resolve: (args:{[string]: any},
             context:any,
@@ -63,6 +64,7 @@ export type QueryConfig ={
  */
 export type MutationConfig ={
   description?:string,
+  config?:any,
   inputFields:ArgsType,
   outputFields:{[string]:LinkedFieldType},
   mutateAndGetPayload:(args:{[string]: any},

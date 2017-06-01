@@ -29,6 +29,9 @@ export default SG.model('Todo', {
   dueTodos: {
     description: 'Find all due todos',
     $type: [TodoType],
+    config: {
+      acl: "User"
+    },
     args: {
       ownerId: {
         $type: UserType,
@@ -52,7 +55,7 @@ export default SG.model('Todo', {
     }
   }
 }).mutations({
-  cpmpletedTodo: {
+  completedTodo: {
     description: 'Mark the todo task completed.',
     inputFields: {
       todoId: {
