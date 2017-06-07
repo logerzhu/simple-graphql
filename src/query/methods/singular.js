@@ -24,8 +24,14 @@ export default function singularQuery (model:Model):QueryConfig {
     }
   })
 
+  let config = {}
+  if ((typeof model.config.options.singularQuery) === 'object') {
+    config = model.config.options.singularQuery
+  }
+
   return {
     name: name,
+    config: config,
     $type: SG.modelRef(model.name),
     args: searchFields,
     resolve: async function (args:{[argName: string]: any}, context:any, info:graphql.GraphQLResolveInfo, models) {

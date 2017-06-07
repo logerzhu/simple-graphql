@@ -13,7 +13,7 @@ export default function addMutation (model:Model):MutationConfig {
   const name = 'add' + StringHelper.toInitialUpperCase(model.name)
   const addedName = 'added' + StringHelper.toInitialUpperCase(model.name) + 'Edge'
 
-  const config = {}
+  const inputFields = {}
   _.forOwn(model.config.fields, (value, key) => {
     if (value instanceof ModelRef || (value && value.$type instanceof ModelRef)) {
       if (!key.endsWith('Id')) {
@@ -22,15 +22,20 @@ export default function addMutation (model:Model):MutationConfig {
     }
     if (value && value.$type) {
       if (!value.hidden && value.initializable !== false) {
-        config[key] = value
+        inputFields[key] = value
       }
     } else {
-      config[key] = value
+      inputFields[key] = value
     }
   })
+  let config = {}
+  if ((typeof model.config.options.addMutation) === 'object') {
+    config = model.config.options.addMutation
+  }
   return {
     name: name,
-    inputFields: config,
+    config: config,
+    inputFields: inputFields,
     outputFields: {
       [addedName]: SG.Connection.edgeType(SG.modelRef(model.name))
     },

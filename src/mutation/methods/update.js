@@ -13,7 +13,7 @@ export default function updateMutation (model:Model):MutationConfig {
   const name = 'update' + StringHelper.toInitialUpperCase(model.name)
   const changedName = 'changed' + StringHelper.toInitialUpperCase(model.name)
 
-  const config = {
+  const inputFields = {
     id: {
       $type: SG.modelRef(model.name),
       required: true
@@ -28,16 +28,22 @@ export default function updateMutation (model:Model):MutationConfig {
     }
     if (value && value.$type) {
       if (!value.hidden && value.mutable !== false) {
-        config.values[key] = {...value, required: false, default: null}
+        inputFields.values[key] = {...value, required: false, default: null}
       }
     } else {
-      config.values[key] = value
+      inputFields.values[key] = value
     }
   })
 
+  let config = {}
+  if ((typeof model.config.options.updateMutation) === 'object') {
+    config = model.config.options.updateMutation
+  }
+
   return {
     name: name,
-    inputFields: config,
+    config: config,
+    inputFields: inputFields,
     outputFields: {
       [changedName]: SG.modelRef(model.name)
     },

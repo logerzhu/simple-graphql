@@ -10,8 +10,13 @@ import type {MutationConfig} from '../../Context'
 
 export default function deleteMutation (model:Model):MutationConfig {
   const name = 'delete' + StringHelper.toInitialUpperCase(model.name)
+  let config = {}
+  if ((typeof model.config.options.deleteMutation) === 'object') {
+    config = model.config.options.deleteMutation
+  }
   return {
     name: name,
+    config: config,
     inputFields: {
       id: {
         $type: SG.modelRef(model.name),

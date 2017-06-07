@@ -166,9 +166,15 @@ export default function pluralQuery (model:Model):QueryConfig {
     Object.assign(searchFields, (model.config.options.pluralQuery.conditionArgs:any))
   }
 
+  let config = {}
+  if ((typeof model.config.options.pluralQuery) === 'object') {
+    config = model.config.options.pluralQuery
+  }
+
   // 生产
   return {
     name: name,
+    config: config,
     $type: SG.Connection.connectionType(SG.modelRef(model.name)),
     args: {
       condition: {
