@@ -128,11 +128,19 @@ export default{
       })
     }
     const offset = Math.max(after != null ? parseInt(after) : 0, 0)
+    const order = sort.map(s => {
+      if (s.field.indexOf('.') !== -1) {
+        const fieldName = s.field.split('.')[0]
+        return [dbModel.associations[fieldName], s.field.substr(s.field.indexOf('.') + 1), s.order]
+      } else {
+        return [s.field, s.order]
+      }
+    })
 
     const result = await dbModel.findAll({
       include: include,
       where: condition,
-      order: sort.map(s => [s.field, s.order]),
+      order: order,
       limit: first,
       offset: offset
     })
