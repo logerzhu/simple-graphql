@@ -9,7 +9,7 @@ import GS from '../../../src'
 import {dbCfg} from '../config'
 
 const namespace = cls.createNamespace('my-db-namespace')
-Sequelize.useCLS(namespace)
+Sequelize.cls = namespace
 
 export const sequelize = new Sequelize(dbCfg.schema, dbCfg.user, dbCfg.password, dbCfg.options)
 

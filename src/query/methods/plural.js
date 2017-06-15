@@ -313,7 +313,7 @@ export default function pluralQuery (model:Model):QueryConfig {
               if (dbModel.options.underscored) {
                 colFieldName = fieldName + StringHelper.toUnderscoredName(field.substr(field.indexOf('.')))
               }
-              keywordsCondition.push({['$' + colFieldName + '$']: {$like: '%' + value + '%'}})
+              keywordsCondition.push(Sequelize.where(Sequelize.col(colFieldName), {$like: '%' + value + '%'}))
             } else {
               keywordsCondition.push({[field]: {$like: '%' + value + '%'}})
             }

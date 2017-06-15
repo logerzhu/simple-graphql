@@ -26,7 +26,7 @@ declare class Sequelize {
   static UUID:DataType;
 
 
-  static useCLS:any;
+  static cls:any;
   static col:any;
   static fn:any;
   static where:any;
