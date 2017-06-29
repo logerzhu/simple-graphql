@@ -217,7 +217,7 @@ const SimpleGraphQL = {
       })
       finalQueries['viewer'] = {
         description: 'Default Viewer implement to include all queries.',
-        type: context.graphQLObjectTypes['Viewer'],
+        type: new graphql.GraphQLNonNull(((context.graphQLObjectTypes['Viewer']:any):graphql.GraphQLObjectType)),
         resolve: () => {
           return {
             _type: 'Viewer',
