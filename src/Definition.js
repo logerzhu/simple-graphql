@@ -243,8 +243,8 @@ export type HasOneConfig ={
     hooks?: boolean,
     as?:string|Object,
     foreignKey?:string|Object,
-    onDelete?: 'SET NULL' | 'CASCADE',
-    onUpdate?: 'CASCADE',
+    onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
+    onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     constraints?:boolean
   }
 }
@@ -259,8 +259,8 @@ export type BelongsToConfig = {
     hooks?: boolean,
     as?:string|Object,
     foreignKey?:string|Object,
-    onDelete?: 'SET NULL' | 'CASCADE',
-    onUpdate?: 'CASCADE',
+    onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
+    onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     constraints?:boolean
   }
 }
@@ -273,8 +273,8 @@ export type HasManyConfig = {
     as?:string|Object,
     foreignKey?:string|Object,
     scope?:Object,
-    onDelete?: 'SET NULL' | 'CASCADE',
-    onUpdate?: 'CASCADE',
+    onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
+    onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     constraints?:boolean,
     sort?:Array<{field:string, order:'ASC'|'DESC'}>
   }
@@ -298,8 +298,8 @@ export type BelongsToManyConfig ={
     otherKey?:string|Object,
     scope?:Object,
     timestamps?:boolean,
-    onDelete?: 'SET NULL' | 'CASCADE',
-    onUpdate?: 'CASCADE',
+    onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
+    onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     constraints?:boolean
   }
 }

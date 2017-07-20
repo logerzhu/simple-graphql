@@ -43,13 +43,13 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
         model.belongsTo({
           target: fType.name,
           hidden: true,
-          options: {as: key, foreignKey: foreignKey, constraints: true}
+          options: {as: key, foreignKey: foreignKey, constraints: true, onDelete: 'RESTRICT'}
         })
       } else {
         model.belongsTo({
           target: fType.name,
           hidden: true,
-          options: {as: key, foreignKey: foreignKey, constraints: false}
+          options: {as: key, foreignKey: foreignKey, constraints: false, onDelete: 'SET NULL'}
         })
       }
     } else {

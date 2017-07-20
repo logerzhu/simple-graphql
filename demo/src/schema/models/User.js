@@ -22,7 +22,7 @@ export default SG.model('User', {
   target: 'Todo',
   options: {
     as: 'dueTodos',
-    foreignKey: 'ownerId',
+    foreignKey: 'owner_id',
     scope: {
       completed: false
     },
@@ -32,6 +32,6 @@ export default SG.model('User', {
   target: 'UserProfile',
   options: {
     as: 'profile',
-    foreignKey: 'ownerId'
+    foreignKey: 'owner_id'
   }
 })

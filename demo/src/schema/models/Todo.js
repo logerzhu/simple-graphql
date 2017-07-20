@@ -14,7 +14,10 @@ export default SG.model('Todo', {
     }
   }
 }).fields({
-  owner: UserType,
+  owner: {
+    $type:UserType,
+    required:true
+  },
   title: {
     $type: String,
     required: true
