@@ -113,7 +113,7 @@ type ValidateConfig = {
 
 /** DB Column config */
 type ColumnConfig = {
-  type:Sequelize.DataType | {BINARY:Sequelize.DataType} | (number) =>Sequelize.DataType | (number, number) => Sequelize.DataType,
+  type?:Sequelize.DataType | {BINARY:Sequelize.DataType} | (number) =>Sequelize.DataType | (number, number) => Sequelize.DataType,
   allowNull?:boolean,
   defaultValue?:any,
   unique?:boolean,
