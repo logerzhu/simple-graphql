@@ -4,7 +4,7 @@ import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
 import _ from 'lodash'
 
-import type {GraphQLOutputType} from 'graphql'
+import type {GraphQLObjectType} from 'graphql'
 
 import Query from './query'
 import Mutation from './mutation'
@@ -48,7 +48,7 @@ export default class Context {
 
   models:{[id:string]: Model}
 
-  graphQLObjectTypes:{[id:string]: GraphQLOutputType}
+  graphQLObjectTypes:{[id:string]: GraphQLObjectType}
 
   queries:{[id:string]:QueryConfig}
 
@@ -69,7 +69,10 @@ export default class Context {
     this.connectionDefinitions = {}
 
     const self = this
-    this.nodeInterface = relay.nodeDefinitions(null, (obj) => {
+    this.nodeInterface = relay.nodeDefinitions((globalId) => {
+      var {type, id} = relay.fromGlobalId(globalId)
+      console.log('Warning-------------------- node id Fetcher not implement' + type + ' ' + id)
+    }, (obj) => {
       const type = obj._type
       return self.graphQLObjectTypes[type]
     }).nodeInterface
@@ -139,7 +142,7 @@ export default class Context {
     this.mutations[config.name] = config
   }
 
-  graphQLObjectType (name:string):GraphQLOutputType {
+  graphQLObjectType (name:string):GraphQLObjectType {
     const model = this.models[name]
     if (!model) {
       throw new Error('Model ' + name + ' not define.')
@@ -161,9 +164,10 @@ export default class Context {
       Object.assign(obj, Query.hasManyQueryFields(model))
       Object.assign(obj, Query.hasOneQueryFields(model))
 
-      this.graphQLObjectTypes[typeName] = Transformer.toGraphQLFieldConfig(typeName, '', obj, this, interfaces).type
-      if (this.graphQLObjectTypes[typeName] instanceof graphql.GraphQLObjectType) {
-        this.graphQLObjectTypes[typeName].description = model.config.options.description
+      const objectType = Transformer.toGraphQLFieldConfig(typeName, '', obj, this, interfaces).type
+      if (objectType instanceof graphql.GraphQLObjectType) {
+        objectType.description = model.config.options.description
+        this.graphQLObjectTypes[typeName] = objectType
       }
     }
     return this.graphQLObjectTypes[typeName]
@@ -179,7 +183,7 @@ export default class Context {
     if (!this.dbModels[typeName]) {
       this.dbModels[typeName] = Transformer.toSequelizeModel(this.sequelize, model)
       Object.assign(this.dbModels[typeName], model.config.statics)
-      Object.assign(this.dbModels[typeName].Instance.prototype, model.config.methods)
+      Object.assign(this.dbModels[typeName].prototype, model.config.methods)
     }
     return this.dbModels[typeName]
   }
@@ -189,9 +193,6 @@ export default class Context {
 
     const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
 
-    const invoker = (schema, context, rootValue, requestString, variableValues) => {
-      return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
-    }
     let hookFun = (action, invokeInfo, next) => next()
 
     if (this.options.hooks != null) {
@@ -214,7 +215,7 @@ export default class Context {
       models: dbModels()
     },
       () => {
-        return config.resolve(args, context, info, dbModels(), invoker.bind(null, info.schema, context, info.rootValue))
+        return config.resolve(args, context, info, dbModels())
       }
     )
   }
@@ -234,9 +235,6 @@ export default class Context {
 
     const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
 
-    const invoker = (schema, context, rootValue, requestString, variableValues) => {
-      return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
-    }
     let hookFun = (action, invokeInfo, next) => next()
     if (this.options.hooks != null) {
       this.options.hooks.reverse().forEach(hook => {
@@ -257,7 +255,7 @@ export default class Context {
       info: info,
       models: dbModels()
     },
-      () => config.resolve(source, args, context, info, dbModels(), invoker.bind(null, info.schema, context, info.rootValue))
+      () => config.resolve(source, args, context, info, dbModels())
     )
   }
 
@@ -266,9 +264,6 @@ export default class Context {
 
     const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
 
-    const invoker = (schema, context, rootValue, requestString, variableValues) => {
-      return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
-    }
     let hookFun = (action, invokeInfo, next) => next()
     if (this.options.hooks != null) {
       this.options.hooks.reverse().forEach(hook => {
@@ -288,7 +283,7 @@ export default class Context {
       info: info,
       models: dbModels()
     },
-      () => config.mutateAndGetPayload(args, context, info, dbModels(), invoker.bind(null, info.schema, context, info.rootValue))
+      () => config.mutateAndGetPayload(args, context, info, dbModels())
     )
   }
 

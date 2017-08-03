@@ -1,9 +1,10 @@
 [ignore]
+<PROJECT_ROOT>/lib/.*
 
 [include]
 
 [libs]
-flow-typed/jest_v19.x.x.js
+flow-typed/jest_v20.x.x.js
 
 [options]
 module.ignore_non_literal_requires=true

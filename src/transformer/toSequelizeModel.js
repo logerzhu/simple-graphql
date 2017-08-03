@@ -77,7 +77,7 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
           dbDefinition[key].field = StringHelper.toUnderscoredName(key)
         }
       } else {
-        throw new Error('Unknown column type for ', fType)
+        throw new Error('Unknown column type for ' + fType)
       }
     }
   })
