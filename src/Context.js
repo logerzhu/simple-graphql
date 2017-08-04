@@ -13,6 +13,9 @@ import ModelRef from './ModelRef'
 import StringHelper from './utils/StringHelper'
 import Transformer from './transformer'
 
+import SequelizeContext from './sequelize/SequelizeContext'
+
+
 import type {LinkedFieldType, ArgsType, BuildOptionConfig} from './Definition'
 
 export type QueryConfig ={
@@ -38,7 +41,8 @@ export type MutationConfig ={
 }
 
 export default class Context {
-  sequelize:Sequelize
+
+  dbContext:SequelizeContext
 
   options:BuildOptionConfig
 
@@ -57,7 +61,7 @@ export default class Context {
   connectionDefinitions:{[id:string]:{connectionType:graphql.GraphQLObjectType, edgeType:graphql.GraphQLObjectType}}
 
   constructor (sequelize:Sequelize, options:BuildOptionConfig) {
-    this.sequelize = sequelize
+    this.dbContext = new SequelizeContext(sequelize)
     this.options = {...options}
 
     this.dbModels = {}
@@ -181,7 +185,7 @@ export default class Context {
     const typeName = model.name
 
     if (!this.dbModels[typeName]) {
-      this.dbModels[typeName] = Transformer.toSequelizeModel(this.sequelize, model)
+      this.dbModels[typeName] = this.dbContext.define(model)
       Object.assign(this.dbModels[typeName], model.config.statics)
       Object.assign(this.dbModels[typeName].prototype, model.config.methods)
     }
