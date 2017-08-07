@@ -1,7 +1,7 @@
 // @flow
 import SG from '../../../../src/index'
 
-export default SG.model('User', {
+export default SG.schema('User', {
   description: '用户'
 }).fields({
   userName: {

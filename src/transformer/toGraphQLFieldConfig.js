@@ -8,8 +8,6 @@ import type {GraphQLFieldConfig} from 'graphql'
 import Type from '../type'
 import Context from '../Context'
 import StringHelper from '../utils/StringHelper'
-import Connection from '../Connection'
-import ModelRef from '../ModelRef'
 import toGraphQLInputFieldMap from './toGraphQLInputFieldMap'
 
 const toGraphQLFieldConfig = function (name:string,
@@ -57,43 +55,41 @@ const toGraphQLFieldConfig = function (name:string,
     }
   }
 
-  if (fieldType instanceof ModelRef) {
-    return {
-      type: context.graphQLObjectType(fieldType.name),
-      resolve: context.wrapFieldResolve({
-        name: name.split('.').slice(-1)[0],
-        path: name,
-        $type: context.graphQLObjectType(fieldType.name),
-        resolve: async function (root, args, context, info, models) {
-          const fieldName = name.split('.').slice(-1)[0]
-          if (_.isFunction(root['get' + StringHelper.toInitialUpperCase(fieldName)])) {
-            if (root[fieldName] != null && root[fieldName].id != null) {
-              return root[fieldName]
-            } else {
-              return root['get' + StringHelper.toInitialUpperCase(fieldName)]()
+  if (typeof fieldType === 'string') {
+    if (fieldType.endsWith('Edge')) {
+      return {
+        type: context.edgeType(fieldType.substr(0, fieldType.length - 'Edge'.length))
+      }
+    } else if (fieldType.endsWith('Connection')) {
+      return {
+        type: context.connectionType(fieldType.substr(0, fieldType.length - 'Connection'.length))
+      }
+    } else {
+      return {
+        type: context.graphQLObjectType(fieldType),
+        resolve: context.wrapFieldResolve({
+          name: name.split('.').slice(-1)[0],
+          path: name,
+          $type: context.graphQLObjectType(fieldType),
+          resolve: async function (root, args, context, info, models) {
+            const fieldName = name.split('.').slice(-1)[0]
+            if (_.isFunction(root['get' + StringHelper.toInitialUpperCase(fieldName)])) {
+              if (root[fieldName] != null && root[fieldName].id != null) {
+                return root[fieldName]
+              } else {
+                return root['get' + StringHelper.toInitialUpperCase(fieldName)]()
+              }
             }
+            if (root && root[fieldName] && (
+                typeof root[fieldName] === 'number' ||
+                typeof root[fieldName] === 'string'
+              )) {
+              return models[fieldType].findOne({where: {id: root[fieldName]}})
+            }
+            return root[fieldName]
           }
-          if (root && root[fieldName] && (
-              typeof root[fieldName] === 'number' ||
-              typeof root[fieldName] === 'string'
-            )) {
-            return models[fieldType.name].findOne({where: {id: root[fieldName]}})
-          }
-          return root[fieldName]
-        }
-      })
-    }
-  }
-
-  if (fieldType instanceof Connection.ConnectionType) {
-    return {
-      type: context.connectionType(fieldType.nodeType)
-    }
-  }
-
-  if (fieldType instanceof Connection.EdgeType) {
-    return {
-      type: context.edgeType(fieldType.nodeType)
+        })
+      }
     }
   }
 

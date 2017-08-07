@@ -1,10 +1,10 @@
 // @flow
 import SG from '../../../../src/index'
 
-const UserType = SG.modelRef('User')
-const TodoType = SG.modelRef('Todo')
+const UserType = 'User'
+const TodoType = 'Todo'
 
-export default SG.model('Todo', {
+export default SG.schema('Todo', {
   pluralQuery: {
     conditionArgs: {
       owner: {

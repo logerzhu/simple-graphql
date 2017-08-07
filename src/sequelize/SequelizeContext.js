@@ -1,9 +1,10 @@
 // @flow
 import Sequelize from 'sequelize'
 
-import Model from  '../Model'
+import Schema from '../schema/Schema'
 
 import toSequelizeModel from './toSequelizeModel.js'
+import plugin from './plugin'
 
 export default class SequelizeContext {
   sequelize:Sequelize
@@ -12,7 +13,21 @@ export default class SequelizeContext {
     this.sequelize = sequelize
   }
 
-  define (model:Model):Sequelize.Model {
-    return toSequelizeModel(this.sequelize, model)
+  define (schema:Schema):Sequelize.Model {
+    return toSequelizeModel(this.sequelize, schema)
   }
+
+  plugins ():Array<(Schema, any)=>void> {
+    return [
+      plugin.singularQueryPlugin,
+      plugin.pluralQueryPlugin,
+
+      plugin.addMutationPlugin,
+      plugin.deleteMutationPlugin,
+      plugin.updateMutationPlugin]
+  }
+
+  /**
+   * Query the model with specify args and return the connection data
+   */
 }

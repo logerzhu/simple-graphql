@@ -1,8 +1,8 @@
 // @flow
 import SG from '../../../../src/index'
 
-const UserType = SG.modelRef('User')
-export default SG.model('UserProfile', {}).fields({
+const UserType = 'User'
+export default SG.schema('UserProfile', {}).fields({
   owner: {
     $type: UserType,
     required: true

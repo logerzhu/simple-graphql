@@ -4,8 +4,7 @@ import _ from 'lodash'
 import Sequelize from 'sequelize'
 
 import Type from '../type'
-import Model from '../Model'
-import ModelRef from '../ModelRef'
+import Model from '../schema/Schema'
 import StringHelper from '../utils/StringHelper'
 
 export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequelize.Model {
@@ -34,20 +33,20 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
     if (value && value['$type']) {
       fType = value['$type']
     }
-    if (fType instanceof ModelRef) {
+    if (typeof fType === 'string') {
       let foreignKey = key + 'Id'
       if (sequelize.options.define.underscored) {
         foreignKey = StringHelper.toUnderscoredName(foreignKey)
       }
       if (value && value['$type'] && value.required) {
         model.belongsTo({
-          target: fType.name,
+          target: fType,
           hidden: true,
           options: {as: key, foreignKey: foreignKey, constraints: true, onDelete: 'RESTRICT'}
         })
       } else {
         model.belongsTo({
-          target: fType.name,
+          target: fType,
           hidden: true,
           options: {as: key, foreignKey: foreignKey, constraints: false, onDelete: 'SET NULL'}
         })

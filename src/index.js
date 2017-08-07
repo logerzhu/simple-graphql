@@ -6,15 +6,13 @@ import _ from 'lodash'
 import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
 
-import Model from './Model'
+import Schema from './schema/Schema'
 import Type from './type'
 import Context from './Context'
 import StringHelper from './utils/StringHelper'
-import Connection from './Connection'
-import ModelRef from './ModelRef'
 import Transformer from './transformer'
 
-import type {ModelOptionConfig, BuildOptionConfig} from './Definition'
+import type {SchemaOptionConfig, BuildOptionConfig} from './Definition'
 
 const SimpleGraphQL = {
 
@@ -33,37 +31,25 @@ const SimpleGraphQL = {
    */
   ScalarFieldTypes: Type.ScalarFieldTypes,
 
-  /**
-   * Get the Relay Connction helper
-   */
-  Connection: Connection,
-
-  Model: Model,
+  Schema: Schema,
 
   /**
-   * Define a Model
+   * Define a Schema
    *
    * @param name
    * @param options
    */
-  model: (name:string, options:ModelOptionConfig = {}):Model => new Model(name, options),
-
-  /**
-   * @public
-   * Create a model reference, which can be using on the field type definition.
-   * @param name
-   */
-  modelRef: (name:string):ModelRef => new ModelRef(name),
+  schema: (name:string, options:SchemaOptionConfig = {}):Schema => new Schema(name, options),
 
   /**
    * Build the GraphQL Schema
    */
-  build: (sequelize:Sequelize, models:Array<Model>, options:BuildOptionConfig = {}):graphql.GraphQLSchema => {
+  build: (sequelize:Sequelize, schemas:Array<Schema>, options:BuildOptionConfig = {}):graphql.GraphQLSchema => {
     const context = new Context(sequelize, options)
 
-    // 添加Model
-    models.forEach(model => {
-      context.addModel(model)
+    // 添加Schema
+    schemas.forEach(schema => {
+      context.addSchema(schema)
     })
 
     context.buildModelAssociations()

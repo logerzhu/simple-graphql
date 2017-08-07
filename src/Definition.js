@@ -4,8 +4,6 @@ import Sequelize from 'sequelize'
 import type {GraphQLOutputType, GraphQLResolveInfo} from 'graphql'
 
 import Type from './type'
-import Connection from './Connection'
-import ModelRef from './ModelRef'
 
 /* global Class */
 
@@ -13,7 +11,7 @@ import ModelRef from './ModelRef'
  * @public
  */
 export type LinkedFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | JSON | GraphQLOutputType |
-  ModelRef | Type.ScalarFieldType | Connection.ConnectionType | Connection.EdgeType | Array<LinkedFieldType> | {
+  Type.ScalarFieldType | string | Array<LinkedFieldType> | {
   [string]:LinkedFieldType,
   $type?:LinkedFieldType,
   required?:boolean,
@@ -136,8 +134,8 @@ type ColumnConfig = {
 /**
  * @public
  */
-type BaseFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | JSON | ModelRef |GraphQLOutputType |
-  Type.ScalarFieldType | Connection.ConnectionType | Connection.EdgeType
+type BaseFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | JSON |GraphQLOutputType |
+  Type.ScalarFieldType | string
 
 /**
  * @public
@@ -160,7 +158,7 @@ export type FieldType = BaseFieldType | {
 /**
  * @public
  */
-export type ModelOptionConfig = {
+export type SchemaOptionConfig = {
   description?:string,
   singularQuery?:boolean|Object,
   pluralQuery?:boolean|Object,

@@ -13,8 +13,8 @@ Sequelize.useCLS(namespace)
 
 export const sequelize = new Sequelize(dbCfg.schema, dbCfg.user, dbCfg.password, dbCfg.options)
 
-function listModels (dir:string):Array<GS.Model> {
-  const models:Array<GS.Model> = []
+function listModels (dir:string):Array<GS.Schema> {
+  const models:Array<GS.Schema> = []
   const handleFile = (d) => fs.readdirSync(path.resolve(__dirname, d)).map(function (file) {
     const stats = fs.statSync(path.resolve(__dirname, dir, file))
     const relativePath = [dir, file].join('/')
@@ -24,7 +24,7 @@ function listModels (dir:string):Array<GS.Model> {
       if (file.match(/\.js$/) !== null && file !== 'index.js') {
         const name = './' + relativePath.replace('.js', '')
         const model = require(name).default
-        if (model instanceof GS.Model) {
+        if (model instanceof GS.Schema) {
           models.push(model)
         }
       }
