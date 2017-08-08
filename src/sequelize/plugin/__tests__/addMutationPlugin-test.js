@@ -40,14 +40,14 @@ test('AddMutationPlugin should work.', async () => {
   }
   `)
   expect(result.error).toBeUndefined()
-  const userEdge = _.get(result.data, "addUser.addedUserEdge")
+  const userEdge = _.get(result.data, 'addUser.addedUserEdge')
   expect(userEdge).toBeDefined()
   expect(userEdge.cursor).toBeDefined()
 
   const user = userEdge.node
   expect(user.id).toBeDefined()
-  expect(user.userName).toEqual("Demo")
-  expect(user.password).toEqual("password")
+  expect(user.userName).toEqual('Demo')
+  expect(user.password).toEqual('password')
   expect(user.blocked).toEqual(false)
   expect(user.registerAt).toBeDefined()
   expect(user.createdAt).toBeDefined()
@@ -57,4 +57,32 @@ test('AddMutationPlugin should work.', async () => {
   expect(user.dueTodos.edges).toEqual([])
   expect(user.profile).toBeNull()
 
+  const qResult = await graphQL.exec(`
+  query{
+    user(id: "${user.id}") {
+      id
+      userName
+      password
+      blocked
+      registerAt
+      createdAt
+      updatedAt
+      dueTodos {
+        count
+        edges {
+          cursor
+          node {
+            id
+          }
+        }
+      }
+      profile {
+        id
+      }
+    }
+  }
+  `)
+  expect(qResult.error).toBeUndefined()
+  const qUser = _.get(qResult, 'data.user')
+  expect(qUser).toEqual(user)
 })
