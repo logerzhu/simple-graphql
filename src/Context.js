@@ -188,15 +188,15 @@ export default class Context {
     }
 
     return (source, args, context, info) => hookFun({
-        type: 'query',
-        config: config
-      }, {
-        source: source,
-        args: args,
-        context: context,
-        info: info,
-        models: dbModels()
-      },
+      type: 'query',
+      config: config
+    }, {
+      source: source,
+      args: args,
+      context: context,
+      info: info,
+      models: dbModels()
+    },
       () => {
         return config.resolve(args, context, info, dbModels())
       }
@@ -229,15 +229,15 @@ export default class Context {
     }
 
     return (source, args, context, info) => hookFun({
-        type: 'field',
-        config: config
-      }, {
-        source: source,
-        args: args,
-        context: context,
-        info: info,
-        models: dbModels()
-      },
+      type: 'field',
+      config: config
+    }, {
+      source: source,
+      args: args,
+      context: context,
+      info: info,
+      models: dbModels()
+    },
       () => config.resolve(source, args, context, info, dbModels())
     )
   }
@@ -258,14 +258,14 @@ export default class Context {
     }
 
     return (args, context, info) => hookFun({
-        type: 'mutation',
-        config: config
-      }, {
-        args: args,
-        context: context,
-        info: info,
-        models: dbModels()
-      },
+      type: 'mutation',
+      config: config
+    }, {
+      args: args,
+      context: context,
+      info: info,
+      models: dbModels()
+    },
       () => config.mutateAndGetPayload(args, context, info, dbModels())
     )
   }
@@ -297,19 +297,15 @@ export default class Context {
     const self = this
     _.forOwn(self.schemas, (schema, key) => {
       schema.config.associations.hasOne.forEach(config => {
-        console.log(schema.name,config)
         self.dbModel(schema.name).hasOne(self.dbModel(config.target), config.options)
       })
       schema.config.associations.belongsTo.forEach(config => {
-        console.log(schema.name,config)
         self.dbModel(schema.name).belongsTo(self.dbModel(config.target), config.options)
       })
       schema.config.associations.hasMany.forEach(config => {
-        console.log(schema.name,config)
         self.dbModel(schema.name).hasMany(self.dbModel(config.target), config.options)
       })
       schema.config.associations.belongsToMany.forEach(config => {
-        console.log(schema.name,config)
         self.dbModel(schema.name).belongsToMany(self.dbModel(config.target), config.options)
       })
     })

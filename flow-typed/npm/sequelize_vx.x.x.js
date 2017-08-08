@@ -136,6 +136,7 @@ declare class Sequelize {
     hooks?:boolean,
   })=>Promise<any>;
   showAllSchemas:(any) => Promise<any>;
+  models:{[string]:Sequelize.Model}
 }
 
 declare module 'sequelize' {
