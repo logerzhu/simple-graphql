@@ -75,7 +75,7 @@
   ],
   "jest": {
     "verbose": true,
-    "setupTestFrameworkScriptFile": "./src/__tests__/setup.js",
+    "setupTestFrameworkScriptFile": "./src/sequelize/__tests__/setup.js",
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*-test.js?(x)"
     ]

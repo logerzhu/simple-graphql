@@ -15,9 +15,12 @@ export default SG.schema('User', {
 
   blocked: {
     $type: Boolean,
-    defaultValue: false
+    default: false
   },
-  registerAt: Date
+  registerAt: {
+    $type: Date,
+    default: () => new Date()
+  }
 }).hasMany({
   dueTodos: {
     target: 'Todo',

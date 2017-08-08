@@ -5,7 +5,7 @@ export default async function (sequelize:Sequelize) {
   const User = sequelize.models['User']
   const Todo = sequelize.models['Todo']
   const UserProfile = sequelize.models['UserProfile']
-  for (let index = 1; index < 300; index++) {
+  for (let index = 1; index < 100; index++) {
     await User.create({
       id: index,
       userName: 'Demo' + index,

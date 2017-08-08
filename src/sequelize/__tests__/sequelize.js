@@ -15,8 +15,8 @@ const sequelize = new Sequelize('clinic', 'tester', 'password', {
     idle: 10000
   },
   // SQLite only
-  storage: 'test.sqlite',
-  logging: true
+  storage: ':memory:',
+  logging: false
 })
 
 export default sequelize
