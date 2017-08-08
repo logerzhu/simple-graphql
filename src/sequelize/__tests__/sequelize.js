@@ -16,10 +16,6 @@ const sequelize = new Sequelize('clinic', 'tester', 'password', {
   },
   // SQLite only
   storage: 'test.sqlite',
-  define: {
-    underscored: true,
-    underscoredAll: true
-  },
   logging: true
 })
 

@@ -235,12 +235,10 @@ export type SchemaOptionConfig = {
  * @public
  */
 export type HasOneConfig ={
-  target: string,
-  hidden?: boolean,
-  options?: {
-    hooks?: boolean,
-    as?:string|Object,
-    foreignKey?:string|Object,
+  [string]:{
+    hidden?: boolean,
+    target: string,
+    foreignField:string,
     onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     constraints?:boolean
@@ -251,12 +249,10 @@ export type HasOneConfig ={
  * @public
  */
 export type BelongsToConfig = {
-  target: string,
-  hidden?: boolean,
-  options?: {
-    hooks?: boolean,
-    as?:string|Object,
-    foreignKey?:string|Object,
+  [string]:{
+    hidden?: boolean,
+    target: string,
+    foreignField:string,
     onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     constraints?:boolean
@@ -264,12 +260,10 @@ export type BelongsToConfig = {
 }
 
 export type HasManyConfig = {
-  target: string,
-  hidden?: boolean,
-  options?: {
-    hooks?: boolean,
-    as?:string|Object,
-    foreignKey?:string|Object,
+  [string]:{
+    hidden?: boolean,
+    target: string,
+    foreignField:string,
     scope?:Object,
     onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
@@ -282,17 +276,15 @@ export type HasManyConfig = {
  * @public
  */
 export type BelongsToManyConfig ={
-  target: string,
-  hidden?: boolean,
-  options?: {
-    hooks?: boolean,
+  [string]:{
+    hidden?: boolean,
+    target: string,
     through?:string | {
       model:string,
       scope?:Object,
       unique?:boolean
     },
-    as?:string,
-    foreignKey?:string|Object,
+    foreignField?:string|Object,
     otherKey?:string|Object,
     scope?:Object,
     timestamps?:boolean,
@@ -306,10 +298,10 @@ export type BelongsToManyConfig ={
  * @public
  */
 export type AssociationConfig ={
-  hasOne:Array<HasOneConfig>,
-  belongsTo:Array<BelongsToConfig>,
-  hasMany:Array<HasManyConfig>,
-  belongsToMany:Array<BelongsToManyConfig>,
+  hasOne:HasOneConfig,
+  belongsTo:BelongsToConfig,
+  hasMany:HasManyConfig,
+  belongsToMany:BelongsToManyConfig,
 }
 
 export type BuildOptionConfig = {

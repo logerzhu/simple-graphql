@@ -296,17 +296,34 @@ export default class Context {
   buildModelAssociations ():void {
     const self = this
     _.forOwn(self.schemas, (schema, key) => {
-      schema.config.associations.hasOne.forEach(config => {
-        self.dbModel(schema.name).hasOne(self.dbModel(config.target), config.options)
+      _.forOwn(schema.config.associations.hasOne, (config, key) => {
+        self.dbModel(schema.name).hasOne(self.dbModel(config.target), {
+          ...config.options,
+          as: key,
+          foreignKey: config.foreignField + 'Id'
+        })
       })
-      schema.config.associations.belongsTo.forEach(config => {
-        self.dbModel(schema.name).belongsTo(self.dbModel(config.target), config.options)
+
+      _.forOwn(schema.config.associations.belongsTo, (config, key) => {
+        self.dbModel(schema.name).belongsTo(self.dbModel(config.target), {
+          ...config.options,
+          as: key,
+          foreignKey: config.foreignField + 'Id'
+        })
       })
-      schema.config.associations.hasMany.forEach(config => {
-        self.dbModel(schema.name).hasMany(self.dbModel(config.target), config.options)
+      _.forOwn(schema.config.associations.hasMany, (config, key) => {
+        self.dbModel(schema.name).hasMany(self.dbModel(config.target), {
+          ...config.options,
+          as: key,
+          foreignKey: config.foreignField + 'Id'
+        })
       })
-      schema.config.associations.belongsToMany.forEach(config => {
-        self.dbModel(schema.name).belongsToMany(self.dbModel(config.target), config.options)
+      _.forOwn(schema.config.associations.belongsToMany, (config, key) => {
+        self.dbModel(schema.name).belongsToMany(self.dbModel(config.target), {
+          ...config.options,
+          as: key,
+          foreignKey: config.foreignField + 'Id'
+        })
       })
     })
   }

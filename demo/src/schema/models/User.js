@@ -18,20 +18,4 @@ export default SG.schema('User', {
     defaultValue: false
   },
   registerAt: Date
-}).hasMany({
-  target: 'Todo',
-  options: {
-    as: 'dueTodos',
-    foreignKey: 'owner_id',
-    scope: {
-      completed: false
-    },
-    sort: [{field: 'createdAt', order: 'DESC'}]
-  }
-}).hasOne({
-  target: 'UserProfile',
-  options: {
-    as: 'profile',
-    foreignKey: 'owner_id'
-  }
 })

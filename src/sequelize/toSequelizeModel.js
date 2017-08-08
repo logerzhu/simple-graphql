@@ -34,21 +34,26 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
       fType = value['$type']
     }
     if (typeof fType === 'string') {
-      let foreignKey = key + 'Id'
-      if (sequelize.options.define.underscored) {
-        foreignKey = StringHelper.toUnderscoredName(foreignKey)
-      }
+      let foreignField = key
       if (value && value['$type'] && value.required) {
         model.belongsTo({
-          target: fType,
-          hidden: true,
-          options: {as: key, foreignKey: foreignKey, constraints: true, onDelete: 'RESTRICT'}
+          [key]: {
+            target: fType,
+            hidden: true,
+            foreignField: foreignField,
+            onDelete: 'RESTRICT',
+            constraints: true
+          }
         })
       } else {
         model.belongsTo({
-          target: fType,
-          hidden: true,
-          options: {as: key, foreignKey: foreignKey, constraints: false, onDelete: 'SET NULL'}
+          [key]: {
+            target: fType,
+            hidden: true,
+            foreignField: foreignField,
+            onDelete: 'SET NULL',
+            constraints: false
+          }
         })
       }
     } else {

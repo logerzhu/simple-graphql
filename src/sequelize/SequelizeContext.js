@@ -24,7 +24,11 @@ export default class SequelizeContext {
 
       plugin.addMutationPlugin,
       plugin.deleteMutationPlugin,
-      plugin.updateMutationPlugin]
+      plugin.updateMutationPlugin,
+
+      plugin.hasManyLinkedFieldPlugin,
+      plugin.hasOneLinkedFieldPlugin
+    ]
   }
 
   /**

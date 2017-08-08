@@ -1,5 +1,5 @@
 // @flow
-
+import _ from 'lodash'
 import type { LinkedFieldConfig, QueryConfig, MutationConfig,
   FieldType, SchemaOptionConfig, HasOneConfig, BelongsToConfig, HasManyConfig,
   BelongsToManyConfig, AssociationConfig} from '../Definition'
@@ -24,10 +24,10 @@ export default class Schema {
       fields: {},
       links: {},
       associations: {
-        hasOne: [],
-        belongsTo: [],
-        hasMany: [],
-        belongsToMany: []
+        hasOne: {},
+        belongsTo: {},
+        hasMany: {},
+        belongsToMany: {}
       },
       options: options,
       queries: {},
@@ -92,7 +92,9 @@ export default class Schema {
    * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#hasone|HasOne} relations to current Schema.
    */
   hasOne (config:HasOneConfig):Schema {
-    this.config.associations.hasOne.push(config)
+    _.forOwn(config, (value, key) => {
+      this.config.associations.hasOne[key] = value
+    })
     return this
   }
 
@@ -100,7 +102,9 @@ export default class Schema {
    * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#belongsto|BelongsTo} relations to current Schema.
    */
   belongsTo (config:BelongsToConfig):Schema {
-    this.config.associations.belongsTo.push(config)
+    _.forOwn(config, (value, key) => {
+      this.config.associations.belongsTo[key] = value
+    })
     return this
   }
 
@@ -108,7 +112,9 @@ export default class Schema {
    * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#one-to-many-associations|HasMany} relations to current Schema.
    */
   hasMany (config:HasManyConfig):Schema {
-    this.config.associations.hasMany.push(config)
+    _.forOwn(config, (value, key) => {
+      this.config.associations.hasMany[key] = value
+    })
     return this
   }
 
@@ -116,7 +122,9 @@ export default class Schema {
    * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#belongs-to-many-associations|BelongsToMany} relations to current Schema.
    */
   belongsToMany (config:BelongsToManyConfig):Schema {
-    this.config.associations.belongsToMany.push(config)
+    _.forOwn(config, (value, key) => {
+      this.config.associations.belongsToMany[key] = value
+    })
     return this
   }
 

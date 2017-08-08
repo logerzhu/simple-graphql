@@ -6,12 +6,18 @@ import addMutationPlugin from './addMutationPlugin'
 import deleteMutationPlugin from './deleteMutationPlugin'
 import updateMutationPlugin from './updateMutationPlugin'
 
+import hasManyLinkedFieldPlugin from './hasManyLinkedFieldPlugin'
+import hasOneLinkedFieldPlugin from './hasOneLinkedFieldPlugin'
+
 export default{
   singularQueryPlugin: singularQueryPlugin,
   pluralQueryPlugin: pluralQueryPlugin,
 
   addMutationPlugin: addMutationPlugin,
   deleteMutationPlugin: deleteMutationPlugin,
-  updateMutationPlugin: updateMutationPlugin
+  updateMutationPlugin: updateMutationPlugin,
+
+  hasManyLinkedFieldPlugin: hasManyLinkedFieldPlugin,
+  hasOneLinkedFieldPlugin: hasOneLinkedFieldPlugin
 
 }

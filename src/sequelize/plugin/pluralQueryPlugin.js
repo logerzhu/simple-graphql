@@ -235,15 +235,11 @@ export default function pluralQuery (schema:Schema):void {
         const includeFields = {}
 
         const associationType = (model, fieldName):?string => {
-          for (let config of model.config.associations.hasOne) {
-            if (_.get(config, 'options.as') === fieldName) {
-              return config.target
-            }
+          if (model.config.associations.hasOne[fieldName]) {
+            return model.config.associations.hasOne[fieldName].target
           }
-          for (let config of model.config.associations.belongsTo) {
-            if (_.get(config, 'options.as') === fieldName) {
-              return config.target
-            }
+          if (model.config.associations.belongsTo[fieldName]) {
+            return model.config.associations.belongsTo[fieldName].target
           }
           return null
         }
