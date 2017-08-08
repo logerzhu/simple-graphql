@@ -57,17 +57,22 @@ const SimpleGraphQL = {
     const finalQueries:{[fieldName: string]: graphql.GraphQLFieldConfig<any, any>} = {}
 
     _.forOwn(context.queries, (value, key) => {
+      const fieldConfig = Transformer.toGraphQLFieldConfig(
+        key,
+        'Payload',
+        value.$type,
+        context)
       finalQueries[key] = {
-        type: Transformer.toGraphQLFieldConfig(
-          key,
-          'Payload',
-          value.$type,
-          context).type,
+        type: fieldConfig.type,
         resolve: context.wrapQueryResolve(value),
         description: value.description
       }
-      if (value.args) {
-        finalQueries[key].args = Transformer.toGraphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.args)
+      if (value.args || fieldConfig.args) {
+        finalQueries[key].args = Transformer.toGraphQLInputFieldMap(
+          StringHelper.toInitialUpperCase(key), {
+            ...fieldConfig.args,
+            ...value.args
+          })
       }
     })
 

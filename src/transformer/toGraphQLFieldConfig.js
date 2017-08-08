@@ -3,7 +3,7 @@ import _ from 'lodash'
 
 import * as graphql from 'graphql'
 
-import type {GraphQLFieldConfig} from 'graphql'
+import type {GraphQLFieldResolver, GraphQLOutputType} from 'graphql'
 
 import Type from '../type'
 import Context from '../Context'
@@ -14,7 +14,12 @@ const toGraphQLFieldConfig = function (name:string,
                                        postfix:string,
                                        fieldType:any,
                                        context:Context,
-                                       interfaces:any = []):GraphQLFieldConfig<any, any> {
+                                       interfaces:any = []):{
+  type: GraphQLOutputType,
+  args?: {[string]:any},
+  resolve?: GraphQLFieldResolver<any, any>,
+  description?: ?string,
+} {
   const typeName = (path:string) => {
     return path.replace(/\.\$type/g, '').replace(/\[\d*\]/g, '').split('.').map(v => StringHelper.toInitialUpperCase(v)).join('')
   }
@@ -62,6 +67,23 @@ const toGraphQLFieldConfig = function (name:string,
       }
     } else if (fieldType.endsWith('Connection')) {
       return {
+        // Add Relay Connection Args
+        args: {
+          after: {
+            $type: String,
+            description: '返回的记录应该在cursor:after之后'
+          },
+          first: {
+            $type: Number,
+            description: '指定最多返回记录的数量'
+          },
+          before: {
+            $type: String
+          },
+          last: {
+            $type: Number
+          }
+        },
         type: context.connectionType(fieldType.substr(0, fieldType.length - 'Connection'.length))
       }
     } else {
@@ -119,8 +141,8 @@ const toGraphQLFieldConfig = function (name:string,
           resolve: fieldType['resolve']
         })
       }
-      if (fieldType['args']) {
-        result['args'] = toGraphQLInputFieldMap(typeName(name), fieldType['args'])
+      if (fieldType.args || result.args) {
+        result.args = toGraphQLInputFieldMap(typeName(name), {...result.args, ...fieldType.args})
       }
       result.description = fieldType['description']
       return result

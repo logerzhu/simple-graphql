@@ -39,7 +39,7 @@ test('AddMutationPlugin should work.', async () => {
     }
   }
   `)
-  expect(result.error).toBeUndefined()
+  expect(result.errors).toBeUndefined()
   const userEdge = _.get(result.data, 'addUser.addedUserEdge')
   expect(userEdge).toBeDefined()
   expect(userEdge.cursor).toBeDefined()
@@ -82,7 +82,7 @@ test('AddMutationPlugin should work.', async () => {
     }
   }
   `)
-  expect(qResult.error).toBeUndefined()
+  expect(qResult.errors).toBeUndefined()
   const qUser = _.get(qResult, 'data.user')
   expect(qUser).toEqual(user)
 })
