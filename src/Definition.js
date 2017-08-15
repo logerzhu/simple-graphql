@@ -10,7 +10,7 @@ import Type from './type'
 /**
  * @public
  */
-export type LinkedFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | JSON | GraphQLOutputType |
+export type LinkedFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | Class<JSON> | GraphQLOutputType |
   Type.ScalarFieldType | string | Array<LinkedFieldType> | {
   [string]:LinkedFieldType,
   $type?:LinkedFieldType,
@@ -134,7 +134,7 @@ type ColumnConfig = {
 /**
  * @public
  */
-type BaseFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | JSON |GraphQLOutputType |
+type BaseFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | Class<JSON> |GraphQLOutputType |
   Type.ScalarFieldType | string
 
 /**

@@ -107,8 +107,16 @@ const SimpleGraphQL = {
       }
       // TODO check whether viewer.type is a Node
     } else {
-      finalQueries['viewer'] = viewerConfig
-      // TODO check whether viewer.type is a Node
+      const fieldConfig = Transformer.toGraphQLFieldConfig(
+        'viewer',
+        'Payload',
+        viewerConfig.$type,
+        context)
+      finalQueries['viewer'] = {
+        type: fieldConfig.type,
+        resolve: context.wrapQueryResolve(viewerConfig),
+        description: viewerConfig.description
+      }
     }
 
     finalQueries['node'] = {

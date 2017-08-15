@@ -3,3 +3,4 @@ demo
 src
 simple-graphql.iml
 *.sqlite
+**/__tests__/*

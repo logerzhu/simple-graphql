@@ -136,16 +136,16 @@ export default class Context {
     const typeName = model.name
 
     if (!this.graphQLObjectTypes[typeName]) {
-      const obj = Object.assign({}, model.config.fields, model.config.links)
-      const interfaces = [this.nodeInterface]
-      Object.assign(obj, {
-        id: {
-          $type: new graphql.GraphQLNonNull(graphql.GraphQLID),
-          resolve: async function (root) {
-            return relay.toGlobalId(StringHelper.toInitialUpperCase(model.name), root.id)
-          }
+      const obj = Object.assign({
+        id: {}
+      }, model.config.fields, model.config.links)
+      obj.id = {
+        $type: new graphql.GraphQLNonNull(graphql.GraphQLID),
+        resolve: async function (root) {
+          return relay.toGlobalId(StringHelper.toInitialUpperCase(model.name), root.id)
         }
-      })
+      }
+      const interfaces = [this.nodeInterface]
 
       const objectType = Transformer.toGraphQLFieldConfig(typeName, '', obj, this, interfaces).type
       if (objectType instanceof graphql.GraphQLObjectType) {
