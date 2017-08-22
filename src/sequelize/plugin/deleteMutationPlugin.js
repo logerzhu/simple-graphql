@@ -8,8 +8,8 @@ import StringHelper from '../../utils/StringHelper'
 export default function deleteMutation (schema:Schema, options:any):void {
   const name = 'delete' + StringHelper.toInitialUpperCase(schema.name)
   let config = {}
-  if ((typeof schema.config.options.deleteMutation) === 'object') {
-    config = schema.config.options.deleteMutation
+  if ((typeof options) === 'object') {
+    config = options
   }
   schema.mutations({
     [name]: {

@@ -83,7 +83,7 @@ export default class Context {
     }
     this.schemas[schema.name] = schema
 
-    this.dbContext.plugins().forEach(plugin => plugin(schema, this.options))
+    this.dbContext.applyPlugin(schema)
 
     schema.fields({
       createdAt: {

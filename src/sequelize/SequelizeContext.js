@@ -1,4 +1,5 @@
 // @flow
+import _ from 'lodash'
 import Sequelize from 'sequelize'
 
 import Schema from '../schema/Schema'
@@ -9,26 +10,37 @@ import plugin from './plugin'
 export default class SequelizeContext {
   sequelize:Sequelize
 
+  plugins:{[string]:(Schema, any)=>void}
+
   constructor (sequelize:Sequelize) {
     this.sequelize = sequelize
+    this.plugins = {
+      singularQuery: plugin.singularQueryPlugin,
+      pluralQuery: plugin.pluralQueryPlugin,
+
+      addMutation: plugin.addMutationPlugin,
+      deleteMutation: plugin.deleteMutationPlugin,
+      updateMutation: plugin.updateMutationPlugin,
+
+      hasManyLinkedField: plugin.hasManyLinkedFieldPlugin,
+      hasOneLinkedField: plugin.hasOneLinkedFieldPlugin
+    }
   }
 
   define (schema:Schema):Sequelize.Model {
     return toSequelizeModel(this.sequelize, schema)
   }
 
-  plugins ():Array<(Schema, any)=>void> {
-    return [
-      plugin.singularQueryPlugin,
-      plugin.pluralQueryPlugin,
-
-      plugin.addMutationPlugin,
-      plugin.deleteMutationPlugin,
-      plugin.updateMutationPlugin,
-
-      plugin.hasManyLinkedFieldPlugin,
-      plugin.hasOneLinkedFieldPlugin
-    ]
+  applyPlugin (schema:Schema):void {
+    const defaultPluginConfig = {
+      hasManyLinkedField: {},
+      hasOneLinkedField: {}
+    }
+    _.forOwn({...defaultPluginConfig, ...schema.config.options.plugin}, (value, key) => {
+      if (this.plugins[key] && value) {
+        this.plugins[key](schema, value)
+      }
+    })
   }
 
   /**

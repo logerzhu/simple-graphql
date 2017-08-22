@@ -2,7 +2,11 @@
 import SG from '../../../'
 
 export default SG.schema('User', {
-  description: '用户'
+  description: '用户',
+  plugin: {
+    addMutation: true,
+    singularQuery: true
+  }
 }).fields({
   userName: {
     $type: String,

@@ -160,11 +160,7 @@ export type FieldType = BaseFieldType | {
  */
 export type SchemaOptionConfig = {
   description?:string,
-  singularQuery?:boolean|Object,
-  pluralQuery?:boolean|Object,
-  addMutation?:boolean|Object,
-  deleteMutation?:boolean|Object,
-  updateMutation?:boolean|Object,
+  plugin?:Object,
   table?:{
     defaultScope?:Object,
     scopes?:Object,

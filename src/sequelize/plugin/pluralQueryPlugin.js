@@ -122,7 +122,7 @@ const StringConditionType = new graphql.GraphQLInputObjectType({
   }
 })
 
-export default function pluralQuery (schema:Schema):void {
+export default function pluralQuery (schema:Schema, options:any):void {
   const name = StringHelper.toInitialLowerCase(schema.name) + 's'
 
   const searchFields = {}
@@ -159,13 +159,13 @@ export default function pluralQuery (schema:Schema):void {
   }
   )
 
-  if (schema.config.options.pluralQuery && schema.config.options.pluralQuery.conditionArgs) {
-    Object.assign(searchFields, (schema.config.options.pluralQuery.conditionArgs:any))
+  if (options && options.conditionArgs) {
+    Object.assign(searchFields, (options.conditionArgs:any))
   }
 
   let config = {}
-  if ((typeof schema.config.options.pluralQuery) === 'object') {
-    config = schema.config.options.pluralQuery
+  if ((typeof options) === 'object') {
+    config = options
   }
 
   // 生产
