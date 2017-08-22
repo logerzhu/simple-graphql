@@ -122,7 +122,7 @@ const StringConditionType = new graphql.GraphQLInputObjectType({
   }
 })
 
-export default function pluralQuery (schema:Schema, options:any):void {
+export default function pluralQuery (schema:Schema<any>, options:any):void {
   const name = StringHelper.toInitialLowerCase(schema.name) + 's'
 
   const searchFields = {}

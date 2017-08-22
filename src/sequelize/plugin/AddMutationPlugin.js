@@ -5,7 +5,7 @@ import * as graphql from 'graphql'
 import Schema from '../../schema/Schema'
 import StringHelper from '../../utils/StringHelper'
 
-export default function addMutation (schema:Schema, options:any):void {
+export default function addMutation (schema:Schema<any>, options:any):void {
   const name = 'add' + StringHelper.toInitialUpperCase(schema.name)
   const addedName = 'added' + StringHelper.toInitialUpperCase(schema.name) + 'Edge'
 
@@ -25,8 +25,8 @@ export default function addMutation (schema:Schema, options:any):void {
     }
   })
   let config = {}
-  if ((typeof schema.config.options.addMutation) === 'object') {
-    config = schema.config.options.addMutation
+  if (options === 'object') {
+    config = options
   }
   schema.mutations({
     [name]: {

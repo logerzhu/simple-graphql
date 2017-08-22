@@ -4,7 +4,7 @@ import _ from 'lodash'
 import Schema from '../../schema/Schema'
 import StringHelper from '../../utils/StringHelper'
 
-export default function hasOneFieldsConfig (schema:Schema, options:any):void {
+export default function hasOneFieldsConfig (schema:Schema<any>, options:any):void {
   // Conver model association to field config
 
   _.forOwn(schema.config.associations.hasOne, (config, key) => {

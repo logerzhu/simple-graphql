@@ -5,8 +5,8 @@ import fs from 'fs'
 import GS from '../../'
 
 export default function (sequelize:Sequelize) {
-  function listSchemas (dir:string):Array<GS.Schema> {
-    const models:Array<GS.Schema> = []
+  function listSchemas (dir:string):Array<GS.Schema<any>> {
+    const models:Array<GS.Schema<any>> = []
     const handleFile = (d) => fs.readdirSync(path.resolve(__dirname, d)).map(function (file) {
       const stats = fs.statSync(path.resolve(__dirname, dir, file))
       const relativePath = [dir, file].join('/')

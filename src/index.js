@@ -39,12 +39,12 @@ const SimpleGraphQL = {
    * @param name
    * @param options
    */
-  schema: (name:string, options:SchemaOptionConfig = {}):Schema => new Schema(name, options),
+  schema: <T>(name:string, options:SchemaOptionConfig={}):Schema<T> => new Schema(name, options),
 
   /**
    * Build the GraphQL Schema
    */
-  build: (sequelize:Sequelize, schemas:Array<Schema>, options:BuildOptionConfig = {}):graphql.GraphQLSchema => {
+  build: (sequelize:Sequelize, schemas:Array<Schema<any>>, options:BuildOptionConfig = {}):graphql.GraphQLSchema => {
     const context = new Context(sequelize, options)
 
     // 添加Schema

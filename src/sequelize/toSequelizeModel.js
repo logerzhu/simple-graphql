@@ -4,10 +4,10 @@ import _ from 'lodash'
 import Sequelize from 'sequelize'
 
 import Type from '../type'
-import Model from '../schema/Schema'
+import Schema from '../schema/Schema'
 import StringHelper from '../utils/StringHelper'
 
-export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequelize.Model {
+export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any>):Sequelize.Model {
   const dbDefinition = {}
 
   const dbType = (fieldType:any) => {
@@ -28,7 +28,7 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
     }
     return null
   }
-  _.forOwn(model.config.fields, (value, key) => {
+  _.forOwn(schema.config.fields, (value, key) => {
     let fType = value
     if (value && value['$type']) {
       fType = value['$type']
@@ -36,7 +36,7 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
     if (typeof fType === 'string') {
       let foreignField = key
       if (value && value['$type'] && value.required) {
-        model.belongsTo({
+        schema.belongsTo({
           [key]: {
             target: fType,
             hidden: true,
@@ -46,7 +46,7 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
           }
         })
       } else {
-        model.belongsTo({
+        schema.belongsTo({
           [key]: {
             target: fType,
             hidden: true,
@@ -86,6 +86,6 @@ export default function toSequelizeModel (sequelize:Sequelize, model:Model):Sequ
     }
   })
   // console.log("Create Sequlize Model with config", model.name, dbDefinition, model.config.options["table"])
-  const dbModel = sequelize.define(model.name, dbDefinition, model.config.options['table'])
+  const dbModel = sequelize.define(schema.name, dbDefinition, schema.config.options['table'])
   return dbModel
 }

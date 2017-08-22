@@ -46,10 +46,10 @@ export type LinkedFieldConfig = {
 /**
  * @public
  */
-export type QueryConfig ={
+export type QueryConfig<T> ={
   $type:LinkedFieldType,
   description?:string,
-  config?:any,
+  config?:T,
   args?:ArgsType,
   resolve: (args:{[string]: any},
             context:any,
@@ -60,9 +60,9 @@ export type QueryConfig ={
 /**
  * @public
  */
-export type MutationConfig ={
+export type MutationConfig<T> ={
   description?:string,
-  config?:any,
+  config?:T,
   inputFields:ArgsType,
   outputFields:{[string]:LinkedFieldType},
   mutateAndGetPayload:(args:{[string]: any},
@@ -309,7 +309,7 @@ export type BuildOptionConfig = {
            next:()=>any)=>any
   }>,
   query?:{
-    viewer?:'AllQuery' | 'FromModelQuery' | QueryConfig,
+    viewer?:'AllQuery' | 'FromModelQuery' | QueryConfig<any>,
   },
   mutation?:{
     payloadFields?:Array<string|{

@@ -45,7 +45,7 @@ export default class Context {
 
   nodeInterface:graphql.GraphQLInterfaceType
 
-  schemas:{[id:string]: Schema}
+  schemas:{[id:string]: Schema<any> }
 
   graphQLObjectTypes:{[id:string]: GraphQLObjectType}
 
@@ -77,7 +77,7 @@ export default class Context {
     }).nodeInterface
   }
 
-  addSchema (schema:Schema) {
+  addSchema (schema:Schema<any>) {
     if (this.schemas[schema.name]) {
       throw new Error('Schema ' + schema.name + ' already define.')
     }

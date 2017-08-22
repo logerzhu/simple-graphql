@@ -6,7 +6,7 @@ import Schema from '../../schema/Schema'
 
 import resolveConnection from '../resolveConnection'
 
-export default function hasManyLinkedField (schema:Schema, options:any):void {
+export default function hasManyLinkedField (schema:Schema<any>, options:any):void {
   // const name = StringHelper.toInitialLowerCase(schema.name)
   // Conver model association to field config
   _.forOwn(schema.config.associations.hasMany, (config, key) => {

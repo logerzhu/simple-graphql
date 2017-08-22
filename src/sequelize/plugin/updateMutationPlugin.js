@@ -5,7 +5,7 @@ import * as graphql from 'graphql'
 import Schema from '../../schema/Schema'
 import StringHelper from '../../utils/StringHelper'
 
-export default function updateMutation (schema:Schema, options:any):void {
+export default function updateMutation (schema:Schema<any>, options:any):void {
   const name = 'update' + StringHelper.toInitialUpperCase(schema.name)
   const changedName = 'changed' + StringHelper.toInitialUpperCase(schema.name)
 
