@@ -134,12 +134,16 @@ const toGraphQLFieldConfig = function (name:string,
         result.type = new graphql.GraphQLNonNull(result.type)
       }
       if (fieldType['resolve']) {
-        result['resolve'] = context.wrapFieldResolve({
+        const wrapConfig:any = {
           name: name.split('.').slice(-1)[0],
           path: name,
           $type: result.type,
           resolve: fieldType['resolve']
-        })
+        }
+        if (fieldType['config']) {
+          wrapConfig['config'] = fieldType['config']
+        }
+        result['resolve'] = context.wrapFieldResolve(wrapConfig)
       }
       if (fieldType.args || result.args) {
         result.args = toGraphQLInputFieldMap(typeName(name), {...result.args, ...fieldType.args})
