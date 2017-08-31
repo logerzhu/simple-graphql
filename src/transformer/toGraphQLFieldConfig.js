@@ -2,6 +2,7 @@
 import _ from 'lodash'
 
 import * as graphql from 'graphql'
+import * as relay from 'graphql-relay'
 
 import type {GraphQLFieldResolver, GraphQLOutputType} from 'graphql'
 
@@ -61,7 +62,19 @@ const toGraphQLFieldConfig = function (name:string,
   }
 
   if (typeof fieldType === 'string') {
-    if (fieldType.endsWith('Edge')) {
+    if (fieldType.endsWith('Id')) {
+      return {
+        type: graphql.GraphQLID,
+        resolve: async function (root) {
+          const fieldName = name.split('.').slice(-1)[0]
+          if (root[fieldName]) {
+            return relay.toGlobalId(fieldType.substr(0, fieldType.length - 'Id'.length), root[fieldName])
+          } else {
+            return null
+          }
+        }
+      }
+    } else if (fieldType.endsWith('Edge')) {
       return {
         type: context.edgeType(fieldType.substr(0, fieldType.length - 'Edge'.length))
       }

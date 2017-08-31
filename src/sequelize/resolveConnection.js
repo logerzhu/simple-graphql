@@ -11,6 +11,8 @@ export default async function resolveConnection (dbModel:Sequelize.Model, args:{
   sort?: Array<{field: string, order: "ASC"|"DESC"}>
 }):Promise<{
   pageInfo: {
+    startCursor:string|number,
+    endCursor:string|number,
     hasPreviousPage: boolean,
     hasNextPage: boolean
   },
@@ -34,6 +36,7 @@ export default async function resolveConnection (dbModel:Sequelize.Model, args:{
   if (last || before) {
     reverse = true
     first = last || 100
+    before = before || (count + 1)
     after = count - (parseInt(before) - 1)
     sort = sort.map(s => {
       return {
@@ -53,8 +56,16 @@ export default async function resolveConnection (dbModel:Sequelize.Model, args:{
   })
 
   let index = 0
+  let startCursor = offset + 1
+  let endCursor = offset + result.length
+  if (reverse) {
+    startCursor = count - startCursor + 1
+    endCursor = count - endCursor + 1
+  }
   return {
     pageInfo: {
+      startCursor: startCursor,
+      endCursor: endCursor,
       hasPreviousPage: offset > 0,
       hasNextPage: offset + result.length < count
     },

@@ -258,6 +258,7 @@ export type BelongsToConfig = {
 export type HasManyConfig = {
   [string]:{
     hidden?: boolean,
+    conditionFields?:ArgsType,
     target: string,
     foreignField:string,
     scope?:Object,

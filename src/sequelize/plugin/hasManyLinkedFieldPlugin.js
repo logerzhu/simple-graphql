@@ -13,8 +13,13 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
     if (config.hidden) {
       return
     }
+    const args:any = {}
+    if (config.conditionFields) {
+      args['condition'] = config.conditionFields
+    }
     schema.links({
       [key]: {
+        args: args,
         $type: config.target + 'Connection',
         resolve: async function (root, args, context, info, models) {
           const condition = config.scope || {}
