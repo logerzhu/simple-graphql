@@ -30,7 +30,10 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
           //    item.field = StringHelper.toUnderscoredName(item.field)
           //  }
           // } else {
-          condition[config.foreignField + 'Id'] = root.id
+          let sourceKey = config.sourceKey || 'id'
+          let foreignKey = config.foreignKey || (config.foreignField + 'Id')
+          condition[foreignKey] = root[sourceKey]
+
           // }
           return resolveConnection(models[config.target], {...args, condition, sort})
         }
