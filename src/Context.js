@@ -300,7 +300,7 @@ export default class Context {
         self.dbModel(schema.name).hasOne(self.dbModel(config.target), {
           ...config,
           as: key,
-          foreignKey: config.foreignField + 'Id'
+          foreignKey: config.foreignKey || config.foreignField + 'Id'
         })
       })
 
@@ -308,7 +308,7 @@ export default class Context {
         self.dbModel(schema.name).belongsTo(self.dbModel(config.target), {
           ...config,
           as: key,
-          foreignKey: config.foreignField + 'Id'
+          foreignKey: config.foreignKey || config.foreignField + 'Id'
         })
       })
       _.forOwn(schema.config.associations.hasMany, (config, key) => {

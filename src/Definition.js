@@ -234,7 +234,8 @@ export type HasOneConfig ={
   [string]:{
     hidden?: boolean,
     target: string,
-    foreignField:string,
+    foreignField?:string,
+    foreignKey?:string,
     onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     constraints?:boolean
@@ -248,7 +249,8 @@ export type BelongsToConfig = {
   [string]:{
     hidden?: boolean,
     target: string,
-    foreignField:string,
+    foreignField?:string,
+    foreignKey?:string,
     onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     constraints?:boolean

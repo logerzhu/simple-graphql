@@ -1,6 +1,6 @@
 {
   "name": "simple-graphql",
-  "version": "1.0.17",
+  "version": "1.0.23",
   "description": "The simple way to generates GraphQL schemas and Sequelize models from your models definition.",
   "main": "lib/index.js",
   "scripts": {
@@ -37,7 +37,7 @@
     "continuation-local-storage": "^3.2.0",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
-    "sequelize": "^4.6.0"
+    "sequelize": "^4.8.2"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
@@ -54,7 +54,7 @@
     "graphql-relay": "^0.5.2",
     "jest": "^20.0.4",
     "pre-commit": "^1.2.2",
-    "sqlite3": "^3.1.9",
+    "sqlite3": "^3.1.10",
     "standard": "^10.0.3"
   },
   "standard": {
