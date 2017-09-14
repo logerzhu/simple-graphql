@@ -2,21 +2,25 @@
 import _ from 'lodash'
 
 import * as graphql from 'graphql'
+import * as relay from 'graphql-relay'
 
-import type {GraphQLFieldConfig} from 'graphql'
+import type {GraphQLFieldResolver, GraphQLOutputType} from 'graphql'
 
 import Type from '../type'
 import Context from '../Context'
 import StringHelper from '../utils/StringHelper'
-import Connection from '../Connection'
-import ModelRef from '../ModelRef'
 import toGraphQLInputFieldMap from './toGraphQLInputFieldMap'
 
 const toGraphQLFieldConfig = function (name:string,
                                        postfix:string,
                                        fieldType:any,
                                        context:Context,
-                                       interfaces:any = []):GraphQLFieldConfig<any, any> {
+                                       interfaces:any = []):{
+  type: GraphQLOutputType,
+  args?: {[string]:any},
+  resolve?: GraphQLFieldResolver<any, any>,
+  description?: ?string,
+} {
   const typeName = (path:string) => {
     return path.replace(/\.\$type/g, '').replace(/\[\d*\]/g, '').split('.').map(v => StringHelper.toInitialUpperCase(v)).join('')
   }
@@ -57,43 +61,70 @@ const toGraphQLFieldConfig = function (name:string,
     }
   }
 
-  if (fieldType instanceof ModelRef) {
-    return {
-      type: context.graphQLObjectType(fieldType.name),
-      resolve: context.wrapFieldResolve({
-        name: name.split('.').slice(-1)[0],
-        path: name,
-        $type: context.graphQLObjectType(fieldType.name),
-        resolve: async function (root, args, context, info, models) {
+  if (typeof fieldType === 'string') {
+    if (fieldType.endsWith('Id')) {
+      return {
+        type: graphql.GraphQLID,
+        resolve: async function (root) {
           const fieldName = name.split('.').slice(-1)[0]
-          if (_.isFunction(root['get' + StringHelper.toInitialUpperCase(fieldName)])) {
-            if (root[fieldName] != null && root[fieldName].id != null) {
-              return root[fieldName]
-            } else {
-              return root['get' + StringHelper.toInitialUpperCase(fieldName)]()
-            }
+          if (root[fieldName]) {
+            return relay.toGlobalId(fieldType.substr(0, fieldType.length - 'Id'.length), root[fieldName])
+          } else {
+            return null
           }
-          if (root && root[fieldName] && (
-              typeof root[fieldName] === 'number' ||
-              typeof root[fieldName] === 'string'
-            )) {
-            return models[fieldType.name].findOne({where: {id: root[fieldName]}})
-          }
-          return root[fieldName]
         }
-      })
-    }
-  }
-
-  if (fieldType instanceof Connection.ConnectionType) {
-    return {
-      type: context.connectionType(fieldType.nodeType)
-    }
-  }
-
-  if (fieldType instanceof Connection.EdgeType) {
-    return {
-      type: context.edgeType(fieldType.nodeType)
+      }
+    } else if (fieldType.endsWith('Edge')) {
+      return {
+        type: context.edgeType(fieldType.substr(0, fieldType.length - 'Edge'.length))
+      }
+    } else if (fieldType.endsWith('Connection')) {
+      return {
+        // Add Relay Connection Args
+        args: {
+          after: {
+            $type: String,
+            description: '返回的记录应该在cursor:after之后'
+          },
+          first: {
+            $type: Number,
+            description: '指定最多返回记录的数量'
+          },
+          before: {
+            $type: String
+          },
+          last: {
+            $type: Number
+          }
+        },
+        type: context.connectionType(fieldType.substr(0, fieldType.length - 'Connection'.length))
+      }
+    } else {
+      return {
+        type: context.graphQLObjectType(fieldType),
+        resolve: context.wrapFieldResolve({
+          name: name.split('.').slice(-1)[0],
+          path: name,
+          $type: context.graphQLObjectType(fieldType),
+          resolve: async function (root, args, context, info, models) {
+            const fieldName = name.split('.').slice(-1)[0]
+            if (_.isFunction(root['get' + StringHelper.toInitialUpperCase(fieldName)])) {
+              if (root[fieldName] != null && root[fieldName].id != null) {
+                return root[fieldName]
+              } else {
+                return root['get' + StringHelper.toInitialUpperCase(fieldName)]()
+              }
+            }
+            if (root && root[fieldName] && (
+                typeof root[fieldName] === 'number' ||
+                typeof root[fieldName] === 'string'
+              )) {
+              return models[fieldType].findOne({where: {id: root[fieldName]}})
+            }
+            return root[fieldName]
+          }
+        })
+      }
     }
   }
 
@@ -116,15 +147,19 @@ const toGraphQLFieldConfig = function (name:string,
         result.type = new graphql.GraphQLNonNull(result.type)
       }
       if (fieldType['resolve']) {
-        result['resolve'] = context.wrapFieldResolve({
+        const wrapConfig:any = {
           name: name.split('.').slice(-1)[0],
           path: name,
           $type: result.type,
           resolve: fieldType['resolve']
-        })
+        }
+        if (fieldType['config']) {
+          wrapConfig['config'] = fieldType['config']
+        }
+        result['resolve'] = context.wrapFieldResolve(wrapConfig)
       }
-      if (fieldType['args']) {
-        result['args'] = toGraphQLInputFieldMap(typeName(name), fieldType['args'])
+      if (fieldType.args || result.args) {
+        result.args = toGraphQLInputFieldMap(typeName(name), {...result.args, ...fieldType.args})
       }
       result.description = fieldType['description']
       return result

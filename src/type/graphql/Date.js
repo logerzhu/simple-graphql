@@ -6,6 +6,12 @@ export default new GraphQLScalarType({
   name: 'Date',
 
   serialize (value) {
+    if (typeof value === 'string') {
+      const nValue = moment(value, 'YYYY-MM-DD HH:mm:ss.SSS ZZ')
+      if (nValue.isValid()) {
+        value = nValue.toDate()
+      }
+    }
     if (!(value instanceof Date)) {
       throw new TypeError('Field error: value is not an instance of Date')
     }

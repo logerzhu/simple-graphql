@@ -26,7 +26,7 @@ declare class Sequelize {
   static UUID:DataType;
 
 
-  static cls:any;
+  static useCLS:any;
   static col:any;
   static fn:any;
   static where:any;
@@ -136,6 +136,7 @@ declare class Sequelize {
     hooks?:boolean,
   })=>Promise<any>;
   showAllSchemas:(any) => Promise<any>;
+  models:{[string]:Sequelize.Model}
 }
 
 declare module 'sequelize' {

@@ -17,7 +17,7 @@ function defGlobalIdInputType (typeName:string):GraphQLScalarType {
         }
         throw new Error('Incorrect globalId type: ' + type)
       } else {
-        throw new Error('Incorrect globalId format: ', value)
+        throw new Error('Incorrect globalId format: ')
       }
     },
     parseLiteral (ast) {
@@ -32,7 +32,7 @@ function defGlobalIdInputType (typeName:string):GraphQLScalarType {
         }
         throw new Error('Incorrect globalId type: ' + type)
       } else {
-        throw new Error('Incorrect globalId format: ', value)
+        throw new Error('Incorrect globalId format: ' + value)
       }
     }
   })

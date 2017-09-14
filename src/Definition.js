@@ -4,16 +4,14 @@ import Sequelize from 'sequelize'
 import type {GraphQLOutputType, GraphQLResolveInfo} from 'graphql'
 
 import Type from './type'
-import Connection from './Connection'
-import ModelRef from './ModelRef'
 
 /* global Class */
 
 /**
  * @public
  */
-export type LinkedFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | JSON | GraphQLOutputType |
-  ModelRef | Type.ScalarFieldType | Connection.ConnectionType | Connection.EdgeType | Array<LinkedFieldType> | {
+export type LinkedFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | Class<JSON> | GraphQLOutputType |
+  Type.ScalarFieldType | string | Array<LinkedFieldType> | {
   [string]:LinkedFieldType,
   $type?:LinkedFieldType,
   required?:boolean,
@@ -48,10 +46,10 @@ export type LinkedFieldConfig = {
 /**
  * @public
  */
-export type QueryConfig ={
+export type QueryConfig<T> ={
   $type:LinkedFieldType,
   description?:string,
-  config?:any,
+  config?:T,
   args?:ArgsType,
   resolve: (args:{[string]: any},
             context:any,
@@ -62,9 +60,9 @@ export type QueryConfig ={
 /**
  * @public
  */
-export type MutationConfig ={
+export type MutationConfig<T> ={
   description?:string,
-  config?:any,
+  config?:T,
   inputFields:ArgsType,
   outputFields:{[string]:LinkedFieldType},
   mutateAndGetPayload:(args:{[string]: any},
@@ -136,8 +134,8 @@ type ColumnConfig = {
 /**
  * @public
  */
-type BaseFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | JSON | ModelRef |GraphQLOutputType |
-  Type.ScalarFieldType | Connection.ConnectionType | Connection.EdgeType
+type BaseFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | Class<JSON> |GraphQLOutputType |
+  Type.ScalarFieldType | string
 
 /**
  * @public
@@ -160,13 +158,9 @@ export type FieldType = BaseFieldType | {
 /**
  * @public
  */
-export type ModelOptionConfig = {
+export type SchemaOptionConfig = {
   description?:string,
-  singularQuery?:boolean|Object,
-  pluralQuery?:boolean|Object,
-  addMutation?:boolean|Object,
-  deleteMutation?:boolean|Object,
-  updateMutation?:boolean|Object,
+  plugin?:Object,
   table?:{
     defaultScope?:Object,
     scopes?:Object,
@@ -237,12 +231,11 @@ export type ModelOptionConfig = {
  * @public
  */
 export type HasOneConfig ={
-  target: string,
-  hidden?: boolean,
-  options?: {
-    hooks?: boolean,
-    as?:string|Object,
-    foreignKey?:string|Object,
+  [string]:{
+    hidden?: boolean,
+    target: string,
+    foreignField?:string,
+    foreignKey?:string,
     onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     constraints?:boolean
@@ -253,12 +246,11 @@ export type HasOneConfig ={
  * @public
  */
 export type BelongsToConfig = {
-  target: string,
-  hidden?: boolean,
-  options?: {
-    hooks?: boolean,
-    as?:string|Object,
-    foreignKey?:string|Object,
+  [string]:{
+    hidden?: boolean,
+    target: string,
+    foreignField?:string,
+    foreignKey?:string,
     onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     constraints?:boolean
@@ -266,12 +258,13 @@ export type BelongsToConfig = {
 }
 
 export type HasManyConfig = {
-  target: string,
-  hidden?: boolean,
-  options?: {
-    hooks?: boolean,
-    as?:string|Object,
-    foreignKey?:string|Object,
+  [string]:{
+    hidden?: boolean,
+    conditionFields?:ArgsType,
+    target: string,
+    foreignField?:string,
+    foreignKey?:string,
+    sourceKey?:string,
     scope?:Object,
     onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
@@ -284,17 +277,15 @@ export type HasManyConfig = {
  * @public
  */
 export type BelongsToManyConfig ={
-  target: string,
-  hidden?: boolean,
-  options?: {
-    hooks?: boolean,
+  [string]:{
+    hidden?: boolean,
+    target: string,
     through?:string | {
       model:string,
       scope?:Object,
       unique?:boolean
     },
-    as?:string,
-    foreignKey?:string|Object,
+    foreignField?:string|Object,
     otherKey?:string|Object,
     scope?:Object,
     timestamps?:boolean,
@@ -308,10 +299,10 @@ export type BelongsToManyConfig ={
  * @public
  */
 export type AssociationConfig ={
-  hasOne:Array<HasOneConfig>,
-  belongsTo:Array<BelongsToConfig>,
-  hasMany:Array<HasManyConfig>,
-  belongsToMany:Array<BelongsToManyConfig>,
+  hasOne:HasOneConfig,
+  belongsTo:BelongsToConfig,
+  hasMany:HasManyConfig,
+  belongsToMany:BelongsToManyConfig,
 }
 
 export type BuildOptionConfig = {
@@ -323,7 +314,7 @@ export type BuildOptionConfig = {
            next:()=>any)=>any
   }>,
   query?:{
-    viewer?:'AllQuery' | 'FromModelQuery' | QueryConfig,
+    viewer?:'AllQuery' | 'FromModelQuery' | QueryConfig<any>,
   },
   mutation?:{
     payloadFields?:Array<string|{

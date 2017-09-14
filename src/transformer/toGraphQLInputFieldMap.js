@@ -7,7 +7,6 @@ import * as graphql from 'graphql'
 import type {GraphQLInputFieldConfig, GraphQLInputFieldConfigMap} from 'graphql'
 
 import Type from '../type'
-import ModelRef from '../ModelRef'
 import StringHelper from '../utils/StringHelper'
 
 const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):GraphQLInputFieldConfigMap {
@@ -52,9 +51,14 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
       }
     }
 
-    if (field instanceof ModelRef) {
+    if (typeof field === 'string') {
+      if (field.endsWith('Id')) {
+        return {
+          type: Type.GraphQLScalarTypes.globalIdInputType(field.substr(0, field.length - 'Id'.length))
+        }
+      }
       return {
-        type: Type.GraphQLScalarTypes.globalIdInputType(field.name)
+        type: Type.GraphQLScalarTypes.globalIdInputType(field)
       }
     }
     if (field instanceof Object) {

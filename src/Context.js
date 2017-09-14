@@ -4,14 +4,13 @@ import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
 import _ from 'lodash'
 
-import type {GraphQLOutputType} from 'graphql'
+import type {GraphQLObjectType} from 'graphql'
 
-import Query from './query'
-import Mutation from './mutation'
-import Model from './Model'
-import ModelRef from './ModelRef'
+import Schema from './schema/Schema'
 import StringHelper from './utils/StringHelper'
 import Transformer from './transformer'
+
+import SequelizeContext from './sequelize/SequelizeContext'
 
 import type {LinkedFieldType, ArgsType, BuildOptionConfig} from './Definition'
 
@@ -38,7 +37,7 @@ export type MutationConfig ={
 }
 
 export default class Context {
-  sequelize:Sequelize
+  dbContext:SequelizeContext
 
   options:BuildOptionConfig
 
@@ -46,9 +45,9 @@ export default class Context {
 
   nodeInterface:graphql.GraphQLInterfaceType
 
-  models:{[id:string]: Model}
+  schemas:{[id:string]: Schema<any> }
 
-  graphQLObjectTypes:{[id:string]: GraphQLOutputType}
+  graphQLObjectTypes:{[id:string]: GraphQLObjectType}
 
   queries:{[id:string]:QueryConfig}
 
@@ -57,11 +56,11 @@ export default class Context {
   connectionDefinitions:{[id:string]:{connectionType:graphql.GraphQLObjectType, edgeType:graphql.GraphQLObjectType}}
 
   constructor (sequelize:Sequelize, options:BuildOptionConfig) {
-    this.sequelize = sequelize
+    this.dbContext = new SequelizeContext(sequelize)
     this.options = {...options}
 
     this.dbModels = {}
-    this.models = {}
+    this.schemas = {}
     this.graphQLObjectTypes = {}
     this.queries = {}
     this.mutations = {}
@@ -69,19 +68,24 @@ export default class Context {
     this.connectionDefinitions = {}
 
     const self = this
-    this.nodeInterface = relay.nodeDefinitions(null, (obj) => {
+    this.nodeInterface = relay.nodeDefinitions((globalId) => {
+      var {type, id} = relay.fromGlobalId(globalId)
+      console.log('Warning-------------------- node id Fetcher not implement' + type + ' ' + id)
+    }, (obj) => {
       const type = obj._type
       return self.graphQLObjectTypes[type]
     }).nodeInterface
   }
 
-  addModel (model:Model) {
-    if (this.models[model.name]) {
-      throw new Error('Model ' + model.name + ' already define.')
+  addSchema (schema:Schema<any>) {
+    if (this.schemas[schema.name]) {
+      throw new Error('Schema ' + schema.name + ' already define.')
     }
-    this.models[model.name] = model
+    this.schemas[schema.name] = schema
 
-    model.fields({
+    this.dbContext.applyPlugin(schema)
+
+    schema.fields({
       createdAt: {
         $type: Date,
         initializable: false,
@@ -94,35 +98,20 @@ export default class Context {
       }
     })
 
-    _.forOwn(model.config.queries, (value, key) => {
+    _.forOwn(schema.config.queries, (value, key) => {
       if (!value['name']) {
         value['name'] = key
       }
       this.addQuery(value)
     })
-    if (model.config.options.singularQuery !== false) {
-      this.addQuery(Query.singularQuery(model))
-    }
-    if (model.config.options.pluralQuery !== false) {
-      this.addQuery(Query.pluralQuery(model))
-    }
 
-    _.forOwn(model.config.mutations, (value, key) => {
+    _.forOwn(schema.config.mutations, (value, key) => {
       if (!value['name']) {
         value['name'] = key
       }
       this.addMutation(value)
     })
-    if (model.config.options.addMutation !== false) {
-      this.addMutation(Mutation.addMutation(model))
-    }
-    if (model.config.options.updateMutation !== false) {
-      this.addMutation(Mutation.updateMutation(model))
-    }
-    if (model.config.options.deleteMutation !== false) {
-      this.addMutation(Mutation.deleteMutation(model))
-    }
-    this.dbModel(model.name)
+    this.dbModel(schema.name)
   }
 
   addQuery (config:QueryConfig) {
@@ -139,47 +128,45 @@ export default class Context {
     this.mutations[config.name] = config
   }
 
-  graphQLObjectType (name:string):GraphQLOutputType {
-    const model = this.models[name]
+  graphQLObjectType (name:string):GraphQLObjectType {
+    const model = this.schemas[name]
     if (!model) {
-      throw new Error('Model ' + name + ' not define.')
+      throw new Error('Schema ' + name + ' not define.')
     }
     const typeName = model.name
 
     if (!this.graphQLObjectTypes[typeName]) {
-      const obj = Object.assign({}, model.config.fields, model.config.links)
-      const interfaces = [this.nodeInterface]
-      Object.assign(obj, {
-        id: {
-          $type: new graphql.GraphQLNonNull(graphql.GraphQLID),
-          resolve: async function (root) {
-            return relay.toGlobalId(StringHelper.toInitialUpperCase(model.name), root.id)
-          }
+      const obj = Object.assign({
+        id: {}
+      }, model.config.fields, model.config.links)
+      obj.id = {
+        $type: new graphql.GraphQLNonNull(graphql.GraphQLID),
+        resolve: async function (root) {
+          return relay.toGlobalId(StringHelper.toInitialUpperCase(model.name), root.id)
         }
-      })
+      }
+      const interfaces = [this.nodeInterface]
 
-      Object.assign(obj, Query.hasManyQueryFields(model))
-      Object.assign(obj, Query.hasOneQueryFields(model))
-
-      this.graphQLObjectTypes[typeName] = Transformer.toGraphQLFieldConfig(typeName, '', obj, this, interfaces).type
-      if (this.graphQLObjectTypes[typeName] instanceof graphql.GraphQLObjectType) {
-        this.graphQLObjectTypes[typeName].description = model.config.options.description
+      const objectType = Transformer.toGraphQLFieldConfig(typeName, '', obj, this, interfaces).type
+      if (objectType instanceof graphql.GraphQLObjectType) {
+        objectType.description = model.config.options.description
+        this.graphQLObjectTypes[typeName] = objectType
       }
     }
     return this.graphQLObjectTypes[typeName]
   }
 
   dbModel (name:string):Sequelize.Model {
-    const model = this.models[name]
+    const model = this.schemas[name]
     if (!model) {
-      throw new Error('Model ' + name + ' not define.')
+      throw new Error('Schema ' + name + ' not define.')
     }
     const typeName = model.name
 
     if (!this.dbModels[typeName]) {
-      this.dbModels[typeName] = Transformer.toSequelizeModel(this.sequelize, model)
+      this.dbModels[typeName] = this.dbContext.define(model)
       Object.assign(this.dbModels[typeName], model.config.statics)
-      Object.assign(this.dbModels[typeName].Instance.prototype, model.config.methods)
+      Object.assign(this.dbModels[typeName].prototype, model.config.methods)
     }
     return this.dbModels[typeName]
   }
@@ -187,11 +174,8 @@ export default class Context {
   wrapQueryResolve (config:QueryConfig):any {
     const self = this
 
-    const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
+    const dbModels = () => _.mapValues(this.schemas, (schema) => self.dbModel(schema.name))
 
-    const invoker = (schema, context, rootValue, requestString, variableValues) => {
-      return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
-    }
     let hookFun = (action, invokeInfo, next) => next()
 
     if (this.options.hooks != null) {
@@ -214,7 +198,7 @@ export default class Context {
       models: dbModels()
     },
       () => {
-        return config.resolve(args, context, info, dbModels(), invoker.bind(null, info.schema, context, info.rootValue))
+        return config.resolve(args, context, info, dbModels())
       }
     )
   }
@@ -232,11 +216,8 @@ export default class Context {
   }):any {
     const self = this
 
-    const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
+    const dbModels = () => _.mapValues(this.schemas, (model) => self.dbModel(model.name))
 
-    const invoker = (schema, context, rootValue, requestString, variableValues) => {
-      return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
-    }
     let hookFun = (action, invokeInfo, next) => next()
     if (this.options.hooks != null) {
       this.options.hooks.reverse().forEach(hook => {
@@ -257,18 +238,15 @@ export default class Context {
       info: info,
       models: dbModels()
     },
-      () => config.resolve(source, args, context, info, dbModels(), invoker.bind(null, info.schema, context, info.rootValue))
+      () => config.resolve(source, args, context, info, dbModels())
     )
   }
 
   wrapMutateAndGetPayload (config:MutationConfig):any {
     const self = this
 
-    const dbModels = () => _.mapValues(this.models, (model) => self.dbModel(model.name))
+    const dbModels = () => _.mapValues(this.schemas, (schema) => self.dbModel(schema.name))
 
-    const invoker = (schema, context, rootValue, requestString, variableValues) => {
-      return graphql['graphql'](schema, requestString, rootValue, context, variableValues)
-    }
     let hookFun = (action, invokeInfo, next) => next()
     if (this.options.hooks != null) {
       this.options.hooks.reverse().forEach(hook => {
@@ -288,15 +266,15 @@ export default class Context {
       info: info,
       models: dbModels()
     },
-      () => config.mutateAndGetPayload(args, context, info, dbModels(), invoker.bind(null, info.schema, context, info.rootValue))
+      () => config.mutateAndGetPayload(args, context, info, dbModels())
     )
   }
 
-  connectionDefinition (ref:ModelRef):{connectionType:graphql.GraphQLObjectType, edgeType:graphql.GraphQLObjectType} {
-    if (!this.connectionDefinitions[ref.name]) {
-      this.connectionDefinitions[ref.name] = relay.connectionDefinitions({
-        name: StringHelper.toInitialUpperCase(ref.name),
-        nodeType: this.graphQLObjectType(ref.name),
+  connectionDefinition (schemaName:string):{connectionType:graphql.GraphQLObjectType, edgeType:graphql.GraphQLObjectType} {
+    if (!this.connectionDefinitions[schemaName]) {
+      this.connectionDefinitions[schemaName] = relay.connectionDefinitions({
+        name: StringHelper.toInitialUpperCase(schemaName),
+        nodeType: this.graphQLObjectType(schemaName),
         connectionFields: {
           count: {
             type: graphql.GraphQLFloat
@@ -304,31 +282,48 @@ export default class Context {
         }
       })
     }
-    return this.connectionDefinitions[ref.name]
+    return this.connectionDefinitions[schemaName]
   }
 
-  connectionType (ref:ModelRef):graphql.GraphQLObjectType {
-    return this.connectionDefinition(ref).connectionType
+  connectionType (schemaName:string):graphql.GraphQLObjectType {
+    return this.connectionDefinition(schemaName).connectionType
   }
 
-  edgeType (ref:ModelRef):graphql.GraphQLObjectType {
-    return this.connectionDefinition(ref).edgeType
+  edgeType (schemaName:string):graphql.GraphQLObjectType {
+    return this.connectionDefinition(schemaName).edgeType
   }
 
   buildModelAssociations ():void {
     const self = this
-    _.forOwn(self.models, (model, key) => {
-      model.config.associations.hasOne.forEach(config => {
-        self.dbModel(model.name).hasOne(self.dbModel(config.target), config.options)
+    _.forOwn(self.schemas, (schema, schemaName) => {
+      _.forOwn(schema.config.associations.hasOne, (config, key) => {
+        self.dbModel(schema.name).hasOne(self.dbModel(config.target), {
+          ...config,
+          as: key,
+          foreignKey: config.foreignKey || config.foreignField + 'Id'
+        })
       })
-      model.config.associations.belongsTo.forEach(config => {
-        self.dbModel(model.name).belongsTo(self.dbModel(config.target), config.options)
+
+      _.forOwn(schema.config.associations.belongsTo, (config, key) => {
+        self.dbModel(schema.name).belongsTo(self.dbModel(config.target), {
+          ...config,
+          as: key,
+          foreignKey: config.foreignKey || config.foreignField + 'Id'
+        })
       })
-      model.config.associations.hasMany.forEach(config => {
-        self.dbModel(model.name).hasMany(self.dbModel(config.target), config.options)
+      _.forOwn(schema.config.associations.hasMany, (config, key) => {
+        self.dbModel(schema.name).hasMany(self.dbModel(config.target), {
+          ...config,
+          as: key,
+          foreignKey: config.foreignKey || config.foreignField + 'Id'
+        })
       })
-      model.config.associations.belongsToMany.forEach(config => {
-        self.dbModel(model.name).belongsToMany(self.dbModel(config.target), config.options)
+      _.forOwn(schema.config.associations.belongsToMany, (config, key) => {
+        self.dbModel(schema.name).belongsToMany(self.dbModel(config.target), {
+          ...config,
+          as: key,
+          foreignKey: config.foreignField + 'Id'
+        })
       })
     })
   }
