@@ -21,33 +21,21 @@
 npm install graphql graphql-relay simple-graphql --save
 ```
 
-## Demo
-
-Check out the project code (<https://github.com/logerzhu/simple-graphql>).
-
-```shell
-cd simple-graphql
-npm install # install dependencies in the main folder
-npm run start # run the demo and open your browser: http://localhost:9413/graphql
-```
 ## Roadmap
   - [ ] Query cache with [dataloader](https://github.com/facebook/dataloader)
   - [ ] Test
   - [ ] [ < place for your ideas > ](https://github.com/logerzhu/simple-graphql/issues/new)
 
-## Usage
-
-### Define the model
-
-Todo.js
-
-```javascript
+## Demo & Usage
+```
 // @flow
+import Sequelize from 'sequelize'
+import express from 'express'
+import graphqlHTTP from 'express-graphql'
 import SG from 'simple-graphql'
 
-const TodoType = SG.modelRef('Todo') // Reference to Todo model type
-
-export default SG.model('Todo').fields({
+// 定义Schema
+const TodoSchema = SG.schema('Todo').fields({
   title: {
     $type: String,
     required: true
@@ -60,8 +48,8 @@ export default SG.model('Todo').fields({
   dueAt: Date
 }).queries({
   dueTodos: {
-    description: "Find all due todos",
-    $type: [TodoType],
+    description: 'Find all due todos',
+    $type: ['Todo'],
     args: {
       dueBefore: {
         $type: Date,
@@ -80,21 +68,21 @@ export default SG.model('Todo').fields({
     }
   }
 }).mutations({
-  cpmpletedTodo: {
-    description: "Mark the todo task completed.",
+  completedTodo: {
+    description: 'Mark the todo task completed.',
     inputFields: {
       todoId: {
-        $type: TodoType,
+        $type: 'Todo',
         required: true
       }
     },
     outputFields: {
-      changedTodo: TodoType
+      changedTodo: 'Todo'
     },
     mutateAndGetPayload: async function ({todoId}, context, info, {Todo}) {
       const todo = await Todo.findOne({where: {id: todoId}})
       if (!todo) {
-        throw new Error("Todo entity not found.")
+        throw new Error('Todo entity not found.')
       }
       if (!todo.completed) {
         todo.completed = true
@@ -104,48 +92,35 @@ export default SG.model('Todo').fields({
     }
   }
 })
-```
 
-### Generate the GraphQL Schema and start the server
-
-```javascript
-import Sequelize from 'sequelize'
-import SG from 'simple-graphql'
-import express from 'express'
-import graphqlHTTP from 'express-graphql'
-
-import Todo from './Todo'
-
-// Config the Sequelize database connection.
+// 定义Sequelize 链接
 const sequelize = new Sequelize('test1', 'postgres', 'Password', {
   host: 'localhost',
-  port: 5432,
-  dialect: 'postgres',
-
+  dialect: 'sqlite',
   pool: {
     max: 5,
     min: 0,
     idle: 10000
-  }
+  },
+  // SQLite only
+  storage: ':memory:'
 })
 
+// 生成GraphQL的schema
+const schema = SG.build(sequelize, [TodoSchema], {})
 
-// Generate the GraphQL Schema
-const schema = GS.build(sequelize, [Todo], {}) 
-
-// After GS.bulid completed, all sequelize models have defined, and call sequelize.sync will automatic create the schema in database.
+// 自动建立数据库表
 sequelize.sync({
   force: false, // if true, it will drop all existing table and recreate all.
   logging: console.log
 }).then(() => console.log('Init DB Done'), (err) => console.log('Init DB Fail', err))
 
-
-// Start the GraphQL server
+// 启动http服务器
 const app = express()
 
 app.use('/graphql', graphqlHTTP({
- schema: schema,
- graphiql: true
+  schema: schema,
+  graphiql: true
 }))
 app.listen(4000)
 
