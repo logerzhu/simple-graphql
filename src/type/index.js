@@ -50,7 +50,7 @@ export default{
       name: 'JSON',
       graphQLInputType: GraphQLScalarTypes.Json,
       graphQLOutputType: GraphQLScalarTypes.Json,
-      columnType: Sequelize.JSONB
+      columnType: Sequelize.JSON
     })
   } : {[id:string]:ScalarFieldType})
 }

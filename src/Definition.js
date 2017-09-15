@@ -134,14 +134,20 @@ type ColumnConfig = {
 /**
  * @public
  */
-type BaseFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | Class<JSON> |GraphQLOutputType |
-  Type.ScalarFieldType | string
+type BaseFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | Class<JSON> | GraphQLOutputType | Type.ScalarFieldType | string
+
+type JSONType = BaseFieldType | {
+  $type:JSONType,
+  description?:string,
+  enumValues?:Array<string>,
+  default?:any,
+} | Array<JSONType> | {[string]:JSONType}
 
 /**
  * @public
  */
 export type FieldType = BaseFieldType | {
-  $type:BaseFieldType,
+  $type: JSONType,
   description?:string,
   enumValues?:Array<string>,
   default?:any,

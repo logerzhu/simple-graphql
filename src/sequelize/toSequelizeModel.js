@@ -24,9 +24,9 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
       case Date:
         return Sequelize.DATE
       case JSON:
-        return Sequelize.JSONB
+        return Sequelize.JSON
     }
-    return null
+    return Sequelize.JSON
   }
   _.forOwn(schema.config.fields, (value, key) => {
     let fType = value
