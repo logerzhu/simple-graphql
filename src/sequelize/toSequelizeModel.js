@@ -41,6 +41,7 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
             target: fType,
             hidden: true,
             foreignField: foreignField,
+            foreignKey: {name: foreignField + 'Id', allowNull: false},
             onDelete: 'RESTRICT',
             constraints: true
           }
@@ -51,8 +52,8 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
             target: fType,
             hidden: true,
             foreignField: foreignField,
-            onDelete: 'SET NULL',
-            constraints: false
+            onDelete: 'RESTRICT',
+            constraints: true
           }
         })
       }

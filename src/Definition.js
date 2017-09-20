@@ -256,7 +256,7 @@ export type BelongsToConfig = {
     hidden?: boolean,
     target: string,
     foreignField?:string,
-    foreignKey?:string,
+    foreignKey?:string | {name:string, allowNull?:boolean},
     onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     constraints?:boolean
