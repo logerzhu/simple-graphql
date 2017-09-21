@@ -3,6 +3,7 @@ import Sequelize from 'sequelize'
 import path from 'path'
 import fs from 'fs'
 import GS from '../../'
+import DemoService from './definition/service/DemoService'
 
 export default function (sequelize:Sequelize) {
   function listSchemas (dir:string):Array<GS.Schema<any>> {
@@ -42,6 +43,7 @@ export default function (sequelize:Sequelize) {
   return GS.build({
     sequelize: sequelize,
     schemas: schemas,
+    services: [DemoService],
     options: {
       hooks: [{
         description: 'Enable transaction on mutations',
