@@ -2,7 +2,7 @@
 import * as _ from 'lodash'
 import * as graphql from 'graphql'
 
-import Schema from '../../schema/Schema'
+import Schema from '../../definition/Schema'
 import StringHelper from '../../utils/StringHelper'
 
 export default function singularQuery (schema:Schema<any>, options:any):void {

@@ -4,7 +4,7 @@ import _ from 'lodash'
 import Sequelize from 'sequelize'
 
 import Type from '../type'
-import Schema from '../schema/Schema'
+import Schema from '../definition/Schema'
 import StringHelper from '../utils/StringHelper'
 
 export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any>):Sequelize.Model {

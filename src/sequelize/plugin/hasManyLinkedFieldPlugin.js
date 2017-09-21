@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash'
 
-import Schema from '../../schema/Schema'
+import Schema from '../../definition/Schema'
 // import StringHelper from '../../utils/StringHelper'
 
 import resolveConnection from '../resolveConnection'

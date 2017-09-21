@@ -2,7 +2,7 @@
 import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
 
-import Schema from '../../schema/Schema'
+import Schema from '../../definition/Schema'
 import StringHelper from '../../utils/StringHelper'
 
 export default function deleteMutation (schema:Schema<any>, options:any):void {

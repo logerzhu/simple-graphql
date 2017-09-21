@@ -1,7 +1,7 @@
 // @flow
 import _ from 'lodash'
 
-import Schema from '../../schema/Schema'
+import Schema from '../../definition/Schema'
 import StringHelper from '../../utils/StringHelper'
 
 export default function hasOneFieldsConfig (schema:Schema<any>, options:any):void {

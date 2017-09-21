@@ -6,7 +6,7 @@ import _ from 'lodash'
 
 import type {GraphQLObjectType} from 'graphql'
 
-import Schema from './schema/Schema'
+import Schema from './definition/Schema'
 import StringHelper from './utils/StringHelper'
 import Transformer from './transformer'
 

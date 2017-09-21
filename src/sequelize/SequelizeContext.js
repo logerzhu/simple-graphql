@@ -2,7 +2,7 @@
 import _ from 'lodash'
 import Sequelize from 'sequelize'
 
-import Schema from '../schema/Schema'
+import Schema from '../definition/Schema'
 
 import toSequelizeModel from './toSequelizeModel.js'
 import plugin from './plugin'

@@ -6,7 +6,7 @@ import _ from 'lodash'
 import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
 
-import Schema from './schema/Schema'
+import Schema from './definition/Schema'
 import Type from './type'
 import Context from './Context'
 import StringHelper from './utils/StringHelper'
