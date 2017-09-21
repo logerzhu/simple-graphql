@@ -7,6 +7,7 @@ import _ from 'lodash'
 import type {GraphQLObjectType} from 'graphql'
 
 import Schema from './definition/Schema'
+import Service from './definition/Service'
 import StringHelper from './utils/StringHelper'
 import Transformer from './transformer'
 
@@ -47,6 +48,8 @@ export default class Context {
 
   schemas:{[id:string]: Schema<any> }
 
+  services:{[id:string]: Service<any> }
+
   graphQLObjectTypes:{[id:string]: GraphQLObjectType}
 
   queries:{[id:string]:QueryConfig}
@@ -61,6 +64,7 @@ export default class Context {
 
     this.dbModels = {}
     this.schemas = {}
+    this.services = {}
     this.graphQLObjectTypes = {}
     this.queries = {}
     this.mutations = {}
@@ -80,6 +84,9 @@ export default class Context {
   addSchema (schema:Schema<any>) {
     if (this.schemas[schema.name]) {
       throw new Error('Schema ' + schema.name + ' already define.')
+    }
+    if (this.services[schema.name]) {
+      throw new Error('Schema ' + schema.name + ' conflict with Service ' + schema.name)
     }
     this.schemas[schema.name] = schema
 
@@ -112,6 +119,30 @@ export default class Context {
       this.addMutation(value)
     })
     this.dbModel(schema.name)
+  }
+
+  addService (service:Service<any>) {
+    if (this.services[service.name]) {
+      throw new Error('Service ' + service.name + ' already define.')
+    }
+    if (this.schemas[service.name]) {
+      throw new Error('Service ' + service.name + ' conflict with Schema ' + service.name)
+    }
+    this.services[service.name] = service
+
+    _.forOwn(service.config.queries, (value, key) => {
+      if (!value['name']) {
+        value['name'] = key
+      }
+      this.addQuery(value)
+    })
+
+    _.forOwn(service.config.mutations, (value, key) => {
+      if (!value['name']) {
+        value['name'] = key
+      }
+      this.addMutation(value)
+    })
   }
 
   addQuery (config:QueryConfig) {

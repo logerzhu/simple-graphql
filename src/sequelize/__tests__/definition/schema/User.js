@@ -1,5 +1,5 @@
 // @flow
-import SG from '../../../'
+import SG from '../../../../'
 
 export default SG.schema('User', {
   description: '用户',

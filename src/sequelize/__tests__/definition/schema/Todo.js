@@ -1,5 +1,5 @@
 // @flow
-import SG from '../../../'
+import SG from '../../../../'
 
 const UserType = 'User'
 const TodoType = 'Todo'

@@ -1,5 +1,5 @@
 // @flow
-import SG from '../../../'
+import SG from '../../../../'
 
 const UserType = 'User'
 export default SG.schema('UserProfile', {}).fields({

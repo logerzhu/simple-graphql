@@ -7,6 +7,7 @@ import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
 
 import Schema from './definition/Schema'
+import Service from './definition/Service'
 import Type from './type'
 import Context from './Context'
 import StringHelper from './utils/StringHelper'
@@ -33,6 +34,8 @@ const SimpleGraphQL = {
 
   Schema: Schema,
 
+  Service: Service,
+
   /**
    * Define a Schema
    *
@@ -41,15 +44,28 @@ const SimpleGraphQL = {
    */
   schema: <T>(name:string, options:SchemaOptionConfig={}):Schema<T> => new Schema(name, options),
 
+  service: <T>(name:string):Service<T> => new Service(name),
+
   /**
    * Build the GraphQL Schema
    */
-  build: (sequelize:Sequelize, schemas:Array<Schema<any>>, options:BuildOptionConfig = {}):graphql.GraphQLSchema => {
+  build: (args:{
+         sequelize:Sequelize,
+         schemas?:Array<Schema<any>>,
+         services?:Array<Service<any>>,
+         options?:BuildOptionConfig
+         }):graphql.GraphQLSchema => {
+    const {sequelize, schemas = [], services = [], options = {}} = args
     const context = new Context(sequelize, options)
 
     // 添加Schema
     schemas.forEach(schema => {
       context.addSchema(schema)
+    })
+
+    // 添加Schema
+    services.forEach(service => {
+      context.addService(service)
     })
 
     context.buildModelAssociations()
