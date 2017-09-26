@@ -212,8 +212,8 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
       resolve: async function (args:{[argName: string]: any},
                                context:any,
                                info:graphql.GraphQLResolveInfo,
-                               models:any) {
-        const dbModel = models[schema.name]
+                               sgContext) {
+        const dbModel = sgContext.models[schema.name]
 
         let {sort = [{field: 'id', order: 'ASC'}], condition = {}} = (args != null ? args : {})
 
@@ -251,7 +251,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
                 const type = associationType(schema, key)
                 includeFields[key] = true
                 include.push({
-                  model: dbModel.sequelize.models[type],
+                  model: sgContext.models[type],
                   as: key,
                   required: true
                 })
@@ -296,7 +296,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
                 if (!includeFields[fieldName]) {
                   includeFields[fieldName] = true
                   include.push({
-                    model: dbModel.sequelize.models[type],
+                    model: sgContext.models[type],
                     as: fieldName,
                     required: false
                   })

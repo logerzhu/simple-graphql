@@ -14,7 +14,7 @@ export default function hasOneFieldsConfig (schema:Schema<any>, options:any):voi
     schema.links({
       [key]: {
         $type: config.target,
-        resolve: async function (root, args, context, info, models) {
+        resolve: async function (root, args, context, info, sgContext) {
           if (root[key] != null) {
             return root[key]
           } else {

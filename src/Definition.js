@@ -7,6 +7,12 @@ import Type from './type'
 
 /* global Class */
 
+export type SGContext = {
+  sequelize:Sequelize,
+  models:{[string]:Sequelize.Model},
+  services:{[string]:Object}
+}
+
 /**
  * @public
  */
@@ -22,7 +28,7 @@ export type LinkedFieldType = Class<String> | Class<Number> | Class<Boolean> | C
   resolve?: (source:any, args:{[string]: any},
              context:any,
              info:GraphQLResolveInfo,
-             models:{[string]:Sequelize.Model}) => any
+             sgContext:SGContext) => any
 }
 
 /**
@@ -40,7 +46,7 @@ export type LinkedFieldConfig = {
   resolve: (source:any, args:{[string]: any},
             context:any,
             info:GraphQLResolveInfo,
-            models:{[string]:Sequelize.Model}) => any
+            sgContext:SGContext) => any
 }
 
 /**
@@ -54,7 +60,7 @@ export type QueryConfig<T> ={
   resolve: (args:{[string]: any},
             context:any,
             info:GraphQLResolveInfo,
-            models:{[string]:Sequelize.Model}) => any
+            sgContext:SGContext) => any
 }
 
 /**
@@ -68,7 +74,7 @@ export type MutationConfig<T> ={
   mutateAndGetPayload:(args:{[string]: any},
                        context:any,
                        info:GraphQLResolveInfo,
-                       models:{[string]:Sequelize.Model}) => any
+                       sgContext:SGContext) => any
 }
 
 /**
@@ -316,7 +322,7 @@ export type BuildOptionConfig = {
     description?: string,
     filter: (action:{type:'field'|'query'|'mutation', config:any})=>boolean,
     hook: (action:{type:'field'|'query'|'mutation', config:any},
-           invokeInfo:{source?:any, args:any, context:any, info:GraphQLResolveInfo, models:{[string]:Sequelize.Model}},
+           invokeInfo:{source?:any, args:any, context:any, info:GraphQLResolveInfo, sgContext:SGContext},
            next:()=>any)=>any
   }>,
   query?:{
@@ -331,6 +337,6 @@ export type BuildOptionConfig = {
       resolve: (args:{[argName: string]: any},
                 context:any,
                 info:GraphQLResolveInfo,
-                models:{[id:string]:Sequelize.Model}) => any}>
+                sgContext:SGContext) => any}>
   }
 }

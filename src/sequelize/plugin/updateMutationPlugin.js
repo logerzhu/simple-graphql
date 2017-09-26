@@ -43,11 +43,11 @@ export default function updateMutation (schema:Schema<any>, options:any):void {
       outputFields: {
         [changedName]: schema.name
       },
-      mutateAndGetPayload: async function (args, context:any, info:graphql.GraphQLResolveInfo, models) {
+      mutateAndGetPayload: async function (args, context:any, info:graphql.GraphQLResolveInfo, sgContext) {
         if (args == null || args.values == null) {
           throw new Error('Missing update values.')
         }
-        const dbModel = models[schema.name]
+        const dbModel = sgContext.models[schema.name]
         const values = {}
 
         _.forOwn(schema.config.fields, (value, key) => {

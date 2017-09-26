@@ -106,7 +106,7 @@ const toGraphQLFieldConfig = function (name:string,
           name: name.split('.').slice(-1)[0],
           path: name,
           $type: context.graphQLObjectType(fieldType),
-          resolve: async function (root, args, context, info, models) {
+          resolve: async function (root, args, context, info, sgContext) {
             const fieldName = name.split('.').slice(-1)[0]
             if (_.isFunction(root['get' + StringHelper.toInitialUpperCase(fieldName)])) {
               if (root[fieldName] != null && root[fieldName].id != null) {
@@ -119,7 +119,7 @@ const toGraphQLFieldConfig = function (name:string,
                 typeof root[fieldName] === 'number' ||
                 typeof root[fieldName] === 'string'
               )) {
-              return models[fieldType].findOne({where: {id: root[fieldName]}})
+              return sgContext.models[fieldType].findOne({where: {id: root[fieldName]}})
             }
             return root[fieldName]
           }

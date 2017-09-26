@@ -13,7 +13,7 @@ import Transformer from './transformer'
 
 import SequelizeContext from './sequelize/SequelizeContext'
 
-import type {LinkedFieldType, ArgsType, BuildOptionConfig} from './Definition'
+import type {SGContext, LinkedFieldType, ArgsType, BuildOptionConfig} from './Definition'
 
 export type QueryConfig ={
   name:string,
@@ -23,7 +23,7 @@ export type QueryConfig ={
   resolve: (args:{[argName: string]: any},
             context:any,
             info:graphql.GraphQLResolveInfo,
-            models:{[id:string]:Sequelize.Model}) => any
+            sgContext:SGContext) => any
 }
 
 export type MutationConfig ={
@@ -34,7 +34,7 @@ export type MutationConfig ={
   mutateAndGetPayload:(args:{[argName: string]: any},
                        context:any,
                        info:graphql.GraphQLResolveInfo,
-                       models:{[id:string]:Sequelize.Model}) => any
+                       sgContext:SGContext) => any
 }
 
 export default class Context {
@@ -81,6 +81,14 @@ export default class Context {
     }).nodeInterface
   }
 
+  getSGContext () {
+    return {
+      sequelize: this.dbContext.sequelize,
+      models: _.mapValues(this.schemas, (schema) => this.dbModel(schema.name)),
+      services: _.mapValues(this.services, (service) => service.config.statics)
+    }
+  }
+
   addSchema (schema:Schema<any>) {
     if (this.schemas[schema.name]) {
       throw new Error('Schema ' + schema.name + ' already define.')
@@ -122,26 +130,30 @@ export default class Context {
   }
 
   addService (service:Service<any>) {
-    if (this.services[service.name]) {
+    const self = this
+    if (self.services[service.name]) {
       throw new Error('Service ' + service.name + ' already define.')
     }
-    if (this.schemas[service.name]) {
+    if (self.schemas[service.name]) {
       throw new Error('Service ' + service.name + ' conflict with Schema ' + service.name)
     }
-    this.services[service.name] = service
+    service.statics({
+      getSGContext: () => self.getSGContext()
+    })
+    self.services[service.name] = service
 
     _.forOwn(service.config.queries, (value, key) => {
       if (!value['name']) {
         value['name'] = key
       }
-      this.addQuery(value)
+      self.addQuery(value)
     })
 
     _.forOwn(service.config.mutations, (value, key) => {
       if (!value['name']) {
         value['name'] = key
       }
-      this.addMutation(value)
+      self.addMutation(value)
     })
   }
 
@@ -193,19 +205,23 @@ export default class Context {
       throw new Error('Schema ' + name + ' not define.')
     }
     const typeName = model.name
-
-    if (!this.dbModels[typeName]) {
-      this.dbModels[typeName] = this.dbContext.define(model)
-      Object.assign(this.dbModels[typeName], model.config.statics)
-      Object.assign(this.dbModels[typeName].prototype, model.config.methods)
+    const self = this
+    if (!self.dbModels[typeName]) {
+      self.dbModels[typeName] = self.dbContext.define(model)
+      Object.assign(self.dbModels[typeName], {
+        ...model.config.statics,
+        getSGContext: () => self.getSGContext()
+      })
+      Object.assign(self.dbModels[typeName].prototype, {
+        ...model.config.methods,
+        getSGContext: () => self.getSGContext()
+      })
     }
-    return this.dbModels[typeName]
+    return self.dbModels[typeName]
   }
 
   wrapQueryResolve (config:QueryConfig):any {
     const self = this
-
-    const dbModels = () => _.mapValues(this.schemas, (schema) => self.dbModel(schema.name))
 
     let hookFun = (action, invokeInfo, next) => next()
 
@@ -226,10 +242,10 @@ export default class Context {
       args: args,
       context: context,
       info: info,
-      models: dbModels()
+      sgContext: self.getSGContext()
     },
       () => {
-        return config.resolve(args, context, info, dbModels())
+        return config.resolve(args, context, info, self.getSGContext())
       }
     )
   }
@@ -243,11 +259,9 @@ export default class Context {
               args:{[argName: string]: any},
               context:any,
               info:graphql.GraphQLResolveInfo,
-              models:{[id:string]:Sequelize.Model}) => any
+              sgContext:SGContext) => any
   }):any {
     const self = this
-
-    const dbModels = () => _.mapValues(this.schemas, (model) => self.dbModel(model.name))
 
     let hookFun = (action, invokeInfo, next) => next()
     if (this.options.hooks != null) {
@@ -267,16 +281,14 @@ export default class Context {
       args: args,
       context: context,
       info: info,
-      models: dbModels()
+      sgContext: self.getSGContext()
     },
-      () => config.resolve(source, args, context, info, dbModels())
+      () => config.resolve(source, args, context, info, self.getSGContext())
     )
   }
 
   wrapMutateAndGetPayload (config:MutationConfig):any {
     const self = this
-
-    const dbModels = () => _.mapValues(this.schemas, (schema) => self.dbModel(schema.name))
 
     let hookFun = (action, invokeInfo, next) => next()
     if (this.options.hooks != null) {
@@ -295,9 +307,9 @@ export default class Context {
       args: args,
       context: context,
       info: info,
-      models: dbModels()
+      sgContext: self.getSGContext()
     },
-      () => config.mutateAndGetPayload(args, context, info, dbModels())
+      () => config.mutateAndGetPayload(args, context, info, self.getSGContext())
     )
   }
 

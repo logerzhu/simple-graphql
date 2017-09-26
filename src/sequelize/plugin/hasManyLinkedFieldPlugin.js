@@ -21,7 +21,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
       [key]: {
         args: args,
         $type: config.target + 'Connection',
-        resolve: async function (root, args, context, info, models) {
+        resolve: async function (root, args, context, info, sgContext) {
           const condition = config.scope || {}
           const sort = config.sort || [{field: 'id', order: 'ASC'}]
           // if (models[hasManyCfg.target].options.underscored) {
@@ -35,7 +35,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
           condition[foreignKey] = root[sourceKey]
 
           // }
-          return resolveConnection(models[config.target], {...args, condition, sort})
+          return resolveConnection(sgContext.models[config.target], {...args, condition, sort})
         }
       }
     })

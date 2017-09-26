@@ -35,8 +35,8 @@ export default function addMutation (schema:Schema<any>, options:any):void {
       outputFields: {
         [addedName]: schema.name + 'Edge'
       },
-      mutateAndGetPayload: async function (args:any, context:any, info:graphql.GraphQLResolveInfo, models) {
-        const dbModel = models[schema.name]
+      mutateAndGetPayload: async function (args:any, context:any, info:graphql.GraphQLResolveInfo, sgContext) {
+        const dbModel = sgContext.models[schema.name]
         const attrs = {}
 
         _.forOwn(schema.config.fields, (value, key) => {

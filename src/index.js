@@ -148,15 +148,15 @@ const SimpleGraphQL = {
       resolve: context.wrapQueryResolve({
         name: 'node',
         $type: context.nodeInterface,
-        resolve: async function (args, context, info, models, invoker) {
+        resolve: async function (args, context, info, sgContext, invoker) {
           const id = relay.fromGlobalId(args.id)
           if (id.type === 'Viewer') {
             if (finalQueries['viewer'] && finalQueries['viewer'].resolve) {
               return finalQueries['viewer'].resolve(null, args, context, info)
             }
           }
-          if (!models[id.type]) return null
-          const record = await models[id.type].findOne({where: {id: id.id}})
+          if (!sgContext.models[id.type]) return null
+          const record = await sgContext.models[id.type].findOne({where: {id: id.id}})
           if (record) {
             record._type = id.type
           }

@@ -36,7 +36,7 @@ export default SG.schema('Todo').fields({
         required: true
       }
     },
-    resolve: async function ({ownerId, dueBefore}, context, info, {Todo}) {
+    resolve: async function ({ownerId, dueBefore}, context, info, {models: {Todo}}) {
       return Todo.find({
         where: {
           completed: false,
@@ -60,7 +60,7 @@ export default SG.schema('Todo').fields({
     outputFields: {
       changedTodo: TodoType
     },
-    mutateAndGetPayload: async function ({todoId}, context, info, {Todo}) {
+    mutateAndGetPayload: async function ({todoId}, context, info, {models: {Todo}}) {
       const todo = await Todo.findOne({where: {id: todoId}})
       if (!todo) {
         throw new Error('Todo entity not found.')
