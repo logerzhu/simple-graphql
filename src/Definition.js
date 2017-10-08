@@ -242,8 +242,9 @@ export type SchemaOptionConfig = {
 /**
  * @public
  */
-export type HasOneConfig ={
+export type HasOneConfig<T> ={
   [string]:{
+    config?:T,
     hidden?: boolean,
     target: string,
     foreignField?:string,
@@ -269,8 +270,9 @@ export type BelongsToConfig = {
   }
 }
 
-export type HasManyConfig = {
+export type HasManyConfig<T> = {
   [string]:{
+    config?:T,
     hidden?: boolean,
     conditionFields?:ArgsType,
     target: string,
@@ -310,10 +312,10 @@ export type BelongsToManyConfig ={
 /**
  * @public
  */
-export type AssociationConfig ={
-  hasOne:HasOneConfig,
+export type AssociationConfig<T> ={
+  hasOne:HasOneConfig<T>,
   belongsTo:BelongsToConfig,
-  hasMany:HasManyConfig,
+  hasMany:HasManyConfig<T>,
   belongsToMany:BelongsToManyConfig,
 }
 

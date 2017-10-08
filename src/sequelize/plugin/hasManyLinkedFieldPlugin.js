@@ -19,6 +19,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
     }
     schema.links({
       [key]: {
+        config: config.config,
         args: args,
         $type: config.target + 'Connection',
         resolve: async function (root, args, context, info, sgContext) {

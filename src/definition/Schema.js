@@ -10,7 +10,7 @@ export default class Schema<T> {
   config:{
     fields:{[id:string]: FieldType},
     links:{[id:string]:LinkedFieldConfig},
-    associations:AssociationConfig,
+    associations:AssociationConfig<T>,
     options:SchemaOptionConfig,
     queries:{[id:string]: QueryConfig<T>},
     mutations:{[id:string]: MutationConfig<T>},
@@ -91,7 +91,7 @@ export default class Schema<T> {
   /**
    * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#hasone|HasOne} relations to current Schema.
    */
-  hasOne (config:HasOneConfig):Schema<T> {
+  hasOne (config:HasOneConfig<T>):Schema<T> {
     _.forOwn(config, (value, key) => {
       this.config.associations.hasOne[key] = value
     })
@@ -111,7 +111,7 @@ export default class Schema<T> {
   /**
    * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#one-to-many-associations|HasMany} relations to current Schema.
    */
-  hasMany (config:HasManyConfig):Schema<T> {
+  hasMany (config:HasManyConfig<T>):Schema<T> {
     _.forOwn(config, (value, key) => {
       this.config.associations.hasMany[key] = value
     })
