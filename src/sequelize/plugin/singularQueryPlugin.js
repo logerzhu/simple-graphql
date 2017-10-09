@@ -22,8 +22,8 @@ export default function singularQuery (schema:Schema<any>, options:any):void {
   })
 
   let config = {}
-  if ((typeof options.singularQuery) === 'object') {
-    config = options.singularQuery
+  if ((typeof options) === 'object') {
+    config = options
   }
 
   schema.queries({

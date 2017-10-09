@@ -25,7 +25,7 @@ export default function addMutation (schema:Schema<any>, options:any):void {
     }
   })
   let config = {}
-  if (options === 'object') {
+  if ((typeof options) === 'object') {
     config = options
   }
   schema.mutations({

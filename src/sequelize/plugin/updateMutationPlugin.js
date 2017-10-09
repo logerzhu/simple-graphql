@@ -32,8 +32,8 @@ export default function updateMutation (schema:Schema<any>, options:any):void {
   })
 
   let config = {}
-  if ((typeof options.updateMutation) === 'object') {
-    config = options.updateMutation
+  if ((typeof options) === 'object') {
+    config = options
   }
 
   schema.mutations({
