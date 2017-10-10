@@ -106,7 +106,7 @@ const sequelize = new Sequelize('test1', 'postgres', 'Password', {
 })
 
 // 生成GraphQL的schema
-const schema = SG.build({sequelize:sequelize, schemas:[TodoSchema]})
+const schema = SG.build({sequelize:sequelize, schemas:[TodoSchema]}).graphQLSchema
 
 // 自动建立数据库表
 sequelize.sync({

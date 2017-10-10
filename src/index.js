@@ -54,7 +54,7 @@ const SimpleGraphQL = {
          schemas?:Array<Schema<any>>,
          services?:Array<Service<any>>,
          options?:BuildOptionConfig
-         }):graphql.GraphQLSchema => {
+         }):{graphQLSchema:graphql.GraphQLSchema, sgContext:any} => {
     const {sequelize, schemas = [], services = [], options = {}} = args
     const context = new Context(sequelize, options)
 
@@ -180,49 +180,52 @@ const SimpleGraphQL = {
       }
     }
 
-    return new graphql.GraphQLSchema({
-      query: rootQuery,
-      mutation: new graphql.GraphQLObjectType({
-        name: 'RootMutation',
-        fields: () => {
-          const fields:{[fieldName: string]: graphql.GraphQLFieldConfig<any, any>} = {}
-          _.forOwn(context.mutations, (value, key) => {
-            const inputFields = Transformer.toGraphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.inputFields)
-            const outputFields = {}
-            const payloadFields = _.get(options, 'mutation.payloadFields', [])
-            for (let field of payloadFields) {
-              if (typeof field === 'string') {
-                if (!finalQueries[field]) {
-                  throw new Error('Incorrect buildOption. Query[' + field + '] not exist.')
+    return {
+      sgContext: context.getSGContext(),
+      graphQLSchema: new graphql.GraphQLSchema({
+        query: rootQuery,
+        mutation: new graphql.GraphQLObjectType({
+          name: 'RootMutation',
+          fields: () => {
+            const fields:{[fieldName: string]: graphql.GraphQLFieldConfig<any, any>} = {}
+            _.forOwn(context.mutations, (value, key) => {
+              const inputFields = Transformer.toGraphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.inputFields)
+              const outputFields = {}
+              const payloadFields = _.get(options, 'mutation.payloadFields', [])
+              for (let field of payloadFields) {
+                if (typeof field === 'string') {
+                  if (!finalQueries[field]) {
+                    throw new Error('Incorrect buildOption. Query[' + field + '] not exist.')
+                  }
+                  outputFields[field] = finalQueries[field]
+                } else {
+                  outputFields[field.name] = field
                 }
-                outputFields[field] = finalQueries[field]
-              } else {
-                outputFields[field.name] = field
               }
-            }
-            _.forOwn(value.outputFields, (fValue, fKey) => {
-              outputFields[fKey] = Transformer.toGraphQLFieldConfig(
+              _.forOwn(value.outputFields, (fValue, fKey) => {
+                outputFields[fKey] = Transformer.toGraphQLFieldConfig(
                 key + '.' + fKey,
                 'Payload',
                 fValue,
                 context
               )
+              })
+              if (!value['name']) {
+                value['name'] = key
+              }
+              fields[key] = Transformer.mutationWithClientMutationId({
+                name: StringHelper.toInitialUpperCase(key),
+                inputFields: inputFields,
+                outputFields: outputFields,
+                mutateAndGetPayload: context.wrapMutateAndGetPayload(value),
+                description: value.doc
+              })
             })
-            if (!value['name']) {
-              value['name'] = key
-            }
-            fields[key] = Transformer.mutationWithClientMutationId({
-              name: StringHelper.toInitialUpperCase(key),
-              inputFields: inputFields,
-              outputFields: outputFields,
-              mutateAndGetPayload: context.wrapMutateAndGetPayload(value),
-              description: value.doc
-            })
-          })
-          return fields
-        }
+            return fields
+          }
+        })
       })
-    })
+    }
   }
 }
 
