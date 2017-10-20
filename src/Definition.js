@@ -283,7 +283,8 @@ export type HasManyConfig<T> = {
     onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     constraints?:boolean,
-    sort?:Array<{field:string, order:'ASC'|'DESC'}>
+    sort?:Array<{field:string, order:'ASC'|'DESC'}>,
+    outputStructure?:'Connection'|'Array'
   }
 }
 

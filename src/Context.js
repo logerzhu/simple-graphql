@@ -339,6 +339,22 @@ export default class Context {
   buildModelAssociations ():void {
     const self = this
     _.forOwn(self.schemas, (schema, schemaName) => {
+      _.forOwn(schema.config.associations.hasMany, (config, key) => {
+        self.dbModel(schema.name).hasMany(self.dbModel(config.target), {
+          ...config,
+          as: key,
+          foreignKey: config.foreignKey || config.foreignField + 'Id'
+        })
+      })
+
+      _.forOwn(schema.config.associations.belongsToMany, (config, key) => {
+        self.dbModel(schema.name).belongsToMany(self.dbModel(config.target), {
+          ...config,
+          as: key,
+          foreignKey: config.foreignField + 'Id'
+        })
+      })
+
       _.forOwn(schema.config.associations.hasOne, (config, key) => {
         self.dbModel(schema.name).hasOne(self.dbModel(config.target), {
           ...config,
@@ -352,20 +368,6 @@ export default class Context {
           ...config,
           as: key,
           foreignKey: config.foreignKey || config.foreignField + 'Id'
-        })
-      })
-      _.forOwn(schema.config.associations.hasMany, (config, key) => {
-        self.dbModel(schema.name).hasMany(self.dbModel(config.target), {
-          ...config,
-          as: key,
-          foreignKey: config.foreignKey || config.foreignField + 'Id'
-        })
-      })
-      _.forOwn(schema.config.associations.belongsToMany, (config, key) => {
-        self.dbModel(schema.name).belongsToMany(self.dbModel(config.target), {
-          ...config,
-          as: key,
-          foreignKey: config.foreignField + 'Id'
         })
       })
     })

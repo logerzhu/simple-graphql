@@ -35,6 +35,12 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
     }
     if (typeof fType === 'string') {
       let foreignField = key
+      let onDelete = 'RESTRICT'
+      if (value && value['$type'] && value.column) {
+        if (value.column.onDelete) {
+          onDelete = value.column.onDelete
+        }
+      }
       if (value && value['$type'] && value.required) {
         schema.belongsTo({
           [key]: {
@@ -42,7 +48,7 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
             hidden: true,
             foreignField: foreignField,
             foreignKey: {name: foreignField + 'Id', allowNull: false},
-            onDelete: 'RESTRICT',
+            onDelete: onDelete,
             constraints: true
           }
         })
@@ -52,7 +58,7 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
             target: fType,
             hidden: true,
             foreignField: foreignField,
-            onDelete: 'RESTRICT',
+            onDelete: onDelete,
             constraints: true
           }
         })
