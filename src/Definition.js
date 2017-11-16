@@ -147,6 +147,7 @@ type JSONType = BaseFieldType | {
   description?:string,
   enumValues?:Array<string>,
   default?:any,
+  required?:boolean,
 } | Array<JSONType> | {[string]:JSONType}
 
 /**
