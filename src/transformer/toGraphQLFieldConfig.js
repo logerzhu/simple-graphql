@@ -45,16 +45,32 @@ const toGraphQLFieldConfig = function (name:string,
   }
 
   if (_.isArray(fieldType)) {
-    const elementType = new graphql.GraphQLList(toGraphQLFieldConfig(name, postfix, fieldType[0], context).type)
+    const elementType = toGraphQLFieldConfig(name, postfix, fieldType[0], context).type
+    const listType = new graphql.GraphQLList(elementType)
     return {
-      type: elementType,
+      type: listType,
       resolve: context.wrapFieldResolve({
         name: name.split('.').slice(-1)[0],
         path: name,
-        $type: elementType,
-        resolve: async function (root) {
-          // TODO check?
+        $type: listType,
+        resolve: async function (root, args, context, info, sgContext) {
           const fieldName = name.split('.').slice(-1)[0]
+          if (typeof fieldType[0] === 'string' && sgContext.models[fieldType[0]] &&
+            root[fieldName] && root[fieldName].length > 0 &&
+            (typeof root[fieldName][0] === 'number' || typeof root[fieldName][0] === 'string')
+          ) {
+            const records = await sgContext.models[fieldType[0]].findAll({where: {id: {$in: root[fieldName]}}})
+            const result = []
+            for (let cId of root[fieldName]) {
+              for (let record of records) {
+                if (cId.toString() === record.id.toString()) {
+                  result.push(record)
+                  break
+                }
+              }
+            }
+            return result
+          }
           return root[fieldName]
         }
       })
