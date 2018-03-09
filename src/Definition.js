@@ -275,6 +275,11 @@ export type HasManyConfig<T> = {
     hidden?: boolean,
     conditionFields?:ArgsType,
     target: string,
+    through?:string | {
+      model:string,
+      scope?:Object,
+      unique?:boolean
+    },
     foreignField?:string,
     foreignKey?:string,
     sourceKey?:string,

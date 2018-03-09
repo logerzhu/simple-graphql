@@ -343,7 +343,8 @@ export default class Context {
         self.dbModel(schema.name).hasMany(self.dbModel(config.target), {
           ...config,
           as: key,
-          foreignKey: config.foreignKey || config.foreignField + 'Id'
+          foreignKey: config.foreignKey || config.foreignField + 'Id',
+          through: undefined
         })
       })
 
@@ -351,7 +352,8 @@ export default class Context {
         self.dbModel(schema.name).belongsToMany(self.dbModel(config.target), {
           ...config,
           as: key,
-          foreignKey: config.foreignField + 'Id'
+          foreignKey: config.foreignField + 'Id',
+          through: config.through && {...config.through, model: self.dbModel(config.through.model)}
         })
       })
 
