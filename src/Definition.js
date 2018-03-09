@@ -1,7 +1,7 @@
 // @flow
 import Sequelize from 'sequelize'
 
-import type {GraphQLOutputType, GraphQLResolveInfo} from 'graphql'
+import type {GraphQLOutputType, GraphQLResolveInfo, GraphQLInputType} from 'graphql'
 
 import Type from './type'
 
@@ -23,7 +23,7 @@ export type LinkedFieldType = Class<String> | Class<Number> | Class<Boolean> | C
   required?:boolean,
   default?:any,
   enumValues?:Array<string>,
-  description?:string,
+  // description?:string,
   args?:{[string]:LinkedFieldType},
   resolve?: (source:any, args:{[string]: any},
              context:any,
@@ -31,10 +31,20 @@ export type LinkedFieldType = Class<String> | Class<Number> | Class<Boolean> | C
              sgContext:SGContext) => any
 }
 
+type InputFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | Class<JSON> | GraphQLInputType |
+  Type.ScalarFieldType | string | Array<InputFieldType> | {
+  [string]:InputFieldType,
+  $type?:InputFieldType,
+  required?:boolean,
+  default?:any,
+  enumValues?:Array<string>,
+  // description?:string
+}
+
 /**
  * @public
  */
-export type ArgsType = {[string]:LinkedFieldType}
+export type ArgsType = {[string]:InputFieldType}
 
 /**
  * @public
@@ -142,28 +152,16 @@ type ColumnConfig = {
  */
 type BaseFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | Class<JSON> | GraphQLOutputType | Type.ScalarFieldType | string
 
-type JSONType = BaseFieldType | {
-  $type:JSONType,
-  description?:string,
-  enumValues?:Array<string>,
-  default?:any,
-  required?:boolean,
-} | Array<JSONType> | {[string]:JSONType}
-
 /**
  * @public
  */
-export type FieldType = BaseFieldType | {
-  $type: JSONType,
+export type FieldType = BaseFieldType| Array<LinkedFieldType> | {
+  $type: LinkedFieldType,
   description?:string,
   enumValues?:Array<string>,
   default?:any,
   required?:boolean,
   hidden?: boolean,                     // hidden为true, 对应的field将不会出现在graphql schema中
-  searchable?: boolean,                 // 是否可以在plural的Query中出现
-  advancedSearchable?:boolean,          // 是否可以在plural的Query中支持高级搜索
-  initializable?:boolean,               // 是否可以在add的Mutation中出现
-  mutable?:boolean,                      // 是否可以在update的Mutation中出现
   validate?: ValidateConfig,
   column?:ColumnConfig
 }
