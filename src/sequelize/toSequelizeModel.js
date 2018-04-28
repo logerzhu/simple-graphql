@@ -22,7 +22,7 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
       case Boolean:
         return Sequelize.BOOLEAN
       case Date:
-        return Sequelize.DATE
+        return Sequelize.DATE(6)
       case JSON:
         return Sequelize.JSON
     }
