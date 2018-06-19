@@ -90,6 +90,7 @@ export default class Context {
   }
 
   addSchema (schema:Schema<any>) {
+
     if (this.schemas[schema.name]) {
       throw new Error('Schema ' + schema.name + ' already define.')
     }
@@ -126,6 +127,8 @@ export default class Context {
       }
       this.addMutation(value)
     })
+    //console.log('addSchema',schema.name)
+
     this.dbModel(schema.name)
   }
 
@@ -200,8 +203,11 @@ export default class Context {
   }
 
   dbModel (name:string):Sequelize.Model {
+
     const model = this.schemas[name]
+    // console.log('dbModel',name,model)
     if (!model) {
+      // console.log(this.schemas)
       throw new Error('Schema ' + name + ' not define.')
     }
     const typeName = model.name
@@ -222,6 +228,7 @@ export default class Context {
 
   wrapQueryResolve (config:QueryConfig):any {
     const self = this
+    console.log(this.options)
 
     let hookFun = (action, invokeInfo, next) => next()
 
@@ -339,13 +346,17 @@ export default class Context {
   buildModelAssociations ():void {
     const self = this
     _.forOwn(self.schemas, (schema, schemaName) => {
+      console.log('buildModelAssociations',schema.config.associations.hasMany)
       _.forOwn(schema.config.associations.hasMany, (config, key) => {
-        self.dbModel(schema.name).hasMany(self.dbModel(config.target), {
+        console.log('dd',key,config)
+        let d = {
           ...config,
           as: key,
           foreignKey: config.foreignKey || config.foreignField + 'Id',
           through: undefined
-        })
+        }
+        console.log(d)
+        self.dbModel(schema.name).hasMany(self.dbModel(config.target), d)
       })
 
       _.forOwn(schema.config.associations.belongsToMany, (config, key) => {
