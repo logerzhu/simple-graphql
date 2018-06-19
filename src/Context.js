@@ -90,7 +90,6 @@ export default class Context {
   }
 
   addSchema (schema:Schema<any>) {
-
     if (this.schemas[schema.name]) {
       throw new Error('Schema ' + schema.name + ' already define.')
     }
@@ -127,7 +126,7 @@ export default class Context {
       }
       this.addMutation(value)
     })
-    //console.log('addSchema',schema.name)
+    // console.log('addSchema',schema.name)
 
     this.dbModel(schema.name)
   }
@@ -203,7 +202,6 @@ export default class Context {
   }
 
   dbModel (name:string):Sequelize.Model {
-
     const model = this.schemas[name]
     // console.log('dbModel',name,model)
     if (!model) {
@@ -346,9 +344,9 @@ export default class Context {
   buildModelAssociations ():void {
     const self = this
     _.forOwn(self.schemas, (schema, schemaName) => {
-      console.log('buildModelAssociations',schema.config.associations.hasMany)
+      console.log('buildModelAssociations', schema.config.associations.hasMany)
       _.forOwn(schema.config.associations.hasMany, (config, key) => {
-        console.log('dd',key,config)
+        console.log('dd', key, config)
         let d = {
           ...config,
           as: key,

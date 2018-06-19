@@ -1,6 +1,4 @@
 .idea/
 node_modules
-**/*.sqlite
 /lib/
 **/package-lock.json
-Demo.js
