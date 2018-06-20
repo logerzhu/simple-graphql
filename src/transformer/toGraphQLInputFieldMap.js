@@ -26,7 +26,7 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
     }
 
     if (graphql.isCompositeType(field)) {
-      invariant(false,'unsupported type:isCompositeType' + typeof field)
+      invariant(false, 'unsupported type:isCompositeType' + typeof field)
       return
     }
 

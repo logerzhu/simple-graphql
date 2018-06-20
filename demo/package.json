@@ -8,6 +8,7 @@
     "start": "babel-node src/index"
   },
   "dependencies": {
+    "apollo-link-http": "^1.5.4",
     "apollo-server-express": "^1.3.6",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-polyfill": "^6.23.0",
@@ -22,11 +23,13 @@
     "express-graphql": "^0.6.4",
     "flow-bin": "^0.42.0",
     "graphql-subscriptions": "^0.5.8",
+    "graphql-tools": "^3.0.2",
     "http": "0.0.0",
     "jest": "^19.0.2",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
     "mysql2": "^1.5.3",
+    "node-fetch": "^2.1.2",
     "sequelize": "^4.37.10"
   }
 }

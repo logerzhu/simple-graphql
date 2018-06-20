@@ -9,8 +9,8 @@ import { execute, subscribe } from 'graphql'
 import {isEmpty} from './utils'
 import { buildSequelize, buildSchema } from './schema'
 import pubSub from './pubsub'
-import schema from './schema'
-
+// import schema from './schema'
+import {mergeSchema} from './schema'
 const app = express()
 const server = createServer(app)
 const graphqlEndpoint = '/graphql'
@@ -30,7 +30,7 @@ const subscriptionEndpoint = '/subscriptions'
 //   return list
 // }
 
-export async function run ({PORT}) {
+export async function run ({PORT,ONLY_LOCAL_SCHEMA}) {
  if (isEmpty(PORT)) { throw Error(`请在命令行或者env文件提供port:${PORT}`) }
 
   let port = 3301
@@ -43,7 +43,7 @@ export async function run ({PORT}) {
   //   console.log('Could not connect to database')
   //   return
   // }
-
+  const schema = await mergeSchema(ONLY_LOCAL_SCHEMA)
 
   app.use(cors('*'))
 
