@@ -8,6 +8,7 @@ import type {GraphQLInputFieldConfig, GraphQLInputFieldConfigMap} from 'graphql'
 
 import Type from '../type'
 import StringHelper from '../utils/StringHelper'
+import invariant from '../utils/invariant'
 
 const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):GraphQLInputFieldConfigMap {
   const typeName = (name:string, path:string) => {
@@ -25,6 +26,7 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
     }
 
     if (graphql.isCompositeType(field)) {
+      invariant(false,'unsupported type:isCompositeType' + typeof field)
       return
     }
 

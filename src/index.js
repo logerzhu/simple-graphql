@@ -78,6 +78,7 @@ const SimpleGraphQL = {
         'Payload',
         value.$type,
         context)
+
       finalQueries[key] = {
         type: fieldConfig.type,
         resolve: context.wrapQueryResolve(value),
@@ -166,7 +167,7 @@ const SimpleGraphQL = {
     }
 
     const rootQuery = new graphql.GraphQLObjectType({
-      name: 'RootQuery',
+      name: 'Query',
       fields: () => {
         return finalQueries
       }
@@ -185,7 +186,7 @@ const SimpleGraphQL = {
       graphQLSchema: new graphql.GraphQLSchema({
         query: rootQuery,
         mutation: new graphql.GraphQLObjectType({
-          name: 'RootMutation',
+          name: 'Mutation',
           fields: () => {
             const fields:{[fieldName: string]: graphql.GraphQLFieldConfig<any, any>} = {}
             _.forOwn(context.mutations, (value, key) => {
