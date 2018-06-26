@@ -32,6 +32,7 @@ export default class SequelizeContext {
   }
 
   applyPlugin (schema:Schema<any>):void {
+    console.log(`addSchema:${schema.name}`)
     const defaultPluginConfig = {
       hasManyLinkedField: {},
       hasOneLinkedField: {}

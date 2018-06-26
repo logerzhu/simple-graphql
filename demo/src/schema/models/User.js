@@ -1,4 +1,3 @@
-// @flow
 import SG from '../../../../src/index'
 
 export default SG.schema('User', {

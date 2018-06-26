@@ -70,10 +70,7 @@
       "/demo/"
     ]
   },
-  "pre-commit": [
-    "flow",
-    "format"
-  ],
+
   "jest": {
     "verbose": true,
     "setupTestFrameworkScriptFile": "./src/sequelize/__tests__/setup.js",

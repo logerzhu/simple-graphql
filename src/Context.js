@@ -9,6 +9,7 @@ import type {GraphQLObjectType} from 'graphql'
 import Schema from './definition/Schema'
 import Service from './definition/Service'
 import StringHelper from './utils/StringHelper'
+import invariant from './utils/invariant'
 import Transformer from './transformer'
 
 import SequelizeContext from './sequelize/SequelizeContext'
@@ -58,7 +59,7 @@ export default class Context {
 
   connectionDefinitions:{[id:string]:{connectionType:graphql.GraphQLObjectType, edgeType:graphql.GraphQLObjectType}}
 
-  constructor (sequelize:Sequelize, options:BuildOptionConfig) {
+  constructor (sequelize:Sequelize, options:BuildOptionConfig, remoteObjs:{[id:string]: GraphQLObjectType}={}) {
     this.dbContext = new SequelizeContext(sequelize)
     this.options = {...options}
 
@@ -70,6 +71,8 @@ export default class Context {
     this.mutations = {}
 
     this.connectionDefinitions = {}
+
+    // this.graphQLObjectType('City')
 
     const self = this
     this.nodeInterface = relay.nodeDefinitions((globalId) => {
@@ -90,6 +93,7 @@ export default class Context {
   }
 
   addSchema (schema:Schema<any>) {
+    console.log(`addSchema:${schema.name}`)
     if (this.schemas[schema.name]) {
       throw new Error('Schema ' + schema.name + ' already define.')
     }
@@ -126,12 +130,13 @@ export default class Context {
       }
       this.addMutation(value)
     })
-    // console.log('addSchema',schema.name)
 
     this.dbModel(schema.name)
+    console.log('addSchema end', schema.name)
   }
 
   addService (service:Service<any>) {
+    console.log('service begin', service.name)
     const self = this
     if (self.services[service.name]) {
       throw new Error('Service ' + service.name + ' already define.')
@@ -157,6 +162,7 @@ export default class Context {
       }
       self.addMutation(value)
     })
+    console.log('service end', service.name)
   }
 
   addQuery (config:QueryConfig) {
@@ -174,11 +180,15 @@ export default class Context {
   }
 
   graphQLObjectType (name:string):GraphQLObjectType {
+    console.log('enter graphQLObjectType', name)
+
     const model = this.schemas[name]
     if (!model) {
-      throw new Error('Schema ' + name + ' not define.')
+      // throw new Error('Schema ' + name + ' not define.')
+    } else {
+      invariant(model.name === name, `${model.name}与${name}不一致`)
     }
-    const typeName = model.name
+    const typeName = name
 
     if (!this.graphQLObjectTypes[typeName]) {
       const obj = Object.assign({
@@ -191,11 +201,12 @@ export default class Context {
         }
       }
       const interfaces = [this.nodeInterface]
-
       const objectType = Transformer.toGraphQLFieldConfig(typeName, '', obj, this, interfaces).type
       if (objectType instanceof graphql.GraphQLObjectType) {
         objectType.description = model.config.options.description
         this.graphQLObjectTypes[typeName] = objectType
+      } else {
+        invariant(false, `wrong model format:${name}`)
       }
     }
     return this.graphQLObjectTypes[typeName]
@@ -203,9 +214,7 @@ export default class Context {
 
   dbModel (name:string):Sequelize.Model {
     const model = this.schemas[name]
-    // console.log('dbModel',name,model)
     if (!model) {
-      // console.log(this.schemas)
       throw new Error('Schema ' + name + ' not define.')
     }
     const typeName = model.name
@@ -226,8 +235,6 @@ export default class Context {
 
   wrapQueryResolve (config:QueryConfig):any {
     const self = this
-    console.log(this.options)
-
     let hookFun = (action, invokeInfo, next) => next()
 
     if (this.options.hooks != null) {
@@ -346,14 +353,14 @@ export default class Context {
     _.forOwn(self.schemas, (schema, schemaName) => {
       console.log('buildModelAssociations', schema.config.associations.hasMany)
       _.forOwn(schema.config.associations.hasMany, (config, key) => {
-        console.log('dd', key, config)
+        // console.log('dd', key, config)
         let d = {
           ...config,
           as: key,
           foreignKey: config.foreignKey || config.foreignField + 'Id',
           through: undefined
         }
-        console.log(d)
+        // console.log(d)
         self.dbModel(schema.name).hasMany(self.dbModel(config.target), d)
       })
 

@@ -18,6 +18,8 @@ export default class Schema<T> {
     statics:{[id:string]: any}
   }
 
+  linkInfo:{[id:string]: any}
+
   constructor (name:string, options:SchemaOptionConfig = {}) {
     this.name = name
     this.config = {
@@ -43,6 +45,11 @@ export default class Schema<T> {
    */
   fields (fields:{[id:string]: FieldType}):Schema<T> {
     this.config.fields = Object.assign(this.config.fields, fields)
+    return this
+  }
+
+  linkInfo (info:{[id:string]: any}):Schema<T> {
+    this.linkInfo = Object.assign(this.linkInfo, info)
     return this
   }
 

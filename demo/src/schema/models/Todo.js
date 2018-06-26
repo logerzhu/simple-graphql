@@ -1,4 +1,3 @@
-// @flow
 import SG from '../../../../src/index'
 
 // const UserType = SG.modelRef('User')
