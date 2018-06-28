@@ -6,13 +6,16 @@ import Sequelize from 'sequelize'
 import Type from '../type'
 import Schema from '../definition/Schema'
 import StringHelper from '../utils/StringHelper'
-
+import ModelRef from '../definition/ModelRef'
 export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any>):Sequelize.Model {
   const dbDefinition = {}
 
   const dbType = (fieldType:any) => {
     if (fieldType instanceof Type.ScalarFieldType) {
       return fieldType.columnType
+    }
+    if (fieldType instanceof ModelRef) {
+      return Sequelize.STRING
     }
     switch (fieldType) {
       case String:

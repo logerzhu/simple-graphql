@@ -12,7 +12,7 @@ import Type from './type'
 import Context from './Context'
 import StringHelper from './utils/StringHelper'
 import Transformer from './transformer'
-
+import ModelRef from './definition/ModelRef'
 import type {SchemaOptionConfig, BuildOptionConfig} from './Definition'
 
 const SimpleGraphQL = {
@@ -36,6 +36,8 @@ const SimpleGraphQL = {
 
   Service: Service,
 
+  //RemoteLinkConfig: RemoteLinkConfig,
+
   /**
    * Define a Schema
    *
@@ -46,6 +48,7 @@ const SimpleGraphQL = {
 
   service: <T>(name:string):Service<T> => new Service(name),
 
+  modelRef: (name:string):ModelRef => new ModelRef(name),
   /**
    * Build the GraphQL Schema
    */
@@ -73,11 +76,13 @@ const SimpleGraphQL = {
     const finalQueries:{[fieldName: string]: graphql.GraphQLFieldConfig<any, any>} = {}
 
     _.forOwn(context.queries, (value, key) => {
+      console.log('begin build query', key, value)
       const fieldConfig = Transformer.toGraphQLFieldConfig(
         key,
         'Payload',
         value.$type,
         context)
+
       finalQueries[key] = {
         type: fieldConfig.type,
         resolve: context.wrapQueryResolve(value),
@@ -90,10 +95,12 @@ const SimpleGraphQL = {
             ...value.args
           })
       }
+      console.log('build result', key, finalQueries[key])
     })
 
     const viewerConfig = _.get(options, 'query.viewer', 'AllQuery')
     if (viewerConfig === 'AllQuery') {
+      console.log('begin build AllQuery')
       context.graphQLObjectTypes['Viewer'] = new graphql.GraphQLObjectType({
         name: 'Viewer',
         interfaces: [context.nodeInterface],
@@ -107,6 +114,7 @@ const SimpleGraphQL = {
           return fields
         }
       })
+
       finalQueries['viewer'] = {
         description: 'Default Viewer implement to include all queries.',
         type: new graphql.GraphQLNonNull(((context.graphQLObjectTypes['Viewer']:any):graphql.GraphQLObjectType)),
@@ -117,12 +125,14 @@ const SimpleGraphQL = {
           }
         }
       }
+      console.log('build result', finalQueries['viewer'])
     } else if (viewerConfig === 'FromModelQuery') {
       if (!finalQueries['viewer']) {
         throw new Error('Build option has config "query.view=FromModelQuery" but query "viewer" not defined.')
       }
       // TODO check whether viewer.type is a Node
     } else {
+      console.log('begin build other query')
       const fieldConfig = Transformer.toGraphQLFieldConfig(
         'viewer',
         'Payload',
@@ -133,6 +143,7 @@ const SimpleGraphQL = {
         resolve: context.wrapQueryResolve(viewerConfig),
         description: viewerConfig.description
       }
+      console.log('build result', finalQueries['viewer'])
     }
 
     finalQueries['node'] = {
@@ -164,9 +175,10 @@ const SimpleGraphQL = {
         }
       })
     }
+    console.log('build result', finalQueries['node'])
 
     const rootQuery = new graphql.GraphQLObjectType({
-      name: 'RootQuery',
+      name: 'Query',
       fields: () => {
         return finalQueries
       }
@@ -180,50 +192,59 @@ const SimpleGraphQL = {
       }
     }
 
+    const rootMutation = new graphql.GraphQLObjectType({
+      name: 'Mutation',
+      fields: () => {
+        const fields:{[fieldName: string]: graphql.GraphQLFieldConfig<any, any>} = {}
+        _.forOwn(context.mutations, (value, key) => {
+          console.log('begin build mutation:', key, value)
+          const inputFields = Transformer.toGraphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.inputFields)
+          const outputFields = {}
+          const payloadFields = _.get(options, 'mutation.payloadFields', [])
+          for (let field of payloadFields) {
+            if (typeof field === 'string') {
+              if (!finalQueries[field]) {
+                throw new Error('Incorrect buildOption. Query[' + field + '] not exist.')
+              }
+              outputFields[field] = finalQueries[field]
+            } else {
+              outputFields[field.name] = field
+            }
+          }
+          _.forOwn(value.outputFields, (fValue, fKey) => {
+            console.log('begin build mutation outputfiled:', fKey, fValue)
+            outputFields[fKey] = Transformer.toGraphQLFieldConfig(
+              key + '.' + fKey,
+              'Payload',
+              fValue,
+              context)
+            console.log('mutation outputfiled result:', outputFields[fKey])
+          })
+          if (!value['name']) {
+            value['name'] = key
+          }
+          fields[key] = Transformer.mutationWithClientMutationId({
+            name: StringHelper.toInitialUpperCase(key),
+            inputFields: inputFields,
+            outputFields: outputFields,
+            mutateAndGetPayload: context.wrapMutateAndGetPayload(value),
+            description: value.doc
+          })
+          console.log('mutation result:', fields[key])
+        })
+        return fields
+      }
+    })
+
+    // console.log(22222222)
+    // console.log(rootQuery)
+    // console.log(2222222222)
+    // console.log(rootMutation)
     return {
       sgContext: context.getSGContext(),
       graphQLSchema: new graphql.GraphQLSchema({
         query: rootQuery,
-        mutation: new graphql.GraphQLObjectType({
-          name: 'RootMutation',
-          fields: () => {
-            const fields:{[fieldName: string]: graphql.GraphQLFieldConfig<any, any>} = {}
-            _.forOwn(context.mutations, (value, key) => {
-              const inputFields = Transformer.toGraphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.inputFields)
-              const outputFields = {}
-              const payloadFields = _.get(options, 'mutation.payloadFields', [])
-              for (let field of payloadFields) {
-                if (typeof field === 'string') {
-                  if (!finalQueries[field]) {
-                    throw new Error('Incorrect buildOption. Query[' + field + '] not exist.')
-                  }
-                  outputFields[field] = finalQueries[field]
-                } else {
-                  outputFields[field.name] = field
-                }
-              }
-              _.forOwn(value.outputFields, (fValue, fKey) => {
-                outputFields[fKey] = Transformer.toGraphQLFieldConfig(
-                key + '.' + fKey,
-                'Payload',
-                fValue,
-                context
-              )
-              })
-              if (!value['name']) {
-                value['name'] = key
-              }
-              fields[key] = Transformer.mutationWithClientMutationId({
-                name: StringHelper.toInitialUpperCase(key),
-                inputFields: inputFields,
-                outputFields: outputFields,
-                mutateAndGetPayload: context.wrapMutateAndGetPayload(value),
-                description: value.doc
-              })
-            })
-            return fields
-          }
-        })
+        mutation: rootMutation
       })
     }
   }

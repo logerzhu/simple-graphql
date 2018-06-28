@@ -32,10 +32,12 @@ export default class SequelizeContext {
   }
 
   applyPlugin (schema:Schema<any>):void {
+    console.log(`addSchema:${schema.name}`)
     const defaultPluginConfig = {
       hasManyLinkedField: {},
       hasOneLinkedField: {}
     }
+    // console.log(schema)
     _.forOwn({...defaultPluginConfig, ...schema.config.options.plugin}, (value, key) => {
       if (this.plugins[key] && value) {
         this.plugins[key](schema, value)

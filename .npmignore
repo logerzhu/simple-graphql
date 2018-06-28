@@ -1,7 +1,0 @@
-.idea
-demo
-src
-simple-graphql.iml
-*.sqlite
-**/__tests__/*
-Demo.js
