@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash'
-import type { LinkedFieldConfig, QueryConfig, MutationConfig,
+import type { LinkedFieldConfig, QueryConfig, MutationConfig,RemoteLinkConfig,
   FieldType, SchemaOptionConfig, HasOneConfig, BelongsToConfig, HasManyConfig,
   BelongsToManyConfig, AssociationConfig} from '../Definition'
 
@@ -18,7 +18,8 @@ export default class Schema<T> {
     statics:{[id:string]: any}
   }
 
-  linkInfo:{[id:string]: any}
+  remoteLinkConfig:RemoteLinkConfig
+
 
   constructor (name:string, options:SchemaOptionConfig = {}) {
     this.name = name
@@ -37,6 +38,7 @@ export default class Schema<T> {
       methods: {},
       statics: {}
     }
+    this.remoteLinkConfig = {}
   }
 
   /**
@@ -48,8 +50,8 @@ export default class Schema<T> {
     return this
   }
 
-  linkInfo (info:{[id:string]: any}):Schema<T> {
-    this.linkInfo = Object.assign(this.linkInfo, info)
+  remoteLinks (config:RemoteLinkConfig):Schema<T> {
+    this.remoteLinkConfig = Object.assign(this.remoteLinkConfig, config)
     return this
   }
 

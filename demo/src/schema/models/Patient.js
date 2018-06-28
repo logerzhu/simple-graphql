@@ -127,13 +127,7 @@ export default SG.schema('Patient', {
       // )
     }
   },
-  getCitysofPats:{
-    def:'(patienIds:[String]): [City]',
-    resolver:async (args, context, info, {models:{User},services:{City}}) => {
 
-
-    }
-  },
 }).mutations({
   updateMemberData: {
     doc: '更新会员数据',
@@ -147,26 +141,31 @@ export default SG.schema('Patient', {
 
     }
   }
-}).remoteLink({
-  Query:{
+}).remoteLinks({
+  fields:{
+    City:{
+      def:':City!',
+      resolver:async (args, context, info, {models:{User},services:{City}}) => {
+
+
+      }
+    }
+  },
+  queries:{
     getCitys:{
-      def:'(patienId:String): [City]',
+      def:'(patienId:String): [City]!',
       resolver:async (args, context, info, {models:{User},services:{City}}) => {
 
 
       }
     },
     getTest:{
-      def:'(id:String): [City]',
+      def:'(id:String): [City]!',
       resolver:async (args, context, info, {models:{User},services:{City}}) => {
 
 
       }
     }
-
-  },
-  Mutation:{
-
   }
 })
 

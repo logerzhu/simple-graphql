@@ -2,10 +2,12 @@
   "name": "simple-graphql-demo",
   "version": "0.0.0",
   "private": true,
+  "sequalSchemaPath": "src/utils",
   "scripts": {
     "test": "jest",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
-    "start": "babel-node src/index"
+    "start": "babel-node src/index",
+    "reget-sequel-helper": "./bin/reget.sh $npm_package_sequalSchemaPath"
   },
   "dependencies": {
     "apollo-link-http": "^1.5.4",

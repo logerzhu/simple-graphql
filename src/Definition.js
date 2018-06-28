@@ -59,6 +59,14 @@ export type LinkedFieldConfig = {
             sgContext:SGContext) => any
 }
 
+
+export type RemoteLinkConfig={
+  fields?:{[id:string]: FieldType},
+  links?:{[id:string]:LinkedFieldConfig},
+  queries?:{[id:string]: QueryConfig<T>},
+  mutations?:{[id:string]: MutationConfig<T>},
+}
+
 /**
  * @public
  */

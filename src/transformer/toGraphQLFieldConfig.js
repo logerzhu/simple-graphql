@@ -83,7 +83,7 @@ const toGraphQLFieldConfig = function (name:string,
     // console.log(obj)
 
     return {
-      type: Type.GraphQLScalarTypes.Json,
+      type: Type.GraphQLScalarTypes.globalIdInputType(fieldType.name),
       resolve: context.wrapFieldResolve({
         name: name.split('.').slice(-1)[0],
         path: name,

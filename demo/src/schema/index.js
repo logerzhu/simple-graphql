@@ -11,6 +11,7 @@ import SG from '../../../src/index'
 import {dbCfg} from '../config'
 import {remoteSchema} from './remote/remote'
 import {cfg, endPoint} from './remote/endPoints'
+import invariant from '../utils/invariant'
 
 
 const namespace = cls.createNamespace('my-db-namespace')
@@ -26,11 +27,15 @@ sequelize.authenticate().then(() => {
 function listModels(dir: string): {
   models:   Array<SG.Schema>,
   services: Array<SG.Service>,
-  linkInfos:Array<{[id:string]: any}>
+  linkInfos:{
+    [id:string]: SG.Schema.remoteLinkConfig
+  }
 } {
   const models: Array<SG.Schema> = []
   const services: Array<SG.Service> = []
-  const linkInfos: Array<{[id:string]: any}> = []
+  const linkInfos: {
+    [id:string]: SG.RemoteLinkConfig
+  } = {}
   const handleFile = (d) => fs.readdirSync(path.resolve(__dirname, d)).map(function (file) {
     const stats = fs.statSync(path.resolve(__dirname, dir, file))
     const relativePath = [dir, file].join('/')
@@ -43,9 +48,9 @@ function listModels(dir: string): {
         if (model instanceof SG.Schema) {
           models.push(model)
 
-          if (model.linkInfo) {
-            console.log('linkinfo', model.linkInfo)
-            linkInfos.push(model.linkInfo)
+          if (model.remoteLinkConfig) {
+            //console.log(`linkinfo:${model.name}`, model.remoteLinkConfig)
+            linkInfos[model.name] = model.remoteLinkConfig
           }
 
         } else if (model instanceof SG.Service) {
@@ -105,12 +110,19 @@ function buildLocalSchemas(models: Array<SG.Schema>, services: Array<SG.Service>
   return schema
 }
 
-function buildLinkInfos(linkInfos: Array<{[id:string]: any}>): {
-  defs:?Array<string>,
+function buildLinkInfos(linkInfos: {
+  [id:string]: SG.schema.remoteLinkConfig
+}): {
+  gqls:?Array<string>,
   resolvers:?IResolversParameter
 } {
-  if (_.isEmpty(linkInfos))
-    return {defs: [], resolvers: {}}
+  if (_.isEmpty(linkInfos)) {
+    return {
+      gqls: [],
+      resolvers: {}
+    }
+  }
+
 
   let queryDefs: string = ''
   let mutationDefs: string = ''
@@ -118,43 +130,69 @@ function buildLinkInfos(linkInfos: Array<{[id:string]: any}>): {
     Query: {},
     Mutation: {}
   }
+  let gqls: Array<string> = []
 
-  linkInfos.forEach(info => {
-    //Query
-    _.forOwn(info.Query, (value, key) => {
-      queryDefs += `${key}${value.def}\n`
-      resolvers.Query[key] = async(root, args, context, info) => {
-        return value.resolve(args, context, info, SG.getSGContext())
-      }
-    })
 
-    //Mutation
-    _.forOwn(info.Mutation, (value, key) => {
-      mutationDefs += `${key}${value.def}\n`
-      resolvers.Mutation[key] = async(root, args, context, info) => {
-        return value.resolve(args, context, info, SG.getSGContext())
+  _.forOwn(linkInfos, (ext, schemaName) => {
+    if (ext.fields) {
+      let typeDef: string = ''
+      _.forOwn(ext.fields, (field, fieldName) => {
+        invariant(
+          field.def && typeof field.def === 'string' ,
+          'Must provide field definition'
+        )
+        typeDef += `${fieldName}${field.def}\n`
+        if(!resolvers[schemaName])
+          resolvers[schemaName] = {}
+        resolvers[schemaName][fieldName] = async(root, args, context, info) => {
+          return field.resolve(args, context, info, SG.getSGContext())
+        }
+      })
+
+      if (!_.isEmpty(typeDef)) {
+        gqls.push(`extend type ${schemaName}{
+                  ${typeDef}
+        }`)
       }
-    })
+    }
+
+    if(ext.queries){
+      _.forOwn(ext.queries, (value, key) => {
+        queryDefs += `${key}${value.def}\n`
+        resolvers.Query[key] = async(root, args, context, info) => {
+          return value.resolve(args, context, info, SG.getSGContext())
+        }
+      })
+    }
+
+    if(ext.mutations){
+      _.forOwn(ext.mutations, (value, key) => {
+        mutationDefs += `${key}${value.def}\n`
+        resolvers.Mutation[key] = async(root, args, context, info) => {
+          return value.resolve(args, context, info, SG.getSGContext())
+        }
+      })
+    }
   })
 
-  let defs: Array<string> = []
+
   if (queryDefs && queryDefs.length) {
-    defs.push(`extend type Query {
+    gqls.push(`extend type Query {
       ${queryDefs}}`
     )
   }
 
   if (mutationDefs && mutationDefs.length) {
-    defs.push(`extend type Mutation {
+    gqls.push(`extend type Mutation {
       ${mutationDefs}}`
     )
   }
 
-  console.log('defs:', defs)
+  console.log('defs:', gqls)
   console.log('resolver', resolvers)
 
   return {
-    defs,
+    gqls,
     resolvers
   }
 }
@@ -171,17 +209,17 @@ async function mergeSchema(ONLY_LOCAL_SCHEMA: string) {
   console.log('ret', linkInfos)
   const localSchemas = buildLocalSchemas(models, services)
   // console.log(localSchemas)
-  const {defs, resolvers} = buildLinkInfos(linkInfos)
+  const {gqls, resolvers} = buildLinkInfos(linkInfos)
   let schemas = [localSchemas, commonSchemas]
-  if (defs) {
-    let gql = defs.join('/n')
+  if (gqls) {
+    let gql = gqls.join(`\n`)
     if (!_.isEmpty(gql)) {
       schemas.push(gql)
     }
   }
 
 
-  console.log('defs:', defs)
+  console.log('gqls:', gqls)
   const schema = mergeSchemas({
     schemas,
     resolvers

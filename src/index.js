@@ -36,6 +36,8 @@ const SimpleGraphQL = {
 
   Service: Service,
 
+  //RemoteLinkConfig: RemoteLinkConfig,
+
   /**
    * Define a Schema
    *
@@ -54,11 +56,10 @@ const SimpleGraphQL = {
          sequelize:Sequelize,
          schemas?:Array<Schema<any>>,
          services?:Array<Service<any>>,
-         options?:BuildOptionConfig,
-         remoteObjs?:{[id:string]: GraphQLObjectType}
+         options?:BuildOptionConfig
          }):{graphQLSchema:graphql.GraphQLSchema, sgContext:any} => {
-    const {sequelize, schemas = [], services = [], options = {}, remoteObjs = {}} = args
-    const context = new Context(sequelize, options, remoteObjs)
+    const {sequelize, schemas = [], services = [], options = {}} = args
+    const context = new Context(sequelize, options)
 
     // 添加Schema
     schemas.forEach(schema => {
