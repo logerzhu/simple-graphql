@@ -113,6 +113,15 @@ export default class Context {
       }
     })
 
+    if (schema.config.options && schema.config.options.table && schema.config.options.table.paranoid) {
+      schema.fields({
+        deletedAt: {
+          $type: Date,
+          initializable: false
+        }
+      })
+    }
+
     _.forOwn(schema.config.queries, (value, key) => {
       if (!value['name']) {
         value['name'] = key
