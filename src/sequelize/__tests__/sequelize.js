@@ -16,7 +16,13 @@ const sequelize = new Sequelize('clinic', 'tester', 'password', {
   },
   // SQLite only
   storage: ':memory:',
-  logging: false
+  logging: (str) => console.log(str),
+  define: {
+    underscored: true,
+    updatedAt: 'updatedAt',
+    createdAt: 'createdAt',
+    deletedAt: 'deletedAt'
+  }
 })
 
 export default sequelize

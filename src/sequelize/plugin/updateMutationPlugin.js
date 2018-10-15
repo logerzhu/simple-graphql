@@ -37,7 +37,7 @@ export default function updateMutation (schema:Schema<any>, options:any):void {
   }
 
   schema.mutations({
-    [name]: {
+    [config.name || name]: {
       config: config,
       inputFields: inputFields,
       outputFields: {

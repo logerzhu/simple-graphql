@@ -27,7 +27,7 @@ export default function singularQuery (schema:Schema<any>, options:any):void {
   }
 
   schema.queries({
-    [name]: {
+    [config.name || name]: {
       config: config,
       $type: schema.name,
       args: searchFields,

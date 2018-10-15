@@ -4,7 +4,11 @@ import SG from '../../../../'
 const UserType = 'User'
 const TodoType = 'Todo'
 
-export default SG.schema('Todo').fields({
+export default SG.schema('Todo', {
+  table: {
+    underscored: true
+  }
+}).fields({
   owner: {
     $type: UserType,
     required: true

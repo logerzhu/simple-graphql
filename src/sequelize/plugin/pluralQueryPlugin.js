@@ -170,7 +170,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
 
   // 生产
   schema.queries({
-    [name]: {
+    [config.name || name]: {
       config: config,
       $type: schema.name + 'Connection',
       args: {

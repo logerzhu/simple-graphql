@@ -12,7 +12,7 @@ export default function deleteMutation (schema:Schema<any>, options:any):void {
     config = options
   }
   schema.mutations({
-    [name]: {
+    [config.name || name]: {
       config: config,
       inputFields: {
         id: {
