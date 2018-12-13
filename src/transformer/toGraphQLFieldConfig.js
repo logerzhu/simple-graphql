@@ -35,7 +35,23 @@ const toGraphQLFieldConfig = function (name:string,
     case String:
       return {type: graphql.GraphQLString}
     case Number:
-      return {type: graphql.GraphQLFloat}
+      return {
+        type: graphql.GraphQLFloat,
+        resolve: async function (root) {
+          const fieldName = name.split('.').slice(-1)[0]
+          if (root[fieldName]) {
+            for (let x = 1; x < 1000000; x = x * 10) {
+              const fValue = Math.round(root[fieldName] * x)
+              if (Math.abs(fValue - root[fieldName] * x) < 0.0000001) {
+                return fValue / x
+              }
+            }
+            return root[fieldName]
+          } else {
+            return root[fieldName]
+          }
+        }
+      }
     case Boolean:
       return {type: graphql.GraphQLBoolean}
     case Date:

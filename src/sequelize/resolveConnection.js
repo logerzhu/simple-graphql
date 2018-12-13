@@ -56,30 +56,37 @@ export default async function resolveConnection (dbModel:Sequelize.Model, args:{
   })
 
   let index = 0
-  let startCursor = offset + 1
-  let endCursor = offset + result.length
   if (reverse) {
-    startCursor = count - startCursor + 1
-    endCursor = count - endCursor + 1
-  }
-  return {
-    pageInfo: {
-      startCursor: startCursor,
-      endCursor: endCursor,
-      hasPreviousPage: offset > 0,
-      hasNextPage: offset + result.length < count
-    },
-    edges: reverse ? result.map(node => {
-      return {
-        node: node,
-        cursor: count - (offset + (index++))
-      }
-    }).reverse() : result.map(node => {
-      return {
-        node: node,
-        cursor: offset + (++index)
-      }
-    }),
-    count: count
+    return {
+      pageInfo: {
+        startCursor: count - (offset + result.length) + 1,
+        endCursor: count - offset,
+        hasPreviousPage: count - (offset + result.length) > 0,
+        hasNextPage: offset > 0
+      },
+      edges: result.map(node => {
+        return {
+          node: node,
+          cursor: count - offset - (++index) + 1
+        }
+      }).reverse(),
+      count: count
+    }
+  } else {
+    return {
+      pageInfo: {
+        startCursor: offset + 1,
+        endCursor: offset + result.length,
+        hasPreviousPage: offset > 0,
+        hasNextPage: offset + result.length < count
+      },
+      edges: result.map(node => {
+        return {
+          node: node,
+          cursor: offset + (++index)
+        }
+      }),
+      count: count
+    }
   }
 }
