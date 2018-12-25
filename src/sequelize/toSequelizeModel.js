@@ -94,5 +94,47 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
   })
   // console.log("Create Sequlize Model with config", model.name, dbDefinition, model.config.options["table"])
   const dbModel = sequelize.define(schema.name, dbDefinition, schema.config.options['table'])
+  dbModel.buildInclude = function (fragments:Object, selectionSet:Object) {
+    const buildSelections = function (selections:Array<Object>) {
+      const result = []
+      if (selections) {
+        selections.forEach(selection => {
+          if (selection.kind === 'Field') {
+            const selectionSet = selection.selectionSet
+            return result.push({
+              name: selection.name.value,
+              selections: selectionSet && buildSelections(selectionSet.selections)
+            })
+          } else if (selection.kind === 'FragmentSpread') {
+            const fragment = fragments[selection.name.value]
+            buildSelections(fragment.selectionSet && fragment.selectionSet.selections).forEach(
+              r => result.push(r)
+            )
+          }
+        })
+      }
+      return result
+    }
+
+    const sgContext = this.getSGContext()
+    const buildInclude = function (nSchema, selections) {
+      const include = []
+      if (selections) {
+        for (let selection of selections) {
+          const config = nSchema.config.associations.belongsTo[selection.name] || nSchema.config.associations.hasOne[selection.name]
+          if (config) {
+            include.push({
+              model: sgContext.models[config.target],
+              as: selection.name,
+              include: buildInclude(sgContext.schemas[config.target], selection.selections)
+            })
+          }
+        }
+      }
+      return include
+    }
+    const selections = buildSelections(selectionSet && selectionSet.selections)
+    return buildInclude(schema, selections)
+  }
   return dbModel
 }

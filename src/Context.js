@@ -85,6 +85,7 @@ export default class Context {
     return {
       sequelize: this.dbContext.sequelize,
       models: _.mapValues(this.schemas, (schema) => this.dbModel(schema.name)),
+      schemas: this.schemas,
       services: _.mapValues(this.services, (service) => service.config.statics)
     }
   }

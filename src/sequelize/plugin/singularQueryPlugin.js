@@ -35,10 +35,12 @@ export default function singularQuery (schema:Schema<any>, options:any):void {
         if (args === null || Object.keys(args).length === 0) {
           return null
         }
+        const dbModel = sgContext.models[schema.name]
         return sgContext.models[schema.name].findOne({
           where: {
             ...args
-          }
+          },
+          include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet)
         })
       }
     }

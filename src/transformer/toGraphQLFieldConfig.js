@@ -140,18 +140,25 @@ const toGraphQLFieldConfig = function (name:string,
           $type: context.graphQLObjectType(fieldType),
           resolve: async function (root, args, context, info, sgContext) {
             const fieldName = name.split('.').slice(-1)[0]
+            const dbModel = sgContext.models[fieldType]
             if (_.isFunction(root['get' + StringHelper.toInitialUpperCase(fieldName)])) {
               if (root[fieldName] != null && root[fieldName].id != null) {
                 return root[fieldName]
               } else {
-                return root['get' + StringHelper.toInitialUpperCase(fieldName)]()
+                return dbModel.findOne({
+                  where: {id: root[fieldName + 'Id']},
+                  include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet)
+                })
               }
             }
             if (root && root[fieldName] && (
                 typeof root[fieldName] === 'number' ||
                 typeof root[fieldName] === 'string'
               )) {
-              return sgContext.models[fieldType].findOne({where: {id: root[fieldName]}})
+              return dbModel.findOne({
+                where: {id: root[fieldName]},
+                include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet)
+              })
             }
             return root[fieldName]
           }

@@ -2,7 +2,6 @@
 import _ from 'lodash'
 
 import Schema from '../../definition/Schema'
-import StringHelper from '../../utils/StringHelper'
 
 export default function hasOneFieldsConfig (schema:Schema<any>, options:any):void {
   // Conver model association to field config
@@ -19,7 +18,11 @@ export default function hasOneFieldsConfig (schema:Schema<any>, options:any):voi
           if (root[key] != null) {
             return root[key]
           } else {
-            return root['get' + StringHelper.toInitialUpperCase(key)]()
+            const dbModel = sgContext.models[config.target]
+            return dbModel.findOne({
+              where: {[config.foreignKey || config.foreignField + 'Id']: root['id']},
+              include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet)
+            })
           }
         }
       }

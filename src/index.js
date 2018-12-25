@@ -42,17 +42,24 @@ const SimpleGraphQL = {
    * @param name
    * @param options
    */
-  schema: <T>(name:string, options:SchemaOptionConfig={}):Schema<T> => new Schema(name, options),
+  schema: <T>(name:string, options:SchemaOptionConfig={}):Schema
+    <T> => new Schema(name, options),
 
-  service: <T>(name:string):Service<T> => new Service(name),
+  service:
+      <T>(name:string):Service
+        <T> => new Service(name),
 
   /**
    * Build the GraphQL Schema
    */
   build: (args:{
          sequelize:Sequelize,
-         schemas?:Array<Schema<any>>,
-         services?:Array<Service<any>>,
+         schemas?:Array
+          <Schema
+          <any>>,
+         services?:Array
+            <Service
+            <any>>,
          options?:BuildOptionConfig
          }):{graphQLSchema:graphql.GraphQLSchema, sgContext:any} => {
     const {sequelize, schemas = [], services = [], options = {}} = args
@@ -70,7 +77,8 @@ const SimpleGraphQL = {
 
     context.buildModelAssociations()
 
-    const finalQueries:{[fieldName: string]: graphql.GraphQLFieldConfig<any, any>} = {}
+    const finalQueries:{[fieldName: string]: graphql.GraphQLFieldConfig
+              <any, any>} = {}
 
     _.forOwn(context.queries, (value, key) => {
       const fieldConfig = Transformer.toGraphQLFieldConfig(
@@ -156,7 +164,12 @@ const SimpleGraphQL = {
             }
           }
           if (!sgContext.models[id.type]) return null
-          const record = await sgContext.models[id.type].findOne({where: {id: id.id}})
+
+          const dbModel = sgContext.models[id.type]
+          const record = await dbModel.findOne({
+            where: {id: id.id},
+            include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet)
+          })
           if (record) {
             record._type = id.type
           }
