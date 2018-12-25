@@ -231,8 +231,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
           }
         })
 
-        const include = []
-        const includeFields = {}
+        const include = dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet, ['edges', 'node'])
 
         const associationType = (model, fieldName):?string => {
           if (model.config.associations.hasOne[fieldName]) {
@@ -247,9 +246,8 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
         _.forOwn(schema.config.fields, (value, key) => {
           if (typeof value === 'string' || (value && typeof value.$type === 'string')) {
             if (typeof condition[key] !== 'undefined') {
-              if (!includeFields[key]) {
+              if (include.filter(i => i.as === key).length === 0) {
                 const type = associationType(schema, key)
-                includeFields[key] = true
                 include.push({
                   model: sgContext.models[type],
                   as: key,
@@ -293,8 +291,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
               const fieldName = field.split('.')[0]
               const type = associationType(schema, fieldName)
               if (type) {
-                if (!includeFields[fieldName]) {
-                  includeFields[fieldName] = true
+                if (include.filter(i => i.as === fieldName).length === 0) {
                   include.push({
                     model: sgContext.models[type],
                     as: fieldName,

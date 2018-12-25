@@ -33,8 +33,10 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
             let foreignKey = config.foreignKey || (config.foreignField + 'Id')
             condition[foreignKey] = root[sourceKey]
 
-            return sgContext.models[config.target].findAll({
+            const dbModel = sgContext.models[config.target]
+            return dbModel.findAll({
               where: condition,
+              include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet),
               order: sort.map(s => [s.field, s.order])
             })
           }
@@ -63,7 +65,13 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
             condition[foreignKey] = root[sourceKey]
 
             // }
-            return resolveConnection(sgContext.models[config.target], {...args, condition, sort})
+            const dbModel = sgContext.models[config.target]
+            return resolveConnection(sgContext.models[config.target], {
+              ...args,
+              condition,
+              sort,
+              include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet, ['edges', 'node'])
+            })
           }
         }
       })

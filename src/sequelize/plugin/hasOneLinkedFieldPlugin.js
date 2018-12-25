@@ -15,7 +15,7 @@ export default function hasOneFieldsConfig (schema:Schema<any>, options:any):voi
         config: config.config,
         $type: config.target,
         resolve: async function (root, args, context, info, sgContext) {
-          if (root[key] != null) {
+          if (root[key] !== undefined) {
             return root[key]
           } else {
             const dbModel = sgContext.models[config.target]

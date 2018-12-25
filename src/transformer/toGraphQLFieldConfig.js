@@ -75,7 +75,11 @@ const toGraphQLFieldConfig = function (name:string,
             root[fieldName] && root[fieldName].length > 0 &&
             (typeof root[fieldName][0] === 'number' || typeof root[fieldName][0] === 'string')
           ) {
-            const records = await sgContext.models[fieldType[0]].findAll({where: {id: {$in: root[fieldName]}}})
+            const dbModel = sgContext.models[fieldType[0]]
+            const records = await sgContext.models[fieldType[0]].findAll({
+              where: {id: {$in: root[fieldName]}},
+              include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet)
+            })
             const result = []
             for (let cId of root[fieldName]) {
               for (let record of records) {
@@ -142,7 +146,7 @@ const toGraphQLFieldConfig = function (name:string,
             const fieldName = name.split('.').slice(-1)[0]
             const dbModel = sgContext.models[fieldType]
             if (_.isFunction(root['get' + StringHelper.toInitialUpperCase(fieldName)])) {
-              if (root[fieldName] != null && root[fieldName].id != null) {
+              if (root[fieldName] !== undefined) {
                 return root[fieldName]
               } else {
                 return dbModel.findOne({

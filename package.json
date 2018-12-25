@@ -1,12 +1,12 @@
 {
   "name": "simple-graphql",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "The simple way to generates GraphQL schemas and Sequelize models from your models definition.",
   "main": "lib/index.js",
   "scripts": {
     "format": "standard --fix",
     "test": "jest",
-    "sequelize-demo": "babel-node src/sequelize/__tests__/server.js",
+    "sequelize-demo": "supervisor -i node_modules,nohup.out -- -r 'babel-register' -r 'babel-polyfill' src/sequelize/__tests__/server.js",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
     "build": "rm -rf lib && babel src --optional runtime --out-dir lib/ && cp package.json lib/ && npm run build-dot-flow",
     "build-dot-flow": "find ./src -name '*.js' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/lib\\//g'`.flow; done",
