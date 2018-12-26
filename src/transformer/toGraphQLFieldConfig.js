@@ -78,7 +78,7 @@ const toGraphQLFieldConfig = function (name:string,
             const dbModel = sgContext.models[fieldType[0]]
             const records = await sgContext.models[fieldType[0]].findAll({
               where: {id: {$in: root[fieldName]}},
-              include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet)
+              include: dbModel.buildInclude(info)
             })
             const result = []
             for (let cId of root[fieldName]) {
@@ -151,7 +151,7 @@ const toGraphQLFieldConfig = function (name:string,
               } else {
                 return dbModel.findOne({
                   where: {id: root[fieldName + 'Id']},
-                  include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet)
+                  include: dbModel.buildInclude(info)
                 })
               }
             }
@@ -161,7 +161,7 @@ const toGraphQLFieldConfig = function (name:string,
               )) {
               return dbModel.findOne({
                 where: {id: root[fieldName]},
-                include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet)
+                include: dbModel.buildInclude(info)
               })
             }
             return root[fieldName]

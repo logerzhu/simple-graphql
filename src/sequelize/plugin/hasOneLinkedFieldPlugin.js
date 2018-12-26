@@ -21,7 +21,7 @@ export default function hasOneFieldsConfig (schema:Schema<any>, options:any):voi
             const dbModel = sgContext.models[config.target]
             return dbModel.findOne({
               where: {[config.foreignKey || config.foreignField + 'Id']: root['id']},
-              include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet)
+              include: dbModel.buildInclude(info)
             })
           }
         }

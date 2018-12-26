@@ -168,7 +168,7 @@ const SimpleGraphQL = {
           const dbModel = sgContext.models[id.type]
           const record = await dbModel.findOne({
             where: {id: id.id},
-            include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet)
+            include: dbModel.buildInclude(info)
           })
           if (record) {
             record._type = id.type

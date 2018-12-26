@@ -36,7 +36,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
             const dbModel = sgContext.models[config.target]
             return dbModel.findAll({
               where: condition,
-              include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet),
+              include: dbModel.buildInclude(info),
               order: sort.map(s => [s.field, s.order])
             })
           }
@@ -70,7 +70,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
               ...args,
               condition,
               sort,
-              include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet, ['edges', 'node'])
+              include: dbModel.buildInclude(info, 'edges.node')
             })
           }
         }

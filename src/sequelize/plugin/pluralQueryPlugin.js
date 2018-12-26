@@ -231,7 +231,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
           }
         })
 
-        const include = dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet, ['edges', 'node'])
+        const include = dbModel.buildInclude(info, 'edges.node')
 
         const associationType = (model, fieldName):?string => {
           if (model.config.associations.hasOne[fieldName]) {

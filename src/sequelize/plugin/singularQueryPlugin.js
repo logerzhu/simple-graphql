@@ -40,7 +40,7 @@ export default function singularQuery (schema:Schema<any>, options:any):void {
           where: {
             ...args
           },
-          include: dbModel.buildInclude(info.fragments, info.fieldNodes[0].selectionSet)
+          include: dbModel.buildInclude(info)
         })
       }
     }

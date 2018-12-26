@@ -94,7 +94,9 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
   })
   // console.log("Create Sequlize Model with config", model.name, dbDefinition, model.config.options["table"])
   const dbModel = sequelize.define(schema.name, dbDefinition, schema.config.options['table'])
-  dbModel.buildInclude = function (fragments:Object, selectionSet:Object, paths?:Array<string>) {
+  dbModel.buildInclude = function (info:Object, path?:string) {
+    const fragments = info.fragments
+    const selectionSet = info.fieldNodes[0].selectionSet
     const buildSelections = function (selections:Array<Object>) {
       const result = []
       if (selections) {
@@ -117,27 +119,37 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
     }
 
     const sgContext = this.getSGContext()
-    const buildInclude = function (nSchema, selections, paths) {
+    const buildInclude = function (nSchema, selections) {
       const include = []
       if (selections) {
         for (let selection of selections) {
           const config = nSchema.config.associations.belongsTo[selection.name] || nSchema.config.associations.hasOne[selection.name]
           if (config) {
-            include.push({
-              model: sgContext.models[config.target],
-              as: selection.name,
-              include: buildInclude(sgContext.schemas[config.target], selection.selections),
-              required: false
-            })
+            const exit = include.filter(i => i.as === selection.name)[0]
+            if (exit) {
+              const subInclude = buildInclude(sgContext.schemas[config.target], selection.selections)
+              subInclude.forEach(sInclude => {
+                if (exit.include.filter(i => i.as === sInclude.as).length === 0) {
+                  exit.include.push(sInclude)
+                }
+              })
+            } else {
+              include.push({
+                model: sgContext.models[config.target],
+                as: selection.name,
+                include: buildInclude(sgContext.schemas[config.target], selection.selections),
+                required: false
+              })
+            }
           }
         }
       }
       return include
     }
     let selections = buildSelections(selectionSet && selectionSet.selections)
-    if (paths) {
-      paths.forEach(path => {
-        selections = (selections.filter(s => s.name === path)[0] || {}).selections || []
+    if (path) {
+      path.split('.').forEach(p => {
+        selections = (selections.filter(s => s.name === p)[0] || {}).selections || []
       })
     }
     return buildInclude(schema, selections)
