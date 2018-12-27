@@ -37,7 +37,8 @@ export default SG.schema('User', {
     scope: {
       completed: false
     },
-    order: [['createdAt', 'DESC']]
+    order: [['createdAt', 'DESC']],
+    outputStructure: 'Array'
   }
 }).hasOne({
   profile: {

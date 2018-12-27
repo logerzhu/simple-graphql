@@ -29,7 +29,14 @@ export default function (args:{include:Array<any>, info:Object, path?:string}) {
   const buildInclude = function (nInclude, nSchema, selections) {
     if (selections) {
       for (let selection of selections) {
-        const config = nSchema.config.associations.belongsTo[selection.name] || nSchema.config.associations.hasOne[selection.name]
+        let config = nSchema.config.associations.belongsTo[selection.name] || nSchema.config.associations.hasOne[selection.name]
+        if (!config) {
+          const hasManyConfig = nSchema.config.associations.hasMany[selection.name]
+          if (hasManyConfig && hasManyConfig.outputStructure === 'Array' &&
+            (hasManyConfig.conditionFields == null || hasManyConfig.conditionFields.length === 0)) {
+            config = hasManyConfig
+          }
+        }
         if (config) {
           const exit = nInclude.filter(i => i.as === selection.name)[0]
           if (exit) {

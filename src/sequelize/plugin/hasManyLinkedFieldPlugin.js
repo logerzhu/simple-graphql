@@ -22,6 +22,9 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
           args: args,
           $type: [config.target],
           resolve: async function (root, args, context, info, sgContext) {
+            if (root[key] !== null && (config.conditionFields == null || config.conditionFields.length === 0)) {
+              return root[key]
+            }
             let condition = config.scope || {}
             if (args && args.condition) {
               condition = {...condition, ...args.condition}
