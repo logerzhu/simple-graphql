@@ -168,7 +168,7 @@ const SimpleGraphQL = {
           const dbModel = sgContext.models[id.type]
           const record = await dbModel.findOne({
             where: {id: id.id},
-            include: dbModel.buildInclude(info)
+            include: dbModel.buildInclude({info: info})
           })
           if (record) {
             record._type = id.type
@@ -200,7 +200,8 @@ const SimpleGraphQL = {
         mutation: new graphql.GraphQLObjectType({
           name: 'RootMutation',
           fields: () => {
-            const fields:{[fieldName: string]: graphql.GraphQLFieldConfig<any, any>} = {}
+            const fields:{[fieldName: string]: graphql.GraphQLFieldConfig
+              <any, any>} = {}
             _.forOwn(context.mutations, (value, key) => {
               const inputFields = Transformer.toGraphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.inputFields)
               const outputFields = {}

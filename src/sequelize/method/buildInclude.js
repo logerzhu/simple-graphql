@@ -1,6 +1,7 @@
 // @flow
-export default function (info:Object, path?:string) {
+export default function (args:{include:Array<any>, info:Object, path?:string}) {
   const dbModel = this
+  let {include = [], info, path} = args
   const fragments = info.fragments
   const selectionSet = info.fieldNodes[0].selectionSet
   const buildSelections = function (selections:Array<Object>) {
@@ -25,32 +26,31 @@ export default function (info:Object, path?:string) {
   }
 
   const sgContext = this.getSGContext()
-  const buildInclude = function (nSchema, selections) {
-    const include = []
+  const buildInclude = function (nInclude, nSchema, selections) {
     if (selections) {
       for (let selection of selections) {
         const config = nSchema.config.associations.belongsTo[selection.name] || nSchema.config.associations.hasOne[selection.name]
         if (config) {
-          const exit = include.filter(i => i.as === selection.name)[0]
+          const exit = nInclude.filter(i => i.as === selection.name)[0]
           if (exit) {
-            const subInclude = buildInclude(sgContext.schemas[config.target], selection.selections)
+            const subInclude = buildInclude(exit.include || [], sgContext.schemas[config.target], selection.selections)
             subInclude.forEach(sInclude => {
               if (exit.include.filter(i => i.as === sInclude.as).length === 0) {
                 exit.include.push(sInclude)
               }
             })
           } else {
-            include.push({
+            nInclude.push({
               model: sgContext.models[config.target],
               as: selection.name,
-              include: buildInclude(sgContext.schemas[config.target], selection.selections),
+              include: buildInclude([], sgContext.schemas[config.target], selection.selections),
               required: false
             })
           }
         }
       }
     }
-    return include
+    return nInclude
   }
   let selections = buildSelections(selectionSet && selectionSet.selections)
   if (path) {
@@ -58,5 +58,5 @@ export default function (info:Object, path?:string) {
       selections = (selections.filter(s => s.name === p)[0] || {}).selections || []
     })
   }
-  return buildInclude(sgContext.schemas[dbModel.name], selections)
+  return buildInclude(include, sgContext.schemas[dbModel.name], selections)
 }

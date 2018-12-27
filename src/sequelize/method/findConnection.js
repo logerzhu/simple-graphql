@@ -22,42 +22,35 @@ export default async function (args:{
 }> {
   const dbModel = this
   let {after, first = 100, before, last, include = [], where = {}, order = [['id', 'ASC']]} = args
-  let reverse = false
-
-  const count = await dbModel.count({
-    include: include,
-    where: where
-  })
 
   if (last || before) {
-    reverse = true
+    const count = await dbModel.count({
+      include: include,
+      where: where
+    })
     first = last || 100
     before = before || (count + 1)
     after = count - (parseInt(before) - 1)
     order = order.map(o => {
       return [o[0], (o[1] || '').toLocaleUpperCase() === 'ASC' ? 'DESC' : 'ASC']
     })
-  }
-  const offset = Math.max(after != null ? parseInt(after) : 0, 0)
-
-  const result = await dbModel.findAll({
-    include: include,
-    where: where,
-    order: order,
-    limit: first,
-    offset: offset
-  })
-
-  let index = 0
-  if (reverse) {
+    const offset = Math.max(after != null ? parseInt(after) : 0, 0)
+    const rows = await dbModel.findAll({
+      include: include,
+      where: where,
+      order: order,
+      limit: first,
+      offset: offset
+    })
+    let index = 0
     return {
       pageInfo: {
-        startCursor: count - (offset + result.length) + 1,
+        startCursor: count - (offset + rows.length) + 1,
         endCursor: count - offset,
-        hasPreviousPage: count - (offset + result.length) > 0,
+        hasPreviousPage: count - (offset + rows.length) > 0,
         hasNextPage: offset > 0
       },
-      edges: result.map(node => {
+      edges: rows.map(node => {
         return {
           node: node,
           cursor: count - offset - (++index) + 1
@@ -66,14 +59,23 @@ export default async function (args:{
       count: count
     }
   } else {
+    const offset = Math.max(after != null ? parseInt(after) : 0, 0)
+    const {count, rows} = await dbModel.findAndCountAll({
+      include: include,
+      where: where,
+      order: order,
+      limit: first,
+      offset: offset
+    })
+    let index = 0
     return {
       pageInfo: {
         startCursor: offset + 1,
-        endCursor: offset + result.length,
+        endCursor: offset + rows.length,
         hasPreviousPage: offset > 0,
-        hasNextPage: offset + result.length < count
+        hasNextPage: offset + rows.length < count
       },
-      edges: result.map(node => {
+      edges: rows.map(node => {
         return {
           node: node,
           cursor: offset + (++index)
