@@ -6,6 +6,7 @@ export default async function (args:{
   last?: number,
   include?:Array<any>,
   where?:any,
+  bind?:any,
   order?: Array<Array<any>>
 }):Promise<{
   pageInfo: {
@@ -21,12 +22,13 @@ export default async function (args:{
   count: number
 }> {
   const dbModel = this
-  let {after, first = 100, before, last, include = [], where = {}, order = [['id', 'ASC']]} = args
+  let {after, first = 100, before, last, include = [], where = {}, bind = [], order = [['id', 'ASC']]} = args
 
   if (last || before) {
     const count = await dbModel.count({
       include: include,
-      where: where
+      where: where,
+      bind: bind
     })
     first = last || 100
     before = before || (count + 1)
@@ -38,6 +40,7 @@ export default async function (args:{
     const rows = await dbModel.findAll({
       include: include,
       where: where,
+      bind: bind,
       order: order,
       limit: first,
       offset: offset
@@ -63,6 +66,7 @@ export default async function (args:{
     const {count, rows} = await dbModel.findAndCountAll({
       include: include,
       where: where,
+      bind: bind,
       order: order,
       limit: first,
       offset: offset
