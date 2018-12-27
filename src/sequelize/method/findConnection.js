@@ -5,8 +5,8 @@ export default async function (args:{
   before?: string,
   last?: number,
   include?:Array<any>,
-  condition?:any,
-  sort?: Array<{field: string, order: "ASC"|"DESC"}>
+  where?:any,
+  order?: Array<Array<any>>
 }):Promise<{
   pageInfo: {
     startCursor:string|number,
@@ -21,15 +21,12 @@ export default async function (args:{
   count: number
 }> {
   const dbModel = this
-  let {after, first = 100, before, last, include = [], condition = {}, sort = [{
-    field: 'id',
-    order: 'ASC'
-  }]} = args
+  let {after, first = 100, before, last, include = [], where = {}, order = [['id', 'ASC']]} = args
   let reverse = false
 
   const count = await dbModel.count({
     include: include,
-    where: condition
+    where: where
   })
 
   if (last || before) {
@@ -37,19 +34,16 @@ export default async function (args:{
     first = last || 100
     before = before || (count + 1)
     after = count - (parseInt(before) - 1)
-    sort = sort.map(s => {
-      return {
-        field: s.field,
-        order: (s.order === 'ASC' ? 'DESC' : 'ASC')
-      }
+    order = order.map(o => {
+      return [o[0], (o[1] || '').toLocaleUpperCase() === 'ASC' ? 'DESC' : 'ASC']
     })
   }
   const offset = Math.max(after != null ? parseInt(after) : 0, 0)
 
   const result = await dbModel.findAll({
     include: include,
-    where: condition,
-    order: sort.map(s => [s.field, s.order]),
+    where: where,
+    order: order,
     limit: first,
     offset: offset
   })

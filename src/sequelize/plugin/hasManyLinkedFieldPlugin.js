@@ -51,7 +51,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
             if (config.scope) {
               condition = {...condition, ...config.scope}
             }
-            const sort = config.sort || [{field: 'id', order: 'ASC'}]
+            const order = config.order || [['id', 'ASC']]
             // if (models[hasManyCfg.target].options.underscored) {
             //  condition[StringHelper.toUnderscoredName(_.get(hasManyCfg, 'options.foreignKey', name + 'Id'))] = root.id
             //  for (let item of sort) {
@@ -66,8 +66,8 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
             const dbModel = sgContext.models[config.target]
             return sgContext.models[config.target].findConnection({
               ...args,
-              condition,
-              sort,
+              where: condition,
+              order: order,
               include: dbModel.buildInclude(info, 'edges.node')
             })
           }

@@ -311,7 +311,12 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
           }
           condition.$or = keywordsCondition
         }
-        return dbModel.findConnection({...args, condition, include})
+        return dbModel.findConnection({
+          ...args,
+          where: condition,
+          include: include,
+          order: sort.map(s => [s.field, s.order])
+        })
       }
     }
   })
