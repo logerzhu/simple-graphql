@@ -4,8 +4,6 @@ import _ from 'lodash'
 import Schema from '../../definition/Schema'
 // import StringHelper from '../../utils/StringHelper'
 
-import resolveConnection from '../resolveConnection'
-
 export default function hasManyLinkedField (schema:Schema<any>, options:any):void {
   // const name = StringHelper.toInitialLowerCase(schema.name)
   // Conver model association to field config
@@ -66,7 +64,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
 
             // }
             const dbModel = sgContext.models[config.target]
-            return resolveConnection(sgContext.models[config.target], {
+            return sgContext.models[config.target].findConnection({
               ...args,
               condition,
               sort,

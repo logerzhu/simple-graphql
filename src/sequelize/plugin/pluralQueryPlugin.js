@@ -6,7 +6,6 @@ import Sequelize from 'sequelize'
 import Schema from '../../definition/Schema'
 import Type from '../../type'
 import StringHelper from '../../utils/StringHelper'
-import resolveConnection from '../resolveConnection'
 
 const SortEnumType = new graphql.GraphQLEnumType({
   name: 'SortOrder',
@@ -312,7 +311,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
           }
           condition.$or = keywordsCondition
         }
-        return resolveConnection(dbModel, {...args, condition, include})
+        return dbModel.findConnection({...args, condition, include})
       }
     }
   })

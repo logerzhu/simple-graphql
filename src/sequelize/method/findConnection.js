@@ -1,7 +1,5 @@
 // @flow
-import Sequelize from 'sequelize'
-
-export default async function resolveConnection (dbModel:Sequelize.Model, args:{
+export default async function (args:{
   after?: string,
   first?: number,
   before?: string,
@@ -22,6 +20,7 @@ export default async function resolveConnection (dbModel:Sequelize.Model, args:{
   }>,
   count: number
 }> {
+  const dbModel = this
   let {after, first = 100, before, last, include = [], condition = {}, sort = [{
     field: 'id',
     order: 'ASC'
