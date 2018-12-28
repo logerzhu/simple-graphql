@@ -36,11 +36,13 @@ export default function singularQuery (schema:Schema<any>, options:any):void {
           return null
         }
         const dbModel = sgContext.models[schema.name]
+        const option = dbModel.resolveQueryOption({info: info})
         return sgContext.models[schema.name].findOne({
           where: {
             ...args
           },
-          include: dbModel.buildInclude({info: info})
+          include: option.include,
+          attributes: option.attributes
         })
       }
     }

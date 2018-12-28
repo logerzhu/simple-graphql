@@ -76,9 +76,11 @@ const toGraphQLFieldConfig = function (name:string,
             (typeof root[fieldName][0] === 'number' || typeof root[fieldName][0] === 'string')
           ) {
             const dbModel = sgContext.models[fieldType[0]]
+            const option = dbModel.resolveQueryOption({info: info})
             const records = await sgContext.models[fieldType[0]].findAll({
               where: {id: {$in: root[fieldName]}},
-              include: dbModel.buildInclude({info: info})
+              include: option.include,
+              attributes: option.attributes
             })
             const result = []
             for (let cId of root[fieldName]) {
@@ -149,9 +151,11 @@ const toGraphQLFieldConfig = function (name:string,
               if (root[fieldName] !== undefined) {
                 return root[fieldName]
               } else {
+                const option = dbModel.resolveQueryOption({info: info})
                 return dbModel.findOne({
                   where: {id: root[fieldName + 'Id']},
-                  include: dbModel.buildInclude({info: info})
+                  include: option.include,
+                  attributes: option.attributes
                 })
               }
             }
@@ -159,9 +163,11 @@ const toGraphQLFieldConfig = function (name:string,
                 typeof root[fieldName] === 'number' ||
                 typeof root[fieldName] === 'string'
               )) {
+              const option = dbModel.resolveQueryOption({info: info})
               return dbModel.findOne({
                 where: {id: root[fieldName]},
-                include: dbModel.buildInclude({info: info})
+                include: option.include,
+                attributes: option.attributes
               })
             }
             return root[fieldName]

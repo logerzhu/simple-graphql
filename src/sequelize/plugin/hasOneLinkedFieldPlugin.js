@@ -14,14 +14,17 @@ export default function hasOneFieldsConfig (schema:Schema<any>, options:any):voi
       [key]: {
         config: config.config,
         $type: config.target,
+        dependentFields: ['id'],
         resolve: async function (root, args, context, info, sgContext) {
           if (root[key] !== undefined) {
             return root[key]
           } else {
             const dbModel = sgContext.models[config.target]
+            const option = dbModel.resolveQueryOption({info: info})
             return dbModel.findOne({
               where: {[config.foreignKey || config.foreignField + 'Id']: root['id']},
-              include: dbModel.buildInclude({info: info})
+              include: option.include,
+              attributes: option.attributes
             })
           }
         }

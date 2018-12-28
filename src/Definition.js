@@ -52,6 +52,7 @@ export type ArgsType = {[string]:InputFieldType}
 export type LinkedFieldConfig = {
   $type:LinkedFieldType,
   description?:string,
+  dependentFields?:Array<string>,
   args?:ArgsType,
   resolve: (source:any, args:{[string]: any},
             context:any,

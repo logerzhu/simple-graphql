@@ -54,12 +54,9 @@ const SimpleGraphQL = {
    */
   build: (args:{
          sequelize:Sequelize,
-         schemas?:Array
-          <Schema
-          <any>>,
-         services?:Array
-            <Service
-            <any>>,
+         schemas?:Array<Schema<any>>,
+         schemas?:Array<Schema<any>>,
+         services?:Array<Service<any>>,
          options?:BuildOptionConfig
          }):{graphQLSchema:graphql.GraphQLSchema, sgContext:any} => {
     const {sequelize, schemas = [], services = [], options = {}} = args
@@ -77,8 +74,7 @@ const SimpleGraphQL = {
 
     context.buildModelAssociations()
 
-    const finalQueries:{[fieldName: string]: graphql.GraphQLFieldConfig
-              <any, any>} = {}
+    const finalQueries:{[fieldName: string]: graphql.GraphQLFieldConfig<any, any>} = {}
 
     _.forOwn(context.queries, (value, key) => {
       const fieldConfig = Transformer.toGraphQLFieldConfig(
@@ -166,9 +162,11 @@ const SimpleGraphQL = {
           if (!sgContext.models[id.type]) return null
 
           const dbModel = sgContext.models[id.type]
+          const option = dbModel.resolveQueryOption({info: info})
           const record = await dbModel.findOne({
             where: {id: id.id},
-            include: dbModel.buildInclude({info: info})
+            include: option.include,
+            attributes: option.attributes
           })
           if (record) {
             record._type = id.type

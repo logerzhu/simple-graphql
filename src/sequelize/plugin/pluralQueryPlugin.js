@@ -230,7 +230,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
           }
         })
 
-        const include = dbModel.buildInclude({info: info, path: 'edges.node'})
+        const include = []
 
         const associationType = (model, fieldName):?string => {
           if (model.config.associations.hasOne[fieldName]) {
@@ -311,10 +311,12 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
           }
           condition.$or = keywordsCondition
         }
-        return dbModel.findConnection({
+        const option = dbModel.resolveQueryOption({include: include, info: info, path: 'edges.node'})
+        return dbModel.resolveRelayConnection({
           ...args,
           where: condition,
-          include: include,
+          include: option.include,
+          attributes: option.attributes,
           order: sort.map(s => [s.field, s.order])
         })
       }

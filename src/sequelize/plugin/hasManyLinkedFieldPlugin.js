@@ -21,6 +21,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
           config: config.config,
           args: args,
           $type: [config.target],
+          dependentFields: [config.sourceKey || 'id'],
           resolve: async function (root, args, context, info, sgContext) {
             if (root[key] !== undefined && (config.conditionFields == null || config.conditionFields.length === 0)) {
               return root[key] || []
@@ -35,9 +36,11 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
             condition[foreignKey] = root[sourceKey]
 
             const dbModel = sgContext.models[config.target]
+            const option = dbModel.resolveQueryOption({info: info})
             return dbModel.findAll({
               where: condition,
-              include: dbModel.buildInclude({info: info}),
+              include: option.include,
+              attributes: option.attributes,
               order: sort.map(s => [s.field, s.order])
             })
           }
@@ -49,6 +52,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
           config: config.config,
           args: args,
           $type: config.target + 'Connection',
+          dependentFields: [config.sourceKey || 'id'],
           resolve: async function (root, args, context, info, sgContext) {
             let condition = (args && args.condition) || {}
             if (config.scope) {
@@ -67,11 +71,13 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
 
             // }
             const dbModel = sgContext.models[config.target]
-            return sgContext.models[config.target].findConnection({
+            const option = dbModel.resolveQueryOption({info: info, path: 'edges.node'})
+            return sgContext.models[config.target].resolveRelayConnection({
               ...args,
               where: condition,
               order: order,
-              include: dbModel.buildInclude({info: info, path: 'edges.node'})
+              include: option.include,
+              attributes: option.attributes
             })
           }
         }
