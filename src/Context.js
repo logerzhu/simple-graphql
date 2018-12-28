@@ -379,7 +379,8 @@ export default class Context {
         self.dbModel(schema.name).belongsTo(self.dbModel(config.target), {
           ...config,
           as: key,
-          foreignKey: config.foreignKey || config.foreignField + 'Id'
+          foreignKey: config.foreignKey || config.foreignField + 'Id',
+          targetKey: config.targetKey || 'id'
         })
       })
     })
