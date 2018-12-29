@@ -8,6 +8,12 @@ export default function (args:{attributes:Array<string>, include:Array<any>, inf
   const sgContext = this.getSGContext()
 
   const buildQueryOption = function (nAttributes, nInclude, nSchema, selections) {
+    const parseAttributesOption = sgContext.models[nSchema.name].parseAttributes({
+      attributes: nAttributes,
+      selections: selections
+    })
+    selections = [...(selections || []), ...parseAttributesOption.additionSelections]
+
     if (selections) {
       for (let selection of selections) {
         let config = nSchema.config.associations.belongsTo[selection.name] || nSchema.config.associations.hasOne[selection.name]
@@ -39,7 +45,7 @@ export default function (args:{attributes:Array<string>, include:Array<any>, inf
     }
     return {
       include: nInclude,
-      attributes: sgContext.models[nSchema.name].parseAttributes({attributes: nAttributes, selections: selections})
+      attributes: parseAttributesOption.attributes
     }
   }
 
