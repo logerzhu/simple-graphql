@@ -1,4 +1,5 @@
 // @flow
+import _ from 'lodash'
 export default async function (args:{
   after?: string,
   first?: number,
@@ -24,6 +25,13 @@ export default async function (args:{
 }> {
   const dbModel = this
   let {after, first = 100, before, last, include = [], where = {}, attributes, bind = [], order = [['id', 'ASC']]} = args
+
+  if (attributes) {
+    if (order) {
+      order.forEach(o => attributes.push(o[0]))
+      attributes = _.union(attributes, order.map(o => o[0]))
+    }
+  }
 
   if (last || before) {
     const count = await dbModel.count({

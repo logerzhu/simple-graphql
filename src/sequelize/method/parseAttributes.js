@@ -25,7 +25,6 @@ export default function (args:{attributes:Array<string>, selections:Array<any>})
       if (linkConfig.dependentFields) {
         linkConfig.dependentFields.forEach(field => result.push(field))
       } else {
-        console.log('----', selection.name, schema.name)
         // if no dependentFields, default depend all field
         _.forOwn(schema.config.fields, (value, key) => {
           result.push(getFieldName(key, value))
