@@ -1,9 +1,9 @@
 // @flow
+import _ from 'lodash'
 export default function (args:{attributes:Array<string>, include:Array<any>, info:Object, path?:string}) {
   const dbModel = this
   const {include = [], attributes = [], info, path} = args
   const fragments = info.fragments || []
-  const selectionSet = info.fieldNodes[0].selectionSet
 
   const sgContext = this.getSGContext()
 
@@ -49,7 +49,10 @@ export default function (args:{attributes:Array<string>, include:Array<any>, inf
     }
   }
 
-  let selections = dbModel.parseSelections(fragments, selectionSet && selectionSet.selections)
+  let selections = []
+  info.fieldNodes.forEach(node => {
+    selections = _.union(selections, dbModel.parseSelections(fragments, node.selectionSet && node.selectionSet.selections))
+  })
   if (path) {
     path.split('.').forEach(p => {
       selections = (selections.filter(s => s.name === p)[0] || {}).selections || []
