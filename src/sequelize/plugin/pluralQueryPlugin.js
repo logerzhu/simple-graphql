@@ -190,6 +190,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
         return dbModel.resolveRelayConnection({
           ...args,
           where: queryOption.where,
+          bind: queryOption.bind,
           include: option.include,
           attributes: option.attributes,
           order: sort.map(s => [s.field, s.order])

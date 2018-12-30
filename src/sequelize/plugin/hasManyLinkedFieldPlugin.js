@@ -12,9 +12,30 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
       return
     }
     const args:any = {}
-    if (config.conditionFields) {
-      args['condition'] = config.conditionFields
+
+    const conditionFields = {}
+    _.forOwn(config.conditionFields || {}, async function (config:any, key) {
+      if (!config['$type']) {
+        config = {$type: config}
+      }
+      if (!config.mapper) {
+        config.mapper = function (option:{where:Object, additionFields:Array<string>}, argValue) {
+          if (argValue !== undefined) {
+            option.where.$and = option.where.$and || []
+            option.where.$and.push({[key]: argValue})
+          }
+        }
+      }
+      conditionFields[key] = config
+    })
+
+    if (conditionFields && _.keys(conditionFields).length > 0) {
+      args['condition'] = _.mapValues(conditionFields, field => {
+        const {mapper, ...config} = field
+        return config
+      })
     }
+
     if (config.outputStructure === 'Array') {
       schema.links({
         [key]: {
@@ -26,22 +47,27 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
             if (root[key] !== undefined && (config.conditionFields == null || config.conditionFields.length === 0)) {
               return root[key] || []
             }
-            let condition = config.scope || {}
+
+            let queryOption = {where: {...(config.scope || {})}, bind: [], additionFields: []}
+
             if (args && args.condition) {
-              condition = {...condition, ...args.condition}
+              _.forOwn(conditionFields, async (value, key) => {
+                await value.mapper(queryOption, args.condition[key], sgContext)
+              })
             }
-            const sort = config.sort || [{field: 'id', order: 'ASC'}]
+
             let sourceKey = config.sourceKey || 'id'
             let foreignKey = config.foreignKey || (config.foreignField + 'Id')
-            condition[foreignKey] = root[sourceKey]
+            queryOption.where[foreignKey] = root[sourceKey]
 
             const dbModel = sgContext.models[config.target]
-            const option = dbModel.resolveQueryOption({info: info})
+            const option = dbModel.resolveQueryOption({info: info, additionFields: queryOption.additionFields})
             return dbModel.findAll({
-              where: condition,
+              where: queryOption.where,
+              bind: queryOption.bind,
               include: option.include,
               attributes: option.attributes,
-              order: sort.map(s => [s.field, s.order])
+              order: config.order || [['id', 'ASC']]
             })
           }
         }
@@ -54,30 +80,32 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
           $type: config.target + 'Connection',
           dependentFields: [config.sourceKey || 'id'],
           resolve: async function (root, args, context, info, sgContext) {
-            let condition = (args && args.condition) || {}
-            if (config.scope) {
-              condition = {...condition, ...config.scope}
+            const {condition, ...relayArgs} = args || {}
+            let queryOption = {where: {...(config.scope || {})}, bind: [], additionFields: []}
+            if (condition) {
+              _.forOwn(conditionFields, async (value, key) => {
+                await value.mapper(queryOption, condition[key], sgContext)
+              })
             }
-            const order = config.order || [['id', 'ASC']]
-            // if (models[hasManyCfg.target].options.underscored) {
-            //  condition[StringHelper.toUnderscoredName(_.get(hasManyCfg, 'options.foreignKey', name + 'Id'))] = root.id
-            //  for (let item of sort) {
-            //    item.field = StringHelper.toUnderscoredName(item.field)
-            //  }
-            // } else {
+
             let sourceKey = config.sourceKey || 'id'
             let foreignKey = config.foreignKey || (config.foreignField + 'Id')
-            condition[foreignKey] = root[sourceKey]
+            queryOption.where[foreignKey] = root[sourceKey]
 
-            // }
             const dbModel = sgContext.models[config.target]
-            const option = dbModel.resolveQueryOption({info: info, path: 'edges.node'})
+            const option = dbModel.resolveQueryOption({
+              info: info,
+              path: 'edges.node',
+              additionFields: queryOption.additionFields.map(f => 'edges.node.' + f)
+            })
+
             return sgContext.models[config.target].resolveRelayConnection({
-              ...args,
-              where: condition,
-              order: order,
+              ...relayArgs,
+              where: queryOption.where,
+              bind: queryOption.bind,
               include: option.include,
-              attributes: option.attributes
+              attributes: option.attributes,
+              order: config.order || [['id', 'ASC']]
             })
           }
         }

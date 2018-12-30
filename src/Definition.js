@@ -38,6 +38,7 @@ type InputFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Dat
   required?:boolean,
   default?:any,
   enumValues?:Array<string>,
+  mapper?:(option:{where:Object, bind:Array<any>, additionFields: Array<string>}, argValue:any, sgContext:SGContext) => void
   // description?:string
 }
 
@@ -289,7 +290,7 @@ export type HasManyConfig<T> = {
     onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     constraints?:boolean,
-    sort?:Array<Array<any>>,
+    order?:Array<Array<any>>,
     outputStructure?:'Connection'|'Array'
   }
 }
