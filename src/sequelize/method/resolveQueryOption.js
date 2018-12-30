@@ -1,11 +1,21 @@
 // @flow
 import _ from 'lodash'
-export default function (args:{attributes:Array<string>, include:Array<any>, info:Object, path?:string}) {
+export default function (args:{attributes?:Array<string>, include?:Array<any>, info:Object, path?:string, additionFields?:Array<string>}) {
   const dbModel = this
-  const {include = [], attributes = [], info, path} = args
+  const {include = [], attributes = [], info, path, additionFields} = args
   const fragments = info.fragments || []
 
   const sgContext = this.getSGContext()
+
+  const fieldToSelection = (field) => {
+    const index = field.indexOf('.')
+    if (index === -1) { return {name: field} } else {
+      return {
+        name: field.substr(0, index),
+        selections: [fieldToSelection(field.substr(index + 1))]
+      }
+    }
+  }
 
   const buildQueryOption = function (nAttributes, nInclude, nSchema, selections) {
     const parseAttributesOption = sgContext.models[nSchema.name].parseAttributes({
@@ -49,14 +59,16 @@ export default function (args:{attributes:Array<string>, include:Array<any>, inf
     }
   }
 
-  let selections = []
+  let selections = additionFields ? additionFields.map(field => fieldToSelection(field)) : []
   info.fieldNodes.forEach(node => {
     selections = _.union(selections, dbModel.parseSelections(fragments, node.selectionSet && node.selectionSet.selections))
   })
+
   if (path) {
     path.split('.').forEach(p => {
-      selections = (selections.filter(s => s.name === p)[0] || {}).selections || []
+      selections = _.flatten(selections.filter(s => s.name === p).map(t => t.selections || []))
     })
   }
+
   return buildQueryOption(attributes, [...include], sgContext.schemas[dbModel.name], selections)
 }

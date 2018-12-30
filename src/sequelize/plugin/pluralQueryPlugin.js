@@ -1,5 +1,5 @@
 // @flow
-import * as _ from 'lodash'
+import _ from 'lodash'
 import * as graphql from 'graphql'
 import Sequelize from 'sequelize'
 
@@ -45,126 +45,83 @@ const DateConditionType = new graphql.GraphQLInputObjectType({
   }
 })
 
-const NumberConditionType = new graphql.GraphQLInputObjectType({
-  name: 'NumberCondition' + 'Input',
-  fields: {
-    gte: {
-      type: graphql.GraphQLFloat,
-      description: '大于或等于'
-    },
-    lte: {
-      type: graphql.GraphQLFloat,
-      description: '小于或等于'
-    },
-    gt: {
-      type: graphql.GraphQLFloat,
-      description: '大于'
-    },
-    lt: {
-      type: graphql.GraphQLFloat,
-      description: '小于'
-    },
-    ne: {
-      type: graphql.GraphQLFloat,
-      description: '不等于'
-    },
-    eq: {
-      type: graphql.GraphQLFloat,
-      description: '等于'
-    },
-    in: {
-      type: new graphql.GraphQLList(graphql.GraphQLFloat),
-      description: '在里面'
-    },
-    notIn: {
-      type: new graphql.GraphQLList(graphql.GraphQLFloat),
-      description: '不在里面'
-    }
-  }
-})
-
-const StringConditionType = new graphql.GraphQLInputObjectType({
-  name: 'StringCondition' + 'Input',
-  fields: {
-    gte: {
-      type: graphql.GraphQLString,
-      description: '大于或等于'
-    },
-    lte: {
-      type: graphql.GraphQLString,
-      description: '小于或等于'
-    },
-    gt: {
-      type: graphql.GraphQLString,
-      description: '大于'
-    },
-    lt: {
-      type: graphql.GraphQLString,
-      description: '小于'
-    },
-    ne: {
-      type: graphql.GraphQLString,
-      description: '不等于'
-    },
-    eq: {
-      type: graphql.GraphQLString,
-      description: '等于'
-    },
-    in: {
-      type: new graphql.GraphQLList(graphql.GraphQLString),
-      description: '在里面'
-    },
-    nin: {
-      type: new graphql.GraphQLList(graphql.GraphQLString),
-      description: '不在里面'
-    }
-  }
-})
-
-export default function pluralQuery (schema:Schema<any>, options:any):void {
-  const name = StringHelper.toInitialLowerCase(schema.name) + 's'
-
-  const searchFields = {}
-  const conditionFieldKeys = []
-  // 过滤不可搜索的field
+const getSearchFields = (schema) => {
+  const searchFields:any = []
   _.forOwn(schema.config.fields, (value, key) => {
     if (typeof value === 'string' || (value && typeof value.$type === 'string')) {
       if (!key.endsWith('Id')) {
         key = key + 'Id'
       }
     }
-    if (!value['$type'] || (value['searchable'] !== false && value['hidden'] !== true && !value['resolve'])) {
-      if (value['required']) {
-        searchFields[key] = Object.assign({}, value, {required: false})
+    if (!searchFields[key] && (!value['$type'] || (value['searchable'] !== false && value['hidden'] !== true && !value['resolve']))) {
+      if (!value['$type']) {
+        searchFields[key] = {$type: value}
       } else {
-        searchFields[key] = value
+        if (value['required']) {
+          searchFields[key] = {...value, required: false}
+        } else {
+          searchFields[key] = value
+        }
+        if (value['default'] != null) {
+          searchFields[key] = {...searchFields[key], default: null}
+        }
       }
-      if (value['default'] != null) {
-        searchFields[key] = Object.assign({}, searchFields[key], {default: null})
-      }
-      if (value['advancedSearchable']) {
-        if (value['$type'] === Date) {
-          conditionFieldKeys.push(key)
-          searchFields[key] = Object.assign({}, searchFields[key], {$type: DateConditionType})
-        } else if (value['$type'] === Number) {
-          conditionFieldKeys.push(key)
-          searchFields[key] = Object.assign({}, searchFields[key], {$type: NumberConditionType})
-        } else if (value['$type'] === String) {
-          conditionFieldKeys.push(key)
-          searchFields[key] = Object.assign({}, searchFields[key], {$type: StringConditionType})
+
+      searchFields[key].mapper = function (option:{where:Object, additionFields:Array<string>}, argValue) {
+        if (argValue !== undefined) {
+          option.where.$and = option.where.$and || []
+          option.where.$and.push({[key]: argValue})
         }
       }
     }
   }
   )
+  return searchFields
+}
 
-  if (options && options.conditionArgs) {
-    Object.assign(searchFields, (options.conditionArgs:any))
-  }
+export default function pluralQuery (schema:Schema<any>, options:any):void {
+  const name = StringHelper.toInitialLowerCase(schema.name) + 's'
 
+  const searchFields = {...getSearchFields(schema), ...((options && options.conditionFields) || {})}
+
+  // 过滤不可搜索的field
   let config = {}
   if ((typeof options) === 'object') {
     config = options
+  }
+
+  const keywordField = {
+    $type: {
+      fields: {
+        $type: [String],
+        required: true
+      },
+      value: {
+        $type: String,
+        required: true
+      }
+    },
+    mapper: function (option:{where:Object, bind:Array<any>, additionFields:Array<string>}, argValue, sgContext) {
+      if (argValue != null) {
+        const {fields, value} = argValue
+        option.additionFields = _.union((option.additionFields || []), fields)
+        option.where.$and = option.where.$and || []
+        option.where.$and.push({
+          $or: fields.map(field => {
+            let ss = field.split('.')
+            if (sgContext.models[schema.name].options.underscored) {
+              ss = ss.map(f => StringHelper.toUnderscoredName(f))
+            }
+            if (ss.length > 2) {
+              field = ss.slice(0, ss.length - 1).join(('->')) + '.' + ss[ss.length - 1]
+            } else {
+              field = ss.join('.')
+            }
+            return Sequelize.where(Sequelize.col(field), {$like: '%' + value + '%'})
+          })
+        })
+      }
+    }
   }
 
   // 生产
@@ -174,7 +131,8 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
       $type: schema.name + 'Connection',
       args: {
         condition: {
-          $type: _.mapValues(searchFields, (value) => {
+          $type: _.mapValues(searchFields, (fieldConfig) => {
+            const {mapper, ...value} = fieldConfig
             let type = value
             while (type['$type'] || _.isArray(type)) {
               if (type['$type']) {
@@ -184,7 +142,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
               }
             }
             if (value['$type']) {
-              type = Object.assign({}, value, {$type: type, required: false})
+              type = {...value, ...{$type: type}}
             }
             if (type === Date || type['$type'] === Date) {
               type = DateConditionType
@@ -197,16 +155,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
           $type: [{field: String, order: SortEnumType}],
           description: 'Define the sort field'
         },
-        keywords: {
-          fields: {
-            $type: [String],
-            required: true
-          },
-          value: {
-            $type: String,
-            required: true
-          }
-        }
+        keywords: keywordField.$type
       },
       resolve: async function (args:{[argName: string]: any},
                                context:any,
@@ -214,7 +163,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
                                sgContext) {
         const dbModel = sgContext.models[schema.name]
 
-        let {sort = [{field: 'id', order: 'ASC'}], condition = {}} = (args != null ? args : {})
+        let {sort = [{field: 'id', order: 'ASC'}], condition = {}, keywords} = (args || {})
 
         if (dbModel.options.underscored) {
           for (let item of sort) {
@@ -222,99 +171,25 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
           }
         }
 
-        conditionFieldKeys.forEach(fieldKey => {
-          if (condition[fieldKey]) {
-            condition[fieldKey] = _.mapKeys(condition[fieldKey], function (value, key) {
-              return '$' + key
-            })
-          }
-        })
-
-        const include = []
-
-        const associationType = (model, fieldName):?string => {
-          if (model.config.associations.hasOne[fieldName]) {
-            return model.config.associations.hasOne[fieldName].target
-          }
-          if (model.config.associations.belongsTo[fieldName]) {
-            return model.config.associations.belongsTo[fieldName].target
-          }
-          return null
+        let queryOption = {where: {}, bind: [], additionFields: []}
+        if (keywords) {
+          await keywordField.mapper(queryOption, keywords, sgContext)
         }
 
-        _.forOwn(schema.config.fields, (value, key) => {
-          if (typeof value === 'string' || (value && typeof value.$type === 'string')) {
-            if (typeof condition[key] !== 'undefined') {
-              if (include.filter(i => i.as === key).length === 0) {
-                const type = associationType(schema, key)
-                include.push({
-                  model: sgContext.models[type],
-                  as: key,
-                  required: true
-                })
-              }
-              if (!condition.$and) {
-                condition.$and = []
-              }
-              Object.keys(condition[key]).forEach(f => {
-                if (dbModel.options.underscored) {
-                  condition.$and.push(Sequelize.where(Sequelize.col(key + '.' + StringHelper.toUnderscoredName(f)), {$eq: condition[key][f]}))
-                } else {
-                  condition.$and.push(Sequelize.where(Sequelize.col(key + '.' + f), {$eq: condition[key][f]}))
-                }
-              })
-              delete condition[key]
-            }
-
-            if (!key.endsWith('Id')) {
-              key = key + 'Id'
-            }
-            if (typeof condition[key] !== 'undefined') {
-              if (dbModel.options.underscored) {
-                const underscoredKey = StringHelper.toUnderscoredName(key)
-                if (underscoredKey !== key) {
-                  condition[underscoredKey] = condition[key]
-                  delete condition[key]
-                }
-              }
-            }
-          }
-        })
-
-        if (args && args.keywords) {
-          const {fields, value} = args.keywords
-          const keywordsCondition = []
-
-          for (let field of fields) {
-            if (field.indexOf('.') !== -1) {
-              const fieldName = field.split('.')[0]
-              const type = associationType(schema, fieldName)
-              if (type) {
-                if (include.filter(i => i.as === fieldName).length === 0) {
-                  include.push({
-                    model: sgContext.models[type],
-                    as: fieldName,
-                    required: false
-                  })
-                }
-                let colFieldName = field
-                if (dbModel.options.underscored) {
-                  colFieldName = fieldName + StringHelper.toUnderscoredName(field.substr(field.indexOf('.')))
-                }
-                keywordsCondition.push(Sequelize.where(Sequelize.col(colFieldName), {$like: '%' + value + '%'}))
-              } else {
-                keywordsCondition.push({[field]: {$like: '%' + value + '%'}})
-              }
-            } else {
-              keywordsCondition.push({[field]: {$like: '%' + value + '%'}})
-            }
-          }
-          condition.$or = keywordsCondition
+        if (condition) {
+          _.forOwn(searchFields, async (value, key) => {
+            await value.mapper(queryOption, condition[key], sgContext)
+          })
         }
-        const option = dbModel.resolveQueryOption({include: include, info: info, path: 'edges.node'})
+
+        const option = dbModel.resolveQueryOption({
+          info: info,
+          path: 'edges.node',
+          additionFields: queryOption.additionFields.map(f => 'edges.node.' + f)
+        })
         return dbModel.resolveRelayConnection({
           ...args,
-          where: condition,
+          where: queryOption.where,
           include: option.include,
           attributes: option.attributes,
           order: sort.map(s => [s.field, s.order])

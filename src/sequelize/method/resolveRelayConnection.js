@@ -28,7 +28,6 @@ export default async function (args:{
 
   if (attributes) {
     if (order) {
-      order.forEach(o => attributes.push(o[0]))
       attributes = _.union(attributes, order.map(o => o[0]))
     }
   }
