@@ -1,5 +1,4 @@
 // @flow
-import _ from 'lodash'
 export default async function (args:{
   after?: string,
   first?: number,
@@ -26,12 +25,6 @@ export default async function (args:{
   const dbModel = this
   let {after, first = 100, before, last, include = [], where = {}, attributes, bind = [], order = [['id', 'ASC']]} = args
 
-  if (attributes) {
-    if (order) {
-      attributes = _.union(attributes, order.filter(o => typeof o[0] === 'string').map(o => o[0]))
-    }
-  }
-
   if (last || before) {
     const count = await dbModel.count({
       include: include,
@@ -42,7 +35,20 @@ export default async function (args:{
     before = before || (count + 1)
     after = count - (parseInt(before) - 1)
     order = order.map(o => {
-      return [o[0], (o[1] || '').toLocaleUpperCase() === 'ASC' ? 'DESC' : 'ASC']
+      const r = [...o]
+      if (typeof o[0] === 'string') {
+        switch (r[r.length - 1].toLocaleUpperCase()) {
+          case 'ASC':
+            r[r.length - 1] = 'DESC'
+            break
+          case 'DESC':
+            r[r.length - 1] = 'ASC'
+            break
+          default:
+            r.push('DESC')
+        }
+      }
+      return r
     })
     const offset = Math.max(after != null ? parseInt(after) : 0, 0)
     const rows = await dbModel.findAll({

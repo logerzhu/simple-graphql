@@ -90,5 +90,16 @@ export default function (args:{
     })
   }
 
-  return {...buildQueryOption(attributes, [...include], sgContext.schemas[dbModel.name], selections, []), order: order}
+  const getAttributes = () => {
+    if (attributes && order) {
+      return _.union(attributes, order.filter(o => typeof o[0] === 'string').map(o => o[0]))
+    } else {
+      return attributes
+    }
+  }
+
+  return {
+    ...buildQueryOption(getAttributes(), [...include], sgContext.schemas[dbModel.name], selections, []),
+    order: order
+  }
 }
