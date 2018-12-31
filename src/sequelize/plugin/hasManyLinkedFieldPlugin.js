@@ -61,13 +61,17 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
             queryOption.where[foreignKey] = root[sourceKey]
 
             const dbModel = sgContext.models[config.target]
-            const option = dbModel.resolveQueryOption({info: info, additionFields: queryOption.additionFields})
+            const option = dbModel.resolveQueryOption({
+              order: config.order || [['id', 'ASC']],
+              info: info,
+              additionFields: queryOption.additionFields
+            })
             return dbModel.findAll({
               where: queryOption.where,
               bind: queryOption.bind,
               include: option.include,
               attributes: option.attributes,
-              order: config.order || [['id', 'ASC']]
+              order: option.order
             })
           }
         }
@@ -94,6 +98,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
 
             const dbModel = sgContext.models[config.target]
             const option = dbModel.resolveQueryOption({
+              order: config.order || [['id', 'ASC']],
               info: info,
               path: 'edges.node',
               additionFields: queryOption.additionFields.map(f => 'edges.node.' + f)
@@ -105,7 +110,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
               bind: queryOption.bind,
               include: option.include,
               attributes: option.attributes,
-              order: config.order || [['id', 'ASC']]
+              order: option.order
             })
           }
         }

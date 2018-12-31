@@ -24,7 +24,8 @@ export default function hasOneFieldsConfig (schema:Schema<any>, options:any):voi
             return dbModel.findOne({
               where: {[config.foreignKey || config.foreignField + 'Id']: root['id']},
               include: option.include,
-              attributes: option.attributes
+              attributes: option.attributes,
+              order: option.order
             })
           }
         }

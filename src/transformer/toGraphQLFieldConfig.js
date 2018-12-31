@@ -80,7 +80,8 @@ const toGraphQLFieldConfig = function (name:string,
             const records = await sgContext.models[fieldType[0]].findAll({
               where: {id: {$in: root[fieldName]}},
               include: option.include,
-              attributes: option.attributes
+              attributes: option.attributes,
+              order: option.order
             })
             const result = []
             for (let cId of root[fieldName]) {
@@ -155,7 +156,8 @@ const toGraphQLFieldConfig = function (name:string,
                 return dbModel.findOne({
                   where: {id: root[fieldName + 'Id']},
                   include: option.include,
-                  attributes: option.attributes
+                  attributes: option.attributes,
+                  order: option.order
                 })
               }
             }
@@ -167,7 +169,8 @@ const toGraphQLFieldConfig = function (name:string,
               return dbModel.findOne({
                 where: {id: root[fieldName]},
                 include: option.include,
-                attributes: option.attributes
+                attributes: option.attributes,
+                order: option.order
               })
             }
             return root[fieldName]

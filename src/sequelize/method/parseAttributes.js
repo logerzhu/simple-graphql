@@ -58,10 +58,18 @@ export default function (args:{attributes:Array<string>, selections:Array<any>})
       const fieldConfig = schema.config.fields[fieldName]
       if (fieldConfig) {
         push(option.attributes, getFieldName(fieldName, fieldConfig))
-      } else if (fieldName === '*') {
-        _.forOwn(schema.config.fields, (value, key) => {
-          push(option.attributes, getFieldName(key, value))
-        })
+      } else {
+        const hasManyConfig = schema.config.associations.hasMany[fieldName]
+        if (hasManyConfig && hasManyConfig.outputStructure === 'Array' &&
+          (hasManyConfig.conditionFields == null || hasManyConfig.conditionFields.length === 0)) {
+          (hasManyConfig.order || [['id', 'ASC']]).forEach(p => {
+            push(option.additionFields, `${fieldName}.${p[0]}`)
+          })
+        } else if (fieldName === '*') {
+          _.forOwn(schema.config.fields, (value, key) => {
+            push(option.attributes, getFieldName(key, value))
+          })
+        }
       }
     }
     return option

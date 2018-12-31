@@ -110,7 +110,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
           $or: fields.map(field => {
             let ss = field.split('.')
             if (sgContext.models[schema.name].options.underscored) {
-              ss = ss.map(f => StringHelper.toUnderscoredName(f))
+              ss[ss.length - 1] = StringHelper.toUnderscoredName(ss[ss.length - 1])
             }
             if (ss.length > 2) {
               field = ss.slice(0, ss.length - 1).join(('->')) + '.' + ss[ss.length - 1]
@@ -185,15 +185,29 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
         const option = dbModel.resolveQueryOption({
           info: info,
           path: 'edges.node',
-          additionFields: queryOption.additionFields.map(f => 'edges.node.' + f)
+          additionFields: queryOption.additionFields.map(f => 'edges.node.' + f),
+          order: sort.map(s => [s.field, s.order])
         })
+        console.log(require('util').inspect(option, {depth: 20}))
+        try {
+          await dbModel.resolveRelayConnection({
+            ...args,
+            where: queryOption.where,
+            bind: queryOption.bind,
+            include: option.include,
+            attributes: option.attributes,
+            order: option.order
+          })
+        } catch (e) {
+          console.log(e)
+        }
         return dbModel.resolveRelayConnection({
           ...args,
           where: queryOption.where,
           bind: queryOption.bind,
           include: option.include,
           attributes: option.attributes,
-          order: sort.map(s => [s.field, s.order])
+          order: option.order
         })
       }
     }

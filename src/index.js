@@ -165,8 +165,7 @@ const SimpleGraphQL = {
           const option = dbModel.resolveQueryOption({info: info})
           const record = await dbModel.findOne({
             where: {id: id.id},
-            include: option.include,
-            attributes: option.attributes
+            ...option
           })
           if (record) {
             record._type = id.type

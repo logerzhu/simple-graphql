@@ -1,8 +1,15 @@
 // @flow
 import _ from 'lodash'
-export default function (args:{attributes?:Array<string>, include?:Array<any>, info:Object, path?:string, additionFields?:Array<string>}) {
+
+export default function (args:{
+  attributes?:Array<string>,
+  include?:Array<any>,
+  order?: Array<Array<any>>,
+  info:Object,
+  path?:string,
+  additionFields?:Array<string>}) {
   const dbModel = this
-  const {include = [], attributes = [], info, path, additionFields} = args
+  const {include = [], attributes = [], order = [], info, path, additionFields} = args
   const fragments = info.fragments || []
 
   const sgContext = this.getSGContext()
@@ -17,7 +24,7 @@ export default function (args:{attributes?:Array<string>, include?:Array<any>, i
     }
   }
 
-  const buildQueryOption = function (nAttributes, nInclude, nSchema, selections) {
+  const buildQueryOption = function (nAttributes, nInclude, nSchema, selections, orderPaths) {
     const parseAttributesOption = sgContext.models[nSchema.name].parseAttributes({
       attributes: nAttributes,
       selections: selections
@@ -27,21 +34,34 @@ export default function (args:{attributes?:Array<string>, include?:Array<any>, i
     if (selections) {
       for (let selection of selections) {
         let config = nSchema.config.associations.belongsTo[selection.name] || nSchema.config.associations.hasOne[selection.name]
+        const hasManyConfig = nSchema.config.associations.hasMany[selection.name]
+
         if (!config) {
-          const hasManyConfig = nSchema.config.associations.hasMany[selection.name]
           if (hasManyConfig && hasManyConfig.outputStructure === 'Array' &&
             (hasManyConfig.conditionFields == null || hasManyConfig.conditionFields.length === 0)) {
             config = hasManyConfig
+
+            // add hasManyConfig order config
+            const configOrder = (config.order || [['id', 'ASC']])
+            configOrder.forEach(p => {
+              order.push([...orderPaths, {model: sgContext.models[config.target], as: selection.name}, ...p])
+            })
           }
         }
         if (config) {
           const exit = nInclude.filter(i => i.as === selection.name)[0]
           if (exit) {
-            const option = buildQueryOption(exit.attributes || [], exit.include || [], sgContext.schemas[config.target], selection.selections)
+            const option = buildQueryOption(exit.attributes || [], exit.include || [], sgContext.schemas[config.target], selection.selections, [...orderPaths, {
+              model: sgContext.models[config.target],
+              as: selection.name
+            }])
             exit.include = option.include
             exit.attributes = option.attributes
           } else {
-            const option = buildQueryOption([], [], sgContext.schemas[config.target], selection.selections)
+            const option = buildQueryOption([], [], sgContext.schemas[config.target], selection.selections, [...orderPaths, {
+              model: sgContext.models[config.target],
+              as: selection.name
+            }])
             nInclude.push({
               model: sgContext.models[config.target],
               as: selection.name,
@@ -70,5 +90,5 @@ export default function (args:{attributes?:Array<string>, include?:Array<any>, i
     })
   }
 
-  return buildQueryOption(attributes, [...include], sgContext.schemas[dbModel.name], selections)
+  return {...buildQueryOption(attributes, [...include], sgContext.schemas[dbModel.name], selections, []), order: order}
 }

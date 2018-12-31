@@ -42,7 +42,8 @@ export default function singularQuery (schema:Schema<any>, options:any):void {
             ...args
           },
           include: option.include,
-          attributes: option.attributes
+          attributes: option.attributes,
+          order: option.order
         })
       }
     }

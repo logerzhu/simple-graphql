@@ -28,7 +28,7 @@ export default async function (args:{
 
   if (attributes) {
     if (order) {
-      attributes = _.union(attributes, order.map(o => o[0]))
+      attributes = _.union(attributes, order.filter(o => typeof o[0] === 'string').map(o => o[0]))
     }
   }
 
