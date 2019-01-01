@@ -189,18 +189,6 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
           order: sort.map(s => [s.field, s.order])
         })
         console.log(require('util').inspect(option, {depth: 20}))
-        try {
-          await dbModel.resolveRelayConnection({
-            ...args,
-            where: queryOption.where,
-            bind: queryOption.bind,
-            include: option.include,
-            attributes: option.attributes,
-            order: option.order
-          })
-        } catch (e) {
-          console.log(e)
-        }
         return dbModel.resolveRelayConnection({
           ...args,
           where: queryOption.where,

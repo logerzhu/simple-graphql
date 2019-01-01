@@ -25,12 +25,14 @@ export default async function (args:{
   const dbModel = this
   let {after, first = 100, before, last, include = [], where = {}, attributes, bind = [], order = [['id', 'ASC']]} = args
 
+  const count = await dbModel.count({
+    distinct: 'id',
+    include: include,
+    where: where,
+    bind: bind
+  })
+
   if (last || before) {
-    const count = await dbModel.count({
-      include: include,
-      where: where,
-      bind: bind
-    })
     first = last || 100
     before = before || (count + 1)
     after = count - (parseInt(before) - 1)
@@ -50,17 +52,20 @@ export default async function (args:{
       }
       return r
     })
-    const offset = Math.max(after != null ? parseInt(after) : 0, 0)
-    const rows = await dbModel.findAll({
-      include: include,
-      where: where,
-      attributes: attributes,
-      bind: bind,
-      order: order,
-      limit: first,
-      offset: offset
-    })
-    let index = 0
+  }
+  const offset = Math.max(after != null ? parseInt(after) : 0, 0)
+  const rows = await dbModel.findAll({
+    distinct: 'id',
+    include: include,
+    where: where,
+    attributes: attributes,
+    bind: bind,
+    order: order,
+    limit: first,
+    offset: offset
+  })
+  let index = 0
+  if (last || before) {
     return {
       pageInfo: {
         startCursor: count - (offset + rows.length) + 1,
@@ -77,17 +82,6 @@ export default async function (args:{
       count: count
     }
   } else {
-    const offset = Math.max(after != null ? parseInt(after) : 0, 0)
-    const {count, rows} = await dbModel.findAndCountAll({
-      include: include,
-      where: where,
-      attributes: attributes,
-      bind: bind,
-      order: order,
-      limit: first,
-      offset: offset
-    })
-    let index = 0
     return {
       pageInfo: {
         startCursor: offset + 1,

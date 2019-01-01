@@ -36,36 +36,37 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
       })
     }
 
-    if (config.outputStructure === 'Array') {
-      schema.links({
-        [key]: {
-          config: config.config,
-          args: args,
-          $type: [config.target],
-          dependentFields: [config.sourceKey || 'id'],
-          resolve: async function (root, args, context, info, sgContext) {
-            if (root[key] !== undefined && (config.conditionFields == null || config.conditionFields.length === 0)) {
-              return root[key] || []
-            }
+    schema.links({
+      [key]: {
+        config: config.config,
+        args: args,
+        $type: config.outputStructure === 'Array' ? [config.target] : config.target + 'Connection',
+        dependentFields: [config.sourceKey || 'id'],
+        resolve: async function (root, args, context, info, sgContext) {
+          if (root[key] !== undefined && (config.conditionFields == null || config.conditionFields.length === 0)) {
+            return root[key] || []
+          }
 
-            let queryOption = {where: {...(config.scope || {})}, bind: [], additionFields: []}
+          let queryOption = {where: {...(config.scope || {})}, bind: [], additionFields: []}
 
-            if (args && args.condition) {
-              _.forOwn(conditionFields, async (value, key) => {
-                await value.mapper(queryOption, args.condition[key], sgContext)
-              })
-            }
-
-            let sourceKey = config.sourceKey || 'id'
-            let foreignKey = config.foreignKey || (config.foreignField + 'Id')
-            queryOption.where[foreignKey] = root[sourceKey]
-
-            const dbModel = sgContext.models[config.target]
-            const option = dbModel.resolveQueryOption({
-              order: config.order || [['id', 'ASC']],
-              info: info,
-              additionFields: queryOption.additionFields
+          if (args && args.condition) {
+            _.forOwn(conditionFields, async (value, key) => {
+              await value.mapper(queryOption, args.condition[key], sgContext)
             })
+          }
+
+          let sourceKey = config.sourceKey || 'id'
+          let foreignKey = config.foreignKey || (config.foreignField + 'Id')
+          queryOption.where[foreignKey] = root[sourceKey]
+
+          const dbModel = sgContext.models[config.target]
+          const option = dbModel.resolveQueryOption({
+            order: config.order || [['id', 'ASC']],
+            info: info,
+            additionFields: queryOption.additionFields
+          })
+
+          if (config.outputStructure === 'Array') {
             return dbModel.findAll({
               where: queryOption.where,
               bind: queryOption.bind,
@@ -73,37 +74,8 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
               attributes: option.attributes,
               order: option.order
             })
-          }
-        }
-      })
-    } else {
-      schema.links({
-        [key]: {
-          config: config.config,
-          args: args,
-          $type: config.target + 'Connection',
-          dependentFields: [config.sourceKey || 'id'],
-          resolve: async function (root, args, context, info, sgContext) {
+          } else {
             const {condition, ...relayArgs} = args || {}
-            let queryOption = {where: {...(config.scope || {})}, bind: [], additionFields: []}
-            if (condition) {
-              _.forOwn(conditionFields, async (value, key) => {
-                await value.mapper(queryOption, condition[key], sgContext)
-              })
-            }
-
-            let sourceKey = config.sourceKey || 'id'
-            let foreignKey = config.foreignKey || (config.foreignField + 'Id')
-            queryOption.where[foreignKey] = root[sourceKey]
-
-            const dbModel = sgContext.models[config.target]
-            const option = dbModel.resolveQueryOption({
-              order: config.order || [['id', 'ASC']],
-              info: info,
-              path: 'edges.node',
-              additionFields: queryOption.additionFields.map(f => 'edges.node.' + f)
-            })
-
             return sgContext.models[config.target].resolveRelayConnection({
               ...relayArgs,
               where: queryOption.where,
@@ -114,7 +86,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
             })
           }
         }
-      })
-    }
+      }
+    })
   })
 }

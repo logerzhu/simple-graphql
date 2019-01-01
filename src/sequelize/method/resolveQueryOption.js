@@ -44,7 +44,30 @@ export default function (args:{
             // add hasManyConfig order config
             const configOrder = (config.order || [['id', 'ASC']])
             configOrder.forEach(p => {
-              order.push([...orderPaths, {model: sgContext.models[config.target], as: selection.name}, ...p])
+              const mapField = (iSchema, iField) => {
+                const [first, ...other] = iField.split('.')
+
+                const ass = iSchema.config.associations
+
+                const iConfig = ass.belongsTo[first] || ass.hasOne[first] || ass.hasMany[first]
+                if (iConfig) {
+                  return [{
+                    model: sgContext.models[iConfig.target],
+                    as: first
+                  }, ...mapField(sgContext.schemas[iConfig.target], other.join('.'))]
+                } else {
+                  return [iField]
+                }
+              }
+
+              const newPath = {model: sgContext.models[config.target], as: selection.name}
+
+              const [first, ...other] = p
+              if (typeof first === 'string') {
+                order.push([...orderPaths, newPath, ...mapField(sgContext.schemas[config.target], first), ...other])
+              } else {
+                order.push([...orderPaths, newPath, first, ...other])
+              }
             })
           }
         }

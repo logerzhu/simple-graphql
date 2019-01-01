@@ -36,6 +36,16 @@ export default function (args:{attributes:Array<string>, selections:Array<any>})
   }
 
   const getDependentOptions = (option:{additionFields:Array<string>, attributes:Array<string>}, fieldName) => {
+    const hasManyConfig = schema.config.associations.hasMany[fieldName]
+    if (hasManyConfig && hasManyConfig.outputStructure === 'Array' &&
+      (hasManyConfig.conditionFields == null || hasManyConfig.conditionFields.length === 0)) {
+      (hasManyConfig.order || [['id', 'ASC']]).forEach(p => {
+        if (typeof p[0] === 'string') {
+          push(option.additionFields, `${fieldName}.${p[0]}`)
+        }
+      })
+    }
+
     const linkConfig = schema.config.links[fieldName]
     if (linkConfig) {
       if (linkConfig.dependentFields) {
@@ -58,18 +68,10 @@ export default function (args:{attributes:Array<string>, selections:Array<any>})
       const fieldConfig = schema.config.fields[fieldName]
       if (fieldConfig) {
         push(option.attributes, getFieldName(fieldName, fieldConfig))
-      } else {
-        const hasManyConfig = schema.config.associations.hasMany[fieldName]
-        if (hasManyConfig && hasManyConfig.outputStructure === 'Array' &&
-          (hasManyConfig.conditionFields == null || hasManyConfig.conditionFields.length === 0)) {
-          (hasManyConfig.order || [['id', 'ASC']]).forEach(p => {
-            push(option.additionFields, `${fieldName}.${p[0]}`)
-          })
-        } else if (fieldName === '*') {
-          _.forOwn(schema.config.fields, (value, key) => {
-            push(option.attributes, getFieldName(key, value))
-          })
-        }
+      } else if (fieldName === '*') {
+        _.forOwn(schema.config.fields, (value, key) => {
+          push(option.attributes, getFieldName(key, value))
+        })
       }
     }
     return option
