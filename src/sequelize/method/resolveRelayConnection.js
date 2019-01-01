@@ -1,4 +1,27 @@
 // @flow
+import _ from 'lodash'
+const isPrimaryOrder = ({orderConfig, schema, sgContext}) => {
+  if (_.isArray(orderConfig)) {
+    for (let i of orderConfig) {
+      if (i.model && i.as) {
+        if (schema.config.associations.hasMany[i.as]) {
+          return false
+        } else {
+          const config = schema.config.associations.belongsTo[i.as] || schema.config.associations.hasOne[i.as]
+          if (config) {
+            schema = sgContext.schemas[config.target]
+          } else {
+            return true
+          }
+        }
+      } else {
+        return true
+      }
+    }
+  }
+  return true
+}
+
 export default async function (args:{
   after?: string,
   first?: number,
@@ -23,6 +46,7 @@ export default async function (args:{
   count: number
 }> {
   const dbModel = this
+  const sgContext = dbModel.getSGContext()
   let {after, first = 100, before, last, include = [], where = {}, attributes, bind = [], order = [['id', 'ASC']]} = args
 
   const count = await dbModel.count({
@@ -38,7 +62,8 @@ export default async function (args:{
     after = count - (parseInt(before) - 1)
     order = order.map(o => {
       const r = [...o]
-      if (typeof o[0] === 'string') {
+      if (isPrimaryOrder({orderConfig: r, schema: sgContext.schemas[dbModel.name], sgContext: sgContext})) {
+        // TODO Need to hand order field is null case
         switch (r[r.length - 1].toLocaleUpperCase()) {
           case 'ASC':
             r[r.length - 1] = 'DESC'

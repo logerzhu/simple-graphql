@@ -71,7 +71,6 @@
     ]
   },
   "pre-commit": [
-    "flow",
     "format"
   ],
   "jest": {

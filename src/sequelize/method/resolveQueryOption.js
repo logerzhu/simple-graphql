@@ -1,6 +1,123 @@
 // @flow
 import _ from 'lodash'
 
+const fieldToSelection = (field) => {
+  const index = field.indexOf('.')
+  if (index === -1) { return {name: field} } else {
+    return {
+      name: field.substr(0, index),
+      selections: [fieldToSelection(field.substr(index + 1))]
+    }
+  }
+}
+
+const convertOrder = ({orderPaths = [], schema, order, sgContext}) => {
+  order = order || []
+  return order.map(p => {
+    const mapField = (iSchema, iField) => {
+      const [first, ...other] = iField.split('.')
+
+      const ass = iSchema.config.associations
+
+      const iConfig = ass.belongsTo[first] || ass.hasOne[first] || ass.hasMany[first]
+      if (iConfig) {
+        return [{
+          model: sgContext.models[iConfig.target],
+          as: first
+        }, ...mapField(sgContext.schemas[iConfig.target], other.join('.'))]
+      } else {
+        return [iField]
+      }
+    }
+
+    const [first, ...other] = p
+    if (typeof first === 'string') {
+      return [...orderPaths, ...mapField(schema, first), ...other]
+    } else {
+      return [...orderPaths, first, ...other]
+    }
+  })
+}
+
+const buildQueryOption = function ({sgContext, attribute, include, schema, selections, orderPaths}) {
+  const parseAttributesOption = sgContext.models[schema.name].parseAttributes({
+    attributes: attribute,
+    selections: selections
+  })
+  selections = [...(selections || []), ...parseAttributesOption.additionSelections]
+
+  let additionOrder = []
+  if (selections) {
+    for (let selection of selections) {
+      let config = schema.config.associations.belongsTo[selection.name] || schema.config.associations.hasOne[selection.name]
+      const hasManyConfig = schema.config.associations.hasMany[selection.name]
+
+      if (!config) {
+        if (hasManyConfig && hasManyConfig.outputStructure === 'Array' &&
+          (hasManyConfig.conditionFields == null || hasManyConfig.conditionFields.length === 0)) {
+          config = hasManyConfig
+
+          // add hasManyConfig order config
+          additionOrder = [...additionOrder, ...convertOrder({
+            orderPaths: [...orderPaths, {
+              model: sgContext.models[config.target],
+              as: selection.name
+            }],
+            schema: sgContext.schemas[config.target],
+            order: (config.order || [['id', 'ASC']]),
+            sgContext: sgContext
+          })
+          ]
+        }
+      }
+      if (config) {
+        const exit = include.filter(i => i.as === selection.name)[0]
+        if (exit) {
+          const option = buildQueryOption({
+            sgContext: sgContext,
+            attributes: exit.attributes || [],
+            include: exit.include || [],
+            schema: sgContext.schemas[config.target],
+            selections: selection.selections,
+            orderPaths: [...orderPaths, {
+              model: sgContext.models[config.target],
+              as: selection.name
+            }]
+          })
+          exit.include = option.include
+          exit.attributes = option.attributes
+          additionOrder = _.unionBy(additionOrder, option.additionOrder, JSON.stringify)
+        } else {
+          const option = buildQueryOption({
+            sgContext: sgContext,
+            attributes: [],
+            include: [],
+            schema: sgContext.schemas[config.target],
+            selections: selection.selections,
+            orderPaths: [...orderPaths, {
+              model: sgContext.models[config.target],
+              as: selection.name
+            }]
+          })
+          include.push({
+            model: sgContext.models[config.target],
+            as: selection.name,
+            include: option.include,
+            attributes: option.attributes,
+            required: false
+          })
+          additionOrder = _.unionBy(additionOrder, option.additionOrder, JSON.stringify)
+        }
+      }
+    }
+  }
+  return {
+    include: include,
+    attributes: parseAttributesOption.attributes,
+    additionOrder: additionOrder
+  }
+}
+
 export default function (args:{
   attributes?:Array<string>,
   include?:Array<any>,
@@ -9,100 +126,15 @@ export default function (args:{
   path?:string,
   additionFields?:Array<string>}) {
   const dbModel = this
-  const {include = [], attributes = [], order = [], info, path, additionFields} = args
+  const {include = [], attributes = [], order = [], info, path, additionFields = []} = args
   const fragments = info.fragments || []
 
   const sgContext = this.getSGContext()
 
-  const fieldToSelection = (field) => {
-    const index = field.indexOf('.')
-    if (index === -1) { return {name: field} } else {
-      return {
-        name: field.substr(0, index),
-        selections: [fieldToSelection(field.substr(index + 1))]
-      }
-    }
-  }
-
-  const buildQueryOption = function (nAttributes, nInclude, nSchema, selections, orderPaths) {
-    const parseAttributesOption = sgContext.models[nSchema.name].parseAttributes({
-      attributes: nAttributes,
-      selections: selections
-    })
-    selections = [...(selections || []), ...parseAttributesOption.additionSelections]
-
-    if (selections) {
-      for (let selection of selections) {
-        let config = nSchema.config.associations.belongsTo[selection.name] || nSchema.config.associations.hasOne[selection.name]
-        const hasManyConfig = nSchema.config.associations.hasMany[selection.name]
-
-        if (!config) {
-          if (hasManyConfig && hasManyConfig.outputStructure === 'Array' &&
-            (hasManyConfig.conditionFields == null || hasManyConfig.conditionFields.length === 0)) {
-            config = hasManyConfig
-
-            // add hasManyConfig order config
-            const configOrder = (config.order || [['id', 'ASC']])
-            configOrder.forEach(p => {
-              const mapField = (iSchema, iField) => {
-                const [first, ...other] = iField.split('.')
-
-                const ass = iSchema.config.associations
-
-                const iConfig = ass.belongsTo[first] || ass.hasOne[first] || ass.hasMany[first]
-                if (iConfig) {
-                  return [{
-                    model: sgContext.models[iConfig.target],
-                    as: first
-                  }, ...mapField(sgContext.schemas[iConfig.target], other.join('.'))]
-                } else {
-                  return [iField]
-                }
-              }
-
-              const newPath = {model: sgContext.models[config.target], as: selection.name}
-
-              const [first, ...other] = p
-              if (typeof first === 'string') {
-                order.push([...orderPaths, newPath, ...mapField(sgContext.schemas[config.target], first), ...other])
-              } else {
-                order.push([...orderPaths, newPath, first, ...other])
-              }
-            })
-          }
-        }
-        if (config) {
-          const exit = nInclude.filter(i => i.as === selection.name)[0]
-          if (exit) {
-            const option = buildQueryOption(exit.attributes || [], exit.include || [], sgContext.schemas[config.target], selection.selections, [...orderPaths, {
-              model: sgContext.models[config.target],
-              as: selection.name
-            }])
-            exit.include = option.include
-            exit.attributes = option.attributes
-          } else {
-            const option = buildQueryOption([], [], sgContext.schemas[config.target], selection.selections, [...orderPaths, {
-              model: sgContext.models[config.target],
-              as: selection.name
-            }])
-            nInclude.push({
-              model: sgContext.models[config.target],
-              as: selection.name,
-              include: option.include,
-              attributes: option.attributes,
-              required: false
-            })
-          }
-        }
-      }
-    }
-    return {
-      include: nInclude,
-      attributes: parseAttributesOption.attributes
-    }
-  }
-
-  let selections = additionFields ? additionFields.map(field => fieldToSelection(field)) : []
+  let selections = _.union(
+    additionFields || [],
+    (order || []).filter(o => typeof o[0] === 'string').map(o => o[0])
+  ).map(field => fieldToSelection(field))
   info.fieldNodes.forEach(node => {
     selections = _.union(selections, dbModel.parseSelections(fragments, node.selectionSet && node.selectionSet.selections))
   })
@@ -121,8 +153,22 @@ export default function (args:{
     }
   }
 
+  const option = buildQueryOption({
+    sgContext: sgContext,
+    attributes: getAttributes(),
+    include: [...include],
+    schema: sgContext.schemas[dbModel.name],
+    selections: selections,
+    orderPaths: []
+  })
+
   return {
-    ...buildQueryOption(getAttributes(), [...include], sgContext.schemas[dbModel.name], selections, []),
-    order: order
+    include: option.include,
+    attributes: option.attributes,
+    order: _.unionBy(convertOrder({
+      schema: sgContext.schemas[dbModel.name],
+      order: order,
+      sgContext: sgContext
+    }), option.additionOrder, JSON.stringify)
   }
 }

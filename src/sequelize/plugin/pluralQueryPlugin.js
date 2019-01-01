@@ -188,7 +188,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
           additionFields: queryOption.additionFields.map(f => 'edges.node.' + f),
           order: sort.map(s => [s.field, s.order])
         })
-        console.log(require('util').inspect(option, {depth: 20}))
+
         return dbModel.resolveRelayConnection({
           ...args,
           where: queryOption.where,
