@@ -63,7 +63,8 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
           const option = dbModel.resolveQueryOption({
             order: config.order || [['id', 'ASC']],
             info: info,
-            additionFields: queryOption.additionFields
+            additionFields: queryOption.additionFields,
+            path: config.outputStructure === 'Array' ? null : 'edges.node'
           })
 
           if (config.outputStructure === 'Array') {

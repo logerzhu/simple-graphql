@@ -67,6 +67,23 @@ const getSearchFields = (schema) => {
         }
       }
 
+      let type = searchFields[key]
+      while (type['$type'] || _.isArray(type)) {
+        if (type['$type']) {
+          type = type['$type']
+        } else if (_.isArray(type)) {
+          type = type[0]
+        }
+      }
+      if (type === Date || type['$type'] === Date) {
+        type = DateConditionType
+      }
+      if (searchFields[key]['$type']) {
+        searchFields[key] = {...searchFields[key], ...{$type: type}}
+      } else {
+        searchFields[key] = {$type: type}
+      }
+
       searchFields[key].mapper = function (option:{where:Object, additionFields:Array<string>}, argValue) {
         if (argValue !== undefined) {
           option.where.$and = option.where.$and || []
@@ -74,8 +91,7 @@ const getSearchFields = (schema) => {
         }
       }
     }
-  }
-  )
+  })
   return searchFields
 }
 
@@ -133,21 +149,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
         condition: {
           $type: _.mapValues(searchFields, (fieldConfig) => {
             const {mapper, ...value} = fieldConfig
-            let type = value
-            while (type['$type'] || _.isArray(type)) {
-              if (type['$type']) {
-                type = type['$type']
-              } else if (_.isArray(type)) {
-                type = type[0]
-              }
-            }
-            if (value['$type']) {
-              type = {...value, ...{$type: type}}
-            }
-            if (type === Date || type['$type'] === Date) {
-              type = DateConditionType
-            }
-            return type
+            return value
           }),
           description: 'Query Condition'
         },
