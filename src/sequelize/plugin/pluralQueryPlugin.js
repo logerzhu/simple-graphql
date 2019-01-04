@@ -167,12 +167,6 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
 
         let {sort = [{field: 'id', order: 'ASC'}], condition = {}, keywords} = (args || {})
 
-        if (dbModel.options.underscored) {
-          for (let item of sort) {
-            item.field = StringHelper.toUnderscoredName(item.field)
-          }
-        }
-
         let queryOption = {where: {}, bind: [], additionFields: []}
         if (keywords) {
           await keywordField.mapper(queryOption, keywords, sgContext)

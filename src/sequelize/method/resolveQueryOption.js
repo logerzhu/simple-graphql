@@ -39,7 +39,7 @@ const convertOrder = ({orderPaths = [], schema, order, sgContext}) => {
   })
 }
 
-const buildQueryOption = function ({sgContext, attributes, include, schema, selections, orderPaths}) {
+const buildQueryOption = function ({sgContext, attributes, include, schema, selections, orderPaths, eagerHasMany}) {
   const parseAttributesOption = sgContext.models[schema.name].parseAttributes({
     attributes: attributes,
     selections: selections
@@ -51,7 +51,7 @@ const buildQueryOption = function ({sgContext, attributes, include, schema, sele
     let config = schema.config.associations.belongsTo[selection.name] || schema.config.associations.hasOne[selection.name]
     const hasManyConfig = schema.config.associations.hasMany[selection.name]
 
-    if (!config) {
+    if (!config && eagerHasMany) {
       if (hasManyConfig && hasManyConfig.outputStructure === 'Array' &&
         (hasManyConfig.conditionFields == null || hasManyConfig.conditionFields.length === 0)) {
         config = hasManyConfig
@@ -81,7 +81,8 @@ const buildQueryOption = function ({sgContext, attributes, include, schema, sele
           orderPaths: [...orderPaths, {
             model: sgContext.models[config.target],
             as: selection.name
-          }]
+          }],
+          eagerHasMany: eagerHasMany
         })
         exit.include = option.include
         exit.attributes = option.attributes
@@ -96,7 +97,8 @@ const buildQueryOption = function ({sgContext, attributes, include, schema, sele
           orderPaths: [...orderPaths, {
             model: sgContext.models[config.target],
             as: selection.name
-          }]
+          }],
+          eagerHasMany: eagerHasMany
         })
         include.push({
           model: sgContext.models[config.target],
@@ -147,22 +149,25 @@ export default function (args:{
     (order || []).filter(o => typeof o[0] === 'string').map(o => o[0])
   ).map(field => fieldToSelection(field))]
 
+  const mainOrder = convertOrder({
+    schema: sgContext.schemas[dbModel.name],
+    order: order,
+    sgContext: sgContext
+  })
+
   const option = buildQueryOption({
     sgContext: sgContext,
     attributes: attributes,
     include: [...include],
     schema: sgContext.schemas[dbModel.name],
     selections: selections,
-    orderPaths: []
+    orderPaths: [],
+    eagerHasMany: mainOrder.filter(s => typeof s[0] !== 'string').length === 0
   })
   // console.log(require('util').inspect(option, {depth: 20}))
   return {
     include: option.include,
     attributes: option.attributes,
-    order: _.unionBy(convertOrder({
-      schema: sgContext.schemas[dbModel.name],
-      order: order,
-      sgContext: sgContext
-    }), option.additionOrder, JSON.stringify)
+    order: _.unionBy(mainOrder, option.additionOrder, JSON.stringify)
   }
 }
