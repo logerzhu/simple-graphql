@@ -187,6 +187,10 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
 
         return dbModel.resolveRelayConnection({
           ...args,
+          first: dbModel.hasSelection({
+            info: info,
+            path: 'edges'
+          }) ? args.first : 0,
           where: queryOption.where,
           bind: queryOption.bind,
           include: option.include,

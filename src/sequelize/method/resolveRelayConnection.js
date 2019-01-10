@@ -79,7 +79,7 @@ export default async function (args:{
     })
   }
   const offset = Math.max(after != null ? parseInt(after) : 0, 0)
-  const rows = await dbModel.findAll({
+  const rows = first === 0 ? [] : await dbModel.findAll({
     distinct: 'id',
     include: include,
     where: where,

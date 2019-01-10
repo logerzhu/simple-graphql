@@ -3,10 +3,12 @@ import resolveRelayConnection from './resolveRelayConnection'
 import resolveQueryOption from './resolveQueryOption'
 import parseSelections from './parseSelections'
 import parseAttributes from './parseAttributes'
+import hasSelection from './hasSelection'
 
 export default {
   resolveRelayConnection: resolveRelayConnection,
   resolveQueryOption: resolveQueryOption,
   parseSelections: parseSelections,
-  parseAttributes: parseAttributes
+  parseAttributes: parseAttributes,
+  hasSelection: hasSelection
 }

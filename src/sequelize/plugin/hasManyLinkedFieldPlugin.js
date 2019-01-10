@@ -79,6 +79,10 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
             const {condition, ...relayArgs} = args || {}
             return sgContext.models[config.target].resolveRelayConnection({
               ...relayArgs,
+              first: sgContext.models[config.target].hasSelection({
+                info: info,
+                path: 'edges'
+              }) ? relayArgs.first : 0,
               where: queryOption.where,
               bind: queryOption.bind,
               include: option.include,
