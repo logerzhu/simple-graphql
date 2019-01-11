@@ -124,17 +124,16 @@ export default function (args:{
   include?:Array<any>,
   order?: Array<Array<any>>,
   info:Object,
-  path?:string,
-  additionFields?:Array<string>}) {
+  path?:string}) {
   const dbModel = this
-  const {include = [], attributes = [], order = [], info, path, additionFields = []} = args
+  const {include = [], attributes = [], order = [], info, path} = args
   const fragments = info.fragments || []
 
   const sgContext = this.getSGContext()
 
-  let selections = []
+  let selections = [];
 
-  info.fieldNodes.forEach(node => {
+  (info.fieldNodes || []).forEach(node => {
     selections = _.union(selections, dbModel.parseSelections(fragments, node.selectionSet && node.selectionSet.selections))
   })
 
@@ -145,7 +144,7 @@ export default function (args:{
   }
 
   selections = [...selections, ..._.union(
-    additionFields || [],
+    attributes || [],
     (order || []).filter(o => typeof o[0] === 'string').map(o => o[0])
   ).map(field => fieldToSelection(field))]
 
@@ -157,13 +156,14 @@ export default function (args:{
 
   const option = buildQueryOption({
     sgContext: sgContext,
-    attributes: attributes,
+    attributes: [],
     include: [...include],
     schema: sgContext.schemas[dbModel.name],
     selections: selections,
     orderPaths: [],
     eagerHasMany: mainOrder.filter(s => typeof s[0] !== 'string').length === 0
   })
+
   // console.log(require('util').inspect(option, {depth: 20}))
   return {
     include: option.include,

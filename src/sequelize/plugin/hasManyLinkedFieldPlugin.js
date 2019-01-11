@@ -19,7 +19,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
         config = {$type: config}
       }
       if (!config.mapper) {
-        config.mapper = function (option:{where:Object, additionFields:Array<string>}, argValue) {
+        config.mapper = function (option:{where:Object, attributes:Array<string>}, argValue) {
           if (argValue !== undefined) {
             option.where.$and = option.where.$and || []
             option.where.$and.push({[key]: argValue})
@@ -47,7 +47,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
             return root[key] || []
           }
 
-          let queryOption = {where: {...(config.scope || {})}, bind: [], additionFields: []}
+          let queryOption = {where: {...(config.scope || {})}, bind: [], attributes: []}
 
           if (args && args.condition) {
             _.forOwn(conditionFields, async (value, key) => {
@@ -60,14 +60,13 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
           queryOption.where[foreignKey] = root[sourceKey]
 
           const dbModel = sgContext.models[config.target]
-          const option = dbModel.resolveQueryOption({
-            order: config.order || [['id', 'ASC']],
-            info: info,
-            additionFields: queryOption.additionFields,
-            path: config.outputStructure === 'Array' ? null : 'edges.node'
-          })
 
           if (config.outputStructure === 'Array') {
+            const option = dbModel.resolveQueryOption({
+              order: config.order || [['id', 'ASC']],
+              info: info,
+              attributes: queryOption.attributes
+            })
             return dbModel.findAll({
               where: queryOption.where,
               bind: queryOption.bind,
@@ -78,16 +77,12 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
           } else {
             const {condition, ...relayArgs} = args || {}
             return sgContext.models[config.target].resolveRelayConnection({
-              ...relayArgs,
-              first: sgContext.models[config.target].hasSelection({
-                info: info,
-                path: 'edges'
-              }) ? relayArgs.first : 0,
+              pagination: relayArgs,
+              selectionInfo: info,
               where: queryOption.where,
               bind: queryOption.bind,
-              include: option.include,
-              attributes: option.attributes,
-              order: option.order
+              attributes: queryOption.attributes,
+              order: config.order || [['id', 'ASC']]
             })
           }
         }

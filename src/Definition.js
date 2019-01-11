@@ -38,7 +38,7 @@ type InputFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Dat
   required?:boolean,
   default?:any,
   enumValues?:Array<string>,
-  mapper?:(option:{where:Object, bind:Array<any>, additionFields: Array<string>}, argValue:any, sgContext:SGContext) => void
+  mapper?:(option:{where:Object, bind:Array<any>, attributes: Array<string>}, argValue:any, sgContext:SGContext) => void
   // description?:string
 }
 

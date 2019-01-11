@@ -23,10 +23,13 @@ const isPrimaryOrder = ({orderConfig, schema, sgContext}) => {
 }
 
 export default async function (args:{
-  after?: string,
-  first?: number,
-  before?: string,
-  last?: number,
+  pagination?:{
+    after?: string,
+    first?: number,
+    before?: string,
+    last?: number,
+  },
+  selectionInfo?:Object,
   include?:Array<any>,
   attributes?:Array<string>,
   where?:any,
@@ -47,7 +50,19 @@ export default async function (args:{
 }> {
   const dbModel = this
   const sgContext = dbModel.getSGContext()
-  let {after, first = 100, before, last, include = [], where = {}, attributes, bind = [], order = [['id', 'ASC']]} = args
+  let {pagination = {}, selectionInfo = {}, include = [], where = {}, attributes, bind = [], order = [['id', 'ASC']]} = args
+  let {after, first = 100, before, last} = pagination
+
+  const option = dbModel.resolveQueryOption({
+    info: selectionInfo,
+    path: 'edges.node',
+    include: include,
+    order: order,
+    attributes: attributes
+  })
+  include = option.include
+  order = option.order
+  attributes = option.attributes
 
   const count = await dbModel.count({
     distinct: 'id',
@@ -79,7 +94,10 @@ export default async function (args:{
     })
   }
   const offset = Math.max(after != null ? parseInt(after) : 0, 0)
-  const rows = first === 0 ? [] : await dbModel.findAll({
+  const rows = dbModel.hasSelection({
+    info: selectionInfo,
+    path: 'edges'
+  }) ? await dbModel.findAll({
     distinct: 'id',
     include: include,
     where: where,
@@ -88,7 +106,7 @@ export default async function (args:{
     order: order,
     limit: first,
     offset: offset
-  })
+  }) : []
   let index = 0
   if (last || before) {
     return {

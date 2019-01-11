@@ -10,9 +10,9 @@ export default function (args:{
 
   const fragments = info.fragments || []
 
-  let selections = []
+  let selections = [];
 
-  info.fieldNodes.forEach(node => {
+  (info.fieldNodes || []).forEach(node => {
     selections = _.union(selections, dbModel.parseSelections(fragments, node.selectionSet && node.selectionSet.selections))
   })
 

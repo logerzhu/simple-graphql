@@ -84,7 +84,7 @@ const getSearchFields = (schema) => {
         searchFields[key] = {$type: type}
       }
 
-      searchFields[key].mapper = function (option:{where:Object, additionFields:Array<string>}, argValue) {
+      searchFields[key].mapper = function (option:{where:Object, attributes:Array<string>}, argValue) {
         if (argValue !== undefined) {
           option.where.$and = option.where.$and || []
           option.where.$and.push({[key]: argValue})
@@ -117,10 +117,10 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
         required: true
       }
     },
-    mapper: function (option:{where:Object, bind:Array<any>, additionFields:Array<string>}, argValue, sgContext) {
+    mapper: function (option:{where:Object, bind:Array<any>, attributes:Array<string>}, argValue, sgContext) {
       if (argValue != null) {
         const {fields, value} = argValue
-        option.additionFields = _.union((option.additionFields || []), fields)
+        option.attributes = _.union((option.attributes || []), fields)
         option.where.$and = option.where.$and || []
         option.where.$and.push({
           $or: fields.map(field => {
@@ -167,7 +167,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
 
         let {sort = [{field: 'id', order: 'ASC'}], condition = {}, keywords} = (args || {})
 
-        let queryOption = {where: {}, bind: [], additionFields: []}
+        let queryOption = {where: {}, bind: [], attributes: []}
         if (keywords) {
           await keywordField.mapper(queryOption, keywords, sgContext)
         }
@@ -178,24 +178,13 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
           })
         }
 
-        const option = dbModel.resolveQueryOption({
-          info: info,
-          path: 'edges.node',
-          additionFields: queryOption.additionFields.map(f => 'edges.node.' + f),
-          order: sort.map(s => [s.field, s.order])
-        })
-
         return dbModel.resolveRelayConnection({
-          ...args,
-          first: dbModel.hasSelection({
-            info: info,
-            path: 'edges'
-          }) ? args.first : 0,
+          pagination: args,
+          selectionInfo: info,
           where: queryOption.where,
           bind: queryOption.bind,
-          include: option.include,
-          attributes: option.attributes,
-          order: option.order
+          attributes: queryOption.attributes,
+          order: sort.map(s => [s.field, s.order])
         })
       }
     }
