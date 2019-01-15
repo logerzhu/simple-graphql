@@ -51,13 +51,13 @@ export default function (args:{attributes:Array<string>, selections:Array<any>})
       if (linkConfig.dependentFields) {
         linkConfig.dependentFields.forEach(field => {
           const ss = field.split('.')
-          if (schema.config.fields[fieldName]) {
-            push(option.attributes, schema.config.fields[fieldName])
-          }
           if (push(option.additionFields, field)) {
             option = getDependentOptions(option, ss[0])
           }
         })
+        if (schema.config.fields[fieldName]) {
+          push(option.attributes, getFieldName(fieldName, schema.config.fields[fieldName]))
+        }
       } else {
         // if no dependentFields, default depend all field
         _.forOwn(schema.config.fields, (value, key) => {
