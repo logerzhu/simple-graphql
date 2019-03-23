@@ -16,13 +16,13 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
     const conditionFields = {}
     _.forOwn(config.conditionFields || {}, async function (config:any, key) {
       if (!config['$type']) {
-        config = {$type: config}
+        config = { $type: config }
       }
       if (!config.mapper) {
         config.mapper = function (option:{where:Object, attributes:Array<string>}, argValue) {
           if (argValue !== undefined) {
             option.where.$and = option.where.$and || []
-            option.where.$and.push({[key]: argValue})
+            option.where.$and.push({ [key]: argValue })
           }
         }
       }
@@ -31,7 +31,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
 
     if (conditionFields && _.keys(conditionFields).length > 0) {
       args['condition'] = _.mapValues(conditionFields, field => {
-        const {mapper, ...config} = field
+        const { mapper, ...config } = field
         return config
       })
     }
@@ -47,7 +47,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
             return root[key] || []
           }
 
-          let queryOption = {where: {...(config.scope || {})}, bind: [], attributes: []}
+          let queryOption = { where: { ...(config.scope || {}) }, bind: [], attributes: [] }
 
           if (args && args.condition) {
             _.forOwn(conditionFields, async (value, key) => {
@@ -75,7 +75,7 @@ export default function hasManyLinkedField (schema:Schema<any>, options:any):voi
               order: option.order
             })
           } else {
-            const {condition, ...relayArgs} = args || {}
+            const { condition, ...relayArgs } = args || {}
             return sgContext.models[config.target].resolveRelayConnection({
               pagination: relayArgs,
               selectionInfo: info,

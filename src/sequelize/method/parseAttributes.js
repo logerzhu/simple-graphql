@@ -27,7 +27,7 @@ export default function (args:{attributes:Array<string>, selections:Array<any>})
 
   const fieldToSelection = (field) => {
     const index = field.indexOf('.')
-    if (index === -1) { return {name: field} } else {
+    if (index === -1) { return { name: field } } else {
       return {
         name: field.substr(0, index),
         selections: [fieldToSelection(field.substr(index + 1))]
@@ -77,7 +77,7 @@ export default function (args:{attributes:Array<string>, selections:Array<any>})
     return option
   }
 
-  let option = {additionFields: [], attributes: [...(args.attributes || []), 'id']}
+  let option = { additionFields: [], attributes: [...(args.attributes || []), 'id'] }
 
   if (args.selections) {
     args.selections.forEach(selection => {

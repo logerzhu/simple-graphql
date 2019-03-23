@@ -1,5 +1,5 @@
 // @flow
-import type {QueryConfig, MutationConfig} from '../Definition'
+import type { QueryConfig, MutationConfig } from '../Definition'
 
 export default class Service<T> {
   name:string

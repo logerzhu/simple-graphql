@@ -4,7 +4,7 @@ import _ from 'lodash'
 
 import * as graphql from 'graphql'
 
-import type {GraphQLInputFieldConfig, GraphQLInputFieldConfigMap} from 'graphql'
+import type { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap } from 'graphql'
 
 import Type from '../type'
 import StringHelper from '../utils/StringHelper'
@@ -15,13 +15,13 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
   }
 
   const convert = (name:string,
-                   path:string,
-                   field:any):?GraphQLInputFieldConfig => {
+    path:string,
+    field:any):?GraphQLInputFieldConfig => {
     if (graphql.isInputType(field)) {
-      return {type: field}
+      return { type: field }
     }
     if (field instanceof Type.ScalarFieldType) {
-      return {type: field.graphQLInputType}
+      return { type: field.graphQLInputType }
     }
 
     if (graphql.isCompositeType(field)) {
@@ -30,15 +30,15 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
 
     switch (field) {
       case String:
-        return {type: graphql.GraphQLString}
+        return { type: graphql.GraphQLString }
       case Number:
-        return {type: graphql.GraphQLFloat}
+        return { type: graphql.GraphQLFloat }
       case Boolean:
-        return {type: graphql.GraphQLBoolean}
+        return { type: graphql.GraphQLBoolean }
       case Date:
-        return {type: Type.GraphQLScalarTypes.Date}
+        return { type: Type.GraphQLScalarTypes.Date }
       case JSON:
-        return {type: Type.GraphQLScalarTypes.Json}
+        return { type: Type.GraphQLScalarTypes.Json }
     }
 
     if (_.isArray(field)) {
@@ -68,7 +68,7 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
           const values:{[index:string]:any} = {}
           field['enumValues'].forEach(
             t => {
-              values[t] = {value: t}
+              values[t] = { value: t }
             }
           )
           result = ({
@@ -91,7 +91,7 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
       } else {
         const inputType = graphQLInputType(typeName(name, path), field)
         if (inputType) {
-          return {type: inputType}
+          return { type: inputType }
         } else {
 
         }
@@ -100,7 +100,7 @@ const toGraphQLInputFieldMap = function (name:string, fields:{[id:string]:any}):
   }
 
   const graphQLInputType = (name:string,
-                            config:any):?graphql.GraphQLInputType => {
+    config:any):?graphql.GraphQLInputType => {
     name = StringHelper.toInitialUpperCase(name)
 
     if (config['$type']) {

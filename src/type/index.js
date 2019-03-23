@@ -1,6 +1,6 @@
 // @flow
 import Sequelize from 'sequelize'
-import {GraphQLID, GraphQLString, GraphQLFloat, GraphQLInt, GraphQLBoolean} from 'graphql'
+import { GraphQLID, GraphQLString, GraphQLFloat, GraphQLInt, GraphQLBoolean } from 'graphql'
 
 import GraphQLScalarTypes from './graphql'
 import ScalarFieldType from './ScalarFieldType'

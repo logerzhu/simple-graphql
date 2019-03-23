@@ -2,7 +2,7 @@
 import _ from 'lodash'
 import type { LinkedFieldConfig, QueryConfig, MutationConfig,
   FieldType, SchemaOptionConfig, HasOneConfig, BelongsToConfig, HasManyConfig,
-  BelongsToManyConfig, AssociationConfig} from '../Definition'
+  BelongsToManyConfig, AssociationConfig } from '../Definition'
 
 export default class Schema<T> {
   name:string

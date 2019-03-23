@@ -3,7 +3,7 @@ import _ from 'lodash'
 
 const fieldToSelection = (field) => {
   const index = field.indexOf('.')
-  if (index === -1) { return {name: field} } else {
+  if (index === -1) { return { name: field } } else {
     return {
       name: field.substr(0, index),
       selections: [fieldToSelection(field.substr(index + 1))]
@@ -11,7 +11,7 @@ const fieldToSelection = (field) => {
   }
 }
 
-const convertOrder = ({orderPaths = [], schema, order, sgContext}) => {
+const convertOrder = ({ orderPaths = [], schema, order, sgContext }) => {
   order = order || []
   return order.map(p => {
     const mapField = (iSchema, iField) => {
@@ -39,7 +39,7 @@ const convertOrder = ({orderPaths = [], schema, order, sgContext}) => {
   })
 }
 
-const buildQueryOption = function ({sgContext, attributes, include, schema, selections, orderPaths, eagerHasMany}) {
+const buildQueryOption = function ({ sgContext, attributes, include, schema, selections, orderPaths, eagerHasMany }) {
   const parseAttributesOption = sgContext.models[schema.name].parseAttributes({
     attributes: attributes,
     selections: selections
@@ -126,7 +126,7 @@ export default function (args:{
   info:Object,
   path?:string}) {
   const dbModel = this
-  const {include = [], attributes = [], order = [], info, path} = args
+  const { include = [], attributes = [], order = [], info, path } = args
   const fragments = info.fragments || []
 
   const sgContext = this.getSGContext()

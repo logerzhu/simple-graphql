@@ -23,11 +23,11 @@ export default async function resolveConnection (sequelize:Sequelize, modelName:
   }>,
   count: number
 }> {
-  let {after, first, before, last, conditionSql, orderBySql, replacements} = args
+  let { after, first, before, last, conditionSql, orderBySql, replacements } = args
 
   first = (first == null ? 100 : first)
 
-  const count = (await sequelize.query('select count(*) as count ' + conditionSql, {replacements: replacements}))[0][0].count
+  const count = (await sequelize.query('select count(*) as count ' + conditionSql, { replacements: replacements }))[0][0].count
 
   if (last || before) {
     throw new Error('Argument last or before is not supported!')

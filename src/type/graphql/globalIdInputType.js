@@ -1,6 +1,6 @@
 // @flow
-import {GraphQLScalarType, GraphQLError, Kind} from 'graphql'
-import {fromGlobalId} from 'graphql-relay'
+import { GraphQLScalarType, GraphQLError, Kind } from 'graphql'
+import { fromGlobalId } from 'graphql-relay'
 
 function defGlobalIdInputType (typeName:string):GraphQLScalarType {
   return new GraphQLScalarType({

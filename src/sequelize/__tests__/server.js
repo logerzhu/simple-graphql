@@ -14,7 +14,6 @@ async function startServer () {
   await initData(sequelize)
 
   const app = express()
-
   app.use('/graphql', graphqlHTTP({
     schema: schema,
     graphiql: true

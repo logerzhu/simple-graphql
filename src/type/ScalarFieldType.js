@@ -1,6 +1,6 @@
 // @flow
 import Sequelize from 'sequelize'
-import type {GraphQLInputType, GraphQLOutputType} from 'graphql'
+import type { GraphQLInputType, GraphQLOutputType } from 'graphql'
 
 export default class ScalarFieldType {
   name:string

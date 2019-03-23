@@ -13,7 +13,7 @@ import Context from './Context'
 import StringHelper from './utils/StringHelper'
 import Transformer from './transformer'
 
-import type {SchemaOptionConfig, BuildOptionConfig} from './Definition'
+import type { SchemaOptionConfig, BuildOptionConfig } from './Definition'
 
 const SimpleGraphQL = {
 
@@ -42,7 +42,7 @@ const SimpleGraphQL = {
    * @param name
    * @param options
    */
-  schema: <T>(name:string, options:SchemaOptionConfig={}):Schema
+  schema: <T>(name:string, options:SchemaOptionConfig = {}):Schema
     <T> => new Schema(name, options),
 
   service:
@@ -59,7 +59,7 @@ const SimpleGraphQL = {
          services?:Array<Service<any>>,
          options?:BuildOptionConfig
          }):{graphQLSchema:graphql.GraphQLSchema, sgContext:any} => {
-    const {sequelize, schemas = [], services = [], options = {}} = args
+    const { sequelize, schemas = [], services = [], options = {} } = args
     const context = new Context(sequelize, options)
 
     // 添加Schema
@@ -103,7 +103,7 @@ const SimpleGraphQL = {
         interfaces: [context.nodeInterface],
         fields: () => {
           const fields = {
-            id: {type: new graphql.GraphQLNonNull(graphql.GraphQLID)}
+            id: { type: new graphql.GraphQLNonNull(graphql.GraphQLID) }
           }
           _.forOwn(finalQueries, (value, key) => {
             if (key !== 'viewer' && key !== 'relay') fields[key] = value
@@ -162,9 +162,9 @@ const SimpleGraphQL = {
           if (!sgContext.models[id.type]) return null
 
           const dbModel = sgContext.models[id.type]
-          const option = dbModel.resolveQueryOption({info: info})
+          const option = dbModel.resolveQueryOption({ info: info })
           const record = await dbModel.findOne({
-            where: {id: id.id},
+            where: { id: id.id },
             ...option
           })
           if (record) {
@@ -215,11 +215,11 @@ const SimpleGraphQL = {
               }
               _.forOwn(value.outputFields, (fValue, fKey) => {
                 outputFields[fKey] = Transformer.toGraphQLFieldConfig(
-                key + '.' + fKey,
-                'Payload',
-                fValue,
-                context
-              )
+                  key + '.' + fKey,
+                  'Payload',
+                  fValue,
+                  context
+                )
               })
               if (!value['name']) {
                 value['name'] = key

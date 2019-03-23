@@ -24,7 +24,7 @@ export default SG.service('DemoService').queries({
         required: true
       }
     },
-    mutateAndGetPayload: async function ({weather}, context, info) {
+    mutateAndGetPayload: async function ({ weather }, context, info) {
       gWeather = weather
       return {
         weather: gWeather

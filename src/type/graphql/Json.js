@@ -1,5 +1,5 @@
 // @flow
-import {GraphQLScalarType, Kind} from 'graphql'
+import { GraphQLScalarType, Kind } from 'graphql'
 
 function astToJson (ast) {
   if (ast.kind === Kind.INT) {

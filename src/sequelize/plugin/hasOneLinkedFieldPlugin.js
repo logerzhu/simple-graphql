@@ -20,9 +20,9 @@ export default function hasOneFieldsConfig (schema:Schema<any>, options:any):voi
             return root[key]
           } else {
             const dbModel = sgContext.models[config.target]
-            const option = dbModel.resolveQueryOption({info: info})
+            const option = dbModel.resolveQueryOption({ info: info })
             return dbModel.findOne({
-              where: {[config.foreignKey || config.foreignField + 'Id']: root['id']},
+              where: { [config.foreignKey || config.foreignField + 'Id']: root['id'] },
               include: option.include,
               attributes: option.attributes,
               order: option.order

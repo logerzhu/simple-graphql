@@ -10,8 +10,8 @@ import StringHelper from '../../utils/StringHelper'
 const SortEnumType = new graphql.GraphQLEnumType({
   name: 'SortOrder',
   values: {
-    ASC: {value: 'ASC', description: '递增排序'},
-    DESC: {value: 'DESC', description: '递减排序'}
+    ASC: { value: 'ASC', description: '递增排序' },
+    DESC: { value: 'DESC', description: '递减排序' }
   }
 })
 
@@ -55,15 +55,15 @@ const getSearchFields = (schema) => {
     }
     if (!searchFields[key] && (!value['$type'] || (value['searchable'] !== false && value['hidden'] !== true && !value['resolve']))) {
       if (!value['$type']) {
-        searchFields[key] = {$type: value}
+        searchFields[key] = { $type: value }
       } else {
         if (value['required']) {
-          searchFields[key] = {...value, required: false}
+          searchFields[key] = { ...value, required: false }
         } else {
           searchFields[key] = value
         }
         if (value['default'] != null) {
-          searchFields[key] = {...searchFields[key], default: null}
+          searchFields[key] = { ...searchFields[key], default: null }
         }
       }
 
@@ -79,15 +79,15 @@ const getSearchFields = (schema) => {
         type = DateConditionType
       }
       if (searchFields[key]['$type']) {
-        searchFields[key] = {...searchFields[key], ...{$type: type}}
+        searchFields[key] = { ...searchFields[key], ...{ $type: type } }
       } else {
-        searchFields[key] = {$type: type}
+        searchFields[key] = { $type: type }
       }
 
       searchFields[key].mapper = function (option:{where:Object, attributes:Array<string>}, argValue) {
         if (argValue !== undefined) {
           option.where.$and = option.where.$and || []
-          option.where.$and.push({[key]: argValue})
+          option.where.$and.push({ [key]: argValue })
         }
       }
     }
@@ -98,7 +98,7 @@ const getSearchFields = (schema) => {
 export default function pluralQuery (schema:Schema<any>, options:any):void {
   const name = StringHelper.toInitialLowerCase(schema.name) + 's'
 
-  const searchFields = {...getSearchFields(schema), ...((options && options.conditionFields) || {})}
+  const searchFields = { ...getSearchFields(schema), ...((options && options.conditionFields) || {}) }
 
   // 过滤不可搜索的field
   let config = {}
@@ -119,7 +119,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
     },
     mapper: function (option:{where:Object, bind:Array<any>, attributes:Array<string>}, argValue, sgContext) {
       if (argValue != null) {
-        const {fields, value} = argValue
+        const { fields, value } = argValue
         option.attributes = _.union((option.attributes || []), fields)
         option.where.$and = option.where.$and || []
         option.where.$and.push({
@@ -133,7 +133,7 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
             } else {
               field = ss.join('.')
             }
-            return Sequelize.where(Sequelize.col(field), {$like: '%' + value + '%'})
+            return Sequelize.where(Sequelize.col(field), { $like: '%' + value + '%' })
           })
         })
       }
@@ -148,26 +148,26 @@ export default function pluralQuery (schema:Schema<any>, options:any):void {
       args: {
         condition: {
           $type: _.mapValues(searchFields, (fieldConfig) => {
-            const {mapper, ...value} = fieldConfig
+            const { mapper, ...value } = fieldConfig
             return value
           }),
           description: 'Query Condition'
         },
         sort: {
-          $type: [{field: String, order: SortEnumType}],
+          $type: [{ field: String, order: SortEnumType }],
           description: 'Define the sort field'
         },
         keywords: keywordField.$type
       },
       resolve: async function (args:{[argName: string]: any},
-                               context:any,
-                               info:graphql.GraphQLResolveInfo,
-                               sgContext) {
+        context:any,
+        info:graphql.GraphQLResolveInfo,
+        sgContext) {
         const dbModel = sgContext.models[schema.name]
 
-        let {sort = [{field: 'id', order: 'ASC'}], condition = {}, keywords} = (args || {})
+        let { sort = [{ field: 'id', order: 'ASC' }], condition = {}, keywords } = (args || {})
 
-        let queryOption = {where: {}, bind: [], attributes: []}
+        let queryOption = { where: {}, bind: [], attributes: [] }
         if (keywords) {
           await keywordField.mapper(queryOption, keywords, sgContext)
         }

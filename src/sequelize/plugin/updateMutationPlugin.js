@@ -24,7 +24,7 @@ export default function updateMutation (schema:Schema<any>, options:any):void {
     }
     if (value && value.$type) {
       if (!value.hidden && value.mutable !== false) {
-        inputFields.values[key] = {...value, required: false, default: null}
+        inputFields.values[key] = { ...value, required: false, default: null }
       }
     } else {
       inputFields.values[key] = value
@@ -67,7 +67,7 @@ export default function updateMutation (schema:Schema<any>, options:any):void {
           }
         })
 
-        const instance = await dbModel.findOne({where: {id: args.id}})
+        const instance = await dbModel.findOne({ where: { id: args.id } })
         if (!instance) {
           throw new Error(schema.name + '[' + args.id + '] not exist.')
         } else {

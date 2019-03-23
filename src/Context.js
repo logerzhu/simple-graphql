@@ -4,7 +4,7 @@ import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
 import _ from 'lodash'
 
-import type {GraphQLObjectType} from 'graphql'
+import type { GraphQLObjectType } from 'graphql'
 
 import Schema from './definition/Schema'
 import Service from './definition/Service'
@@ -13,7 +13,7 @@ import Transformer from './transformer'
 
 import SequelizeContext from './sequelize/SequelizeContext'
 
-import type {SGContext, LinkedFieldType, ArgsType, BuildOptionConfig} from './Definition'
+import type { SGContext, LinkedFieldType, ArgsType, BuildOptionConfig } from './Definition'
 
 export type QueryConfig ={
   name:string,
@@ -60,7 +60,7 @@ export default class Context {
 
   constructor (sequelize:Sequelize, options:BuildOptionConfig) {
     this.dbContext = new SequelizeContext(sequelize)
-    this.options = {...options}
+    this.options = { ...options }
 
     this.dbModels = {}
     this.schemas = {}
@@ -73,7 +73,7 @@ export default class Context {
 
     const self = this
     this.nodeInterface = relay.nodeDefinitions((globalId) => {
-      var {type, id} = relay.fromGlobalId(globalId)
+      var { type, id } = relay.fromGlobalId(globalId)
       console.log('Warning-------------------- node id Fetcher not implement' + type + ' ' + id)
     }, (obj) => {
       const type = obj._type
@@ -237,7 +237,7 @@ export default class Context {
 
     if (this.options.hooks != null) {
       this.options.hooks.reverse().forEach(hook => {
-        if (!hook.filter || hook.filter({type: 'query', config})) {
+        if (!hook.filter || hook.filter({ type: 'query', config })) {
           const preHook = hookFun
           hookFun = (action, invokeInfo, next) => hook.hook(action, invokeInfo, preHook.bind(null, action, invokeInfo, next))
         }
@@ -254,9 +254,9 @@ export default class Context {
       info: info,
       sgContext: self.getSGContext()
     },
-      () => {
-        return config.resolve(args, context, info, self.getSGContext())
-      }
+    () => {
+      return config.resolve(args, context, info, self.getSGContext())
+    }
     )
   }
 
@@ -276,7 +276,7 @@ export default class Context {
     let hookFun = (action, invokeInfo, next) => next()
     if (this.options.hooks != null) {
       this.options.hooks.reverse().forEach(hook => {
-        if (!hook.filter || hook.filter({type: 'field', config})) {
+        if (!hook.filter || hook.filter({ type: 'field', config })) {
           const preHook = hookFun
           hookFun = (action, invokeInfo, next) => hook.hook(action, invokeInfo, preHook.bind(null, action, invokeInfo, next))
         }
@@ -293,7 +293,7 @@ export default class Context {
       info: info,
       sgContext: self.getSGContext()
     },
-      () => config.resolve(source, args, context, info, self.getSGContext())
+    () => config.resolve(source, args, context, info, self.getSGContext())
     )
   }
 
@@ -303,7 +303,7 @@ export default class Context {
     let hookFun = (action, invokeInfo, next) => next()
     if (this.options.hooks != null) {
       this.options.hooks.reverse().forEach(hook => {
-        if (!hook.filter || hook.filter({type: 'mutation', config})) {
+        if (!hook.filter || hook.filter({ type: 'mutation', config })) {
           const preHook = hookFun
           hookFun = (action, invokeInfo, next) => hook.hook(action, invokeInfo, preHook.bind(null, action, invokeInfo, next))
         }
@@ -319,7 +319,7 @@ export default class Context {
       info: info,
       sgContext: self.getSGContext()
     },
-      () => config.mutateAndGetPayload(args, context, info, self.getSGContext())
+    () => config.mutateAndGetPayload(args, context, info, self.getSGContext())
     )
   }
 
@@ -363,7 +363,7 @@ export default class Context {
           ...config,
           as: key,
           foreignKey: config.foreignField + 'Id',
-          through: config.through && {...config.through, model: self.dbModel(config.through.model)}
+          through: config.through && { ...config.through, model: self.dbModel(config.through.model) }
         })
       })
 

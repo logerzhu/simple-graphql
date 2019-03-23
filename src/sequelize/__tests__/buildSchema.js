@@ -47,15 +47,15 @@ export default function (sequelize:Sequelize) {
     options: {
       hooks: [{
         description: 'Enable transaction on mutations',
-        filter: ({type, config}) => type === 'mutation',
-        hook: async function ({type, config}, {source, args, context, info, schemas}, next) {
+        filter: ({ type, config }) => type === 'mutation',
+        hook: async function ({ type, config }, { source, args, context, info, schemas }, next) {
           return sequelize.transaction(function (t) {
             return next()
           })
         }
       }, {
         description: '自定义hook',
-        filter: ({type, config}) => type === 'mutation' && config.config && config.config.hook,
+        filter: ({ type, config }) => type === 'mutation' && config.config && config.config.hook,
         hook: async function (action, invokeInfo, next) {
           return action.config.config.hook(action, invokeInfo, next)
         }

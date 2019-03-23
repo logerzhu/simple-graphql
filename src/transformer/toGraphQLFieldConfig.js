@@ -4,7 +4,7 @@ import _ from 'lodash'
 import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
 
-import type {GraphQLFieldResolver, GraphQLOutputType} from 'graphql'
+import type { GraphQLFieldResolver, GraphQLOutputType } from 'graphql'
 
 import Type from '../type'
 import Context from '../Context'
@@ -12,10 +12,10 @@ import StringHelper from '../utils/StringHelper'
 import toGraphQLInputFieldMap from './toGraphQLInputFieldMap'
 
 const toGraphQLFieldConfig = function (name:string,
-                                       postfix:string,
-                                       fieldType:any,
-                                       context:Context,
-                                       interfaces:any = []):{
+  postfix:string,
+  fieldType:any,
+  context:Context,
+  interfaces:any = []):{
   type: GraphQLOutputType,
   args?: {[string]:any},
   resolve?: GraphQLFieldResolver<any, any>,
@@ -26,14 +26,14 @@ const toGraphQLFieldConfig = function (name:string,
   }
 
   if (graphql.isOutputType(fieldType)) {
-    return {type: fieldType}
+    return { type: fieldType }
   }
   if (fieldType instanceof Type.ScalarFieldType) {
-    return {type: fieldType.graphQLOutputType}
+    return { type: fieldType.graphQLOutputType }
   }
   switch (fieldType) {
     case String:
-      return {type: graphql.GraphQLString}
+      return { type: graphql.GraphQLString }
     case Number:
       return {
         type: graphql.GraphQLFloat,
@@ -53,11 +53,11 @@ const toGraphQLFieldConfig = function (name:string,
         }
       }
     case Boolean:
-      return {type: graphql.GraphQLBoolean}
+      return { type: graphql.GraphQLBoolean }
     case Date:
-      return {type: Type.GraphQLScalarTypes.Date}
+      return { type: Type.GraphQLScalarTypes.Date }
     case JSON:
-      return {type: Type.GraphQLScalarTypes.Json}
+      return { type: Type.GraphQLScalarTypes.Json }
   }
 
   if (_.isArray(fieldType)) {
@@ -76,9 +76,9 @@ const toGraphQLFieldConfig = function (name:string,
             (typeof root[fieldName][0] === 'number' || typeof root[fieldName][0] === 'string')
           ) {
             const dbModel = sgContext.models[fieldType[0]]
-            const option = dbModel.resolveQueryOption({info: info})
+            const option = dbModel.resolveQueryOption({ info: info })
             const records = await sgContext.models[fieldType[0]].findAll({
-              where: {id: {$in: root[fieldName]}},
+              where: { id: { $in: root[fieldName] } },
               include: option.include,
               attributes: option.attributes,
               order: option.order
@@ -152,9 +152,9 @@ const toGraphQLFieldConfig = function (name:string,
               if (root[fieldName] !== undefined) {
                 return root[fieldName]
               } else {
-                const option = dbModel.resolveQueryOption({info: info})
+                const option = dbModel.resolveQueryOption({ info: info })
                 return dbModel.findOne({
-                  where: {id: root[fieldName + 'Id']},
+                  where: { id: root[fieldName + 'Id'] },
                   include: option.include,
                   attributes: option.attributes,
                   order: option.order
@@ -162,12 +162,12 @@ const toGraphQLFieldConfig = function (name:string,
               }
             }
             if (root && root[fieldName] && (
-                typeof root[fieldName] === 'number' ||
+              typeof root[fieldName] === 'number' ||
                 typeof root[fieldName] === 'string'
-              )) {
-              const option = dbModel.resolveQueryOption({info: info})
+            )) {
+              const option = dbModel.resolveQueryOption({ info: info })
               return dbModel.findOne({
-                where: {id: root[fieldName]},
+                where: { id: root[fieldName] },
                 include: option.include,
                 attributes: option.attributes,
                 order: option.order
@@ -187,7 +187,7 @@ const toGraphQLFieldConfig = function (name:string,
         const values = {}
         fieldType['enumValues'].forEach(
           t => {
-            values[t] = {value: t}
+            values[t] = { value: t }
           }
         )
         result.type = new graphql.GraphQLEnumType({
@@ -211,7 +211,7 @@ const toGraphQLFieldConfig = function (name:string,
         result['resolve'] = context.wrapFieldResolve(wrapConfig)
       }
       if (fieldType.args || result.args) {
-        result.args = toGraphQLInputFieldMap(typeName(name), {...result.args, ...fieldType.args})
+        result.args = toGraphQLInputFieldMap(typeName(name), { ...result.args, ...fieldType.args })
       }
       result.description = fieldType['description']
       return result

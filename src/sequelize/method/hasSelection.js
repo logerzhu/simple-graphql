@@ -6,7 +6,7 @@ export default function (args:{
   path:string}) {
   const dbModel = this
 
-  const {info, path} = args
+  const { info, path } = args
 
   const fragments = info.fragments || []
 

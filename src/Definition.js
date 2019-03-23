@@ -1,7 +1,7 @@
 // @flow
 import Sequelize from 'sequelize'
 
-import type {GraphQLOutputType, GraphQLResolveInfo, GraphQLInputType} from 'graphql'
+import type { GraphQLOutputType, GraphQLResolveInfo, GraphQLInputType } from 'graphql'
 
 import Type from './type'
 
@@ -163,7 +163,7 @@ export type FieldType = BaseFieldType| Array<LinkedFieldType> | {
   enumValues?:Array<string>,
   default?:any,
   required?:boolean,
-  hidden?: boolean,                     // hidden为true, 对应的field将不会出现在graphql schema中
+  hidden?: boolean, // hidden为true, 对应的field将不会出现在graphql schema中
   validate?: ValidateConfig,
   column?:ColumnConfig
 }

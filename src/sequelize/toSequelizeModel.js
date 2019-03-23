@@ -48,7 +48,7 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
             target: fType,
             hidden: true,
             foreignField: foreignField,
-            foreignKey: {name: foreignField + 'Id', allowNull: false},
+            foreignKey: { name: foreignField + 'Id', allowNull: false },
             onDelete: onDelete,
             constraints: true
           }
@@ -68,7 +68,7 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
       const type = dbType(fType)
       if (type) {
         if (value && value['$type']) {
-          dbDefinition[key] = {type: type}
+          dbDefinition[key] = { type: type }
           if (value.required != null) {
             dbDefinition[key].allowNull = !value.required
           }
@@ -81,9 +81,9 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
           if (value.enumValues != null) {
             dbDefinition[key].type = Sequelize.ENUM(...value.enumValues)
           }
-          dbDefinition[key] = {...dbDefinition[key], ...value.column}
+          dbDefinition[key] = { ...dbDefinition[key], ...value.column }
         } else {
-          dbDefinition[key] = {type: type}
+          dbDefinition[key] = { type: type }
         }
         if (sequelize.options.define.underscored && dbDefinition[key].field == null) {
           dbDefinition[key].field = StringHelper.toUnderscoredName(key)

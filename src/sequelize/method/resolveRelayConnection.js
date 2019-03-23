@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash'
-const isPrimaryOrder = ({orderConfig, schema, sgContext}) => {
+const isPrimaryOrder = ({ orderConfig, schema, sgContext }) => {
   if (_.isArray(orderConfig)) {
     for (let i of orderConfig) {
       if (i.model && i.as) {
@@ -50,8 +50,8 @@ export default async function (args:{
 }> {
   const dbModel = this
   const sgContext = dbModel.getSGContext()
-  let {pagination = {}, selectionInfo = {}, include = [], where = {}, attributes, bind = [], order = [['id', 'ASC']]} = args
-  let {after, first = 100, before, last} = pagination
+  let { pagination = {}, selectionInfo = {}, include = [], where = {}, attributes, bind = [], order = [['id', 'ASC']] } = args
+  let { after, first = 100, before, last } = pagination
 
   const option = dbModel.resolveQueryOption({
     info: selectionInfo,
@@ -77,7 +77,7 @@ export default async function (args:{
     after = count - (parseInt(before) - 1)
     order = order.map(o => {
       const r = [...o]
-      if (isPrimaryOrder({orderConfig: r, schema: sgContext.schemas[dbModel.name], sgContext: sgContext})) {
+      if (isPrimaryOrder({ orderConfig: r, schema: sgContext.schemas[dbModel.name], sgContext: sgContext })) {
         // TODO Need to hand order field is null case
         switch (r[r.length - 1].toLocaleUpperCase()) {
           case 'ASC':
@@ -98,15 +98,15 @@ export default async function (args:{
     info: selectionInfo,
     path: 'edges'
   }) ? await dbModel.findAll({
-    distinct: 'id',
-    include: include,
-    where: where,
-    attributes: attributes,
-    bind: bind,
-    order: order,
-    limit: first,
-    offset: offset
-  }) : []
+      distinct: 'id',
+      include: include,
+      where: where,
+      attributes: attributes,
+      bind: bind,
+      order: order,
+      limit: first,
+      offset: offset
+    }) : []
   let index = 0
   if (last || before) {
     return {

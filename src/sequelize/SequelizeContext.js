@@ -36,7 +36,7 @@ export default class SequelizeContext {
       hasManyLinkedField: {},
       hasOneLinkedField: {}
     }
-    _.forOwn({...defaultPluginConfig, ...schema.config.options.plugin}, (value, key) => {
+    _.forOwn({ ...defaultPluginConfig, ...schema.config.options.plugin }, (value, key) => {
       if (this.plugins[key] && value) {
         this.plugins[key](schema, value)
       }

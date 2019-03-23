@@ -1,6 +1,6 @@
 // @flow
 
-import {GraphQLScalarType, GraphQLError, Kind} from 'graphql'
+import { GraphQLScalarType, GraphQLError, Kind } from 'graphql'
 import moment from 'moment'
 export default new GraphQLScalarType({
   name: 'Date',

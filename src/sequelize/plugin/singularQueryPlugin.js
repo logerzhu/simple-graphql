@@ -16,7 +16,7 @@ export default function singularQuery (schema:Schema<any>, options:any):void {
   _.forOwn(schema.config.fields, (value, key) => {
     if (!value['$type'] || (value['searchable'] !== false && value['hidden'] !== true && !value['resolve'])) {
       if (value['unique']) {
-        searchFields[key] = Object.assign({}, value, {required: false})
+        searchFields[key] = Object.assign({}, value, { required: false })
       }
     }
   })
@@ -36,7 +36,7 @@ export default function singularQuery (schema:Schema<any>, options:any):void {
           return null
         }
         const dbModel = sgContext.models[schema.name]
-        const option = dbModel.resolveQueryOption({info: info})
+        const option = dbModel.resolveQueryOption({ info: info })
         return sgContext.models[schema.name].findOne({
           where: {
             ...args
