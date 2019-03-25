@@ -13,7 +13,7 @@ import Context from './Context'
 import StringHelper from './utils/StringHelper'
 import Transformer from './transformer'
 
-import type { SchemaOptionConfig, BuildOptionConfig } from './Definition'
+import type { BuildOptionConfig, SchemaOptionConfig } from './Definition'
 
 const SimpleGraphQL = {
 
@@ -42,23 +42,20 @@ const SimpleGraphQL = {
    * @param name
    * @param options
    */
-  schema: <T>(name:string, options:SchemaOptionConfig = {}):Schema
-    <T> => new Schema(name, options),
+  schema: <T> (name: string, options: SchemaOptionConfig = {}): Schema<T> => new Schema(name, options),
 
-  service:
-      <T>(name:string):Service
-        <T> => new Service(name),
+  service: <T> (name: string): Service<T> => new Service(name),
 
   /**
    * Build the GraphQL Schema
    */
-  build: (args:{
-         sequelize:Sequelize,
-         schemas?:Array<Schema<any>>,
-         schemas?:Array<Schema<any>>,
-         services?:Array<Service<any>>,
-         options?:BuildOptionConfig
-         }):{graphQLSchema:graphql.GraphQLSchema, sgContext:any} => {
+  build: (args: {
+    sequelize: Sequelize,
+    schemas?: Array<Schema<any>>,
+    schemas?: Array<Schema<any>>,
+    services?: Array<Service<any>>,
+    options?: BuildOptionConfig
+  }): { graphQLSchema: graphql.GraphQLSchema, sgContext: any } => {
     const { sequelize, schemas = [], services = [], options = {} } = args
     const context = new Context(sequelize, options)
 
@@ -74,7 +71,7 @@ const SimpleGraphQL = {
 
     context.buildModelAssociations()
 
-    const finalQueries:{[fieldName: string]: graphql.GraphQLFieldConfig<any, any>} = {}
+    const finalQueries: { [fieldName: string]: graphql.GraphQLFieldConfig<any, any> } = {}
 
     _.forOwn(context.queries, (value, key) => {
       const fieldConfig = Transformer.toGraphQLFieldConfig(
@@ -113,7 +110,7 @@ const SimpleGraphQL = {
       })
       finalQueries['viewer'] = {
         description: 'Default Viewer implement to include all queries.',
-        type: new graphql.GraphQLNonNull(((context.graphQLObjectTypes['Viewer']:any):graphql.GraphQLObjectType)),
+        type: new graphql.GraphQLNonNull(((context.graphQLObjectTypes['Viewer']: any): graphql.GraphQLObjectType)),
         resolve: () => {
           return {
             _type: 'Viewer',
@@ -140,7 +137,6 @@ const SimpleGraphQL = {
     }
 
     finalQueries['node'] = {
-      name: 'node',
       description: 'Fetches an object given its ID',
       type: context.nodeInterface,
       args: {
@@ -197,8 +193,10 @@ const SimpleGraphQL = {
         mutation: new graphql.GraphQLObjectType({
           name: 'RootMutation',
           fields: () => {
-            const fields:{[fieldName: string]: graphql.GraphQLFieldConfig
-              <any, any>} = {}
+            const fields: {
+              [fieldName: string]: graphql.GraphQLFieldConfig
+              <any, any>
+            } = {}
             _.forOwn(context.mutations, (value, key) => {
               const inputFields = Transformer.toGraphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.inputFields)
               const outputFields = {}

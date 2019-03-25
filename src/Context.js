@@ -11,9 +11,11 @@ import Service from './definition/Service'
 import StringHelper from './utils/StringHelper'
 import Transformer from './transformer'
 
+import dbMethods from './sequelize/method'
+
 import SequelizeContext from './sequelize/SequelizeContext'
 
-import type { SGContext, LinkedFieldType, ArgsType, BuildOptionConfig } from './Definition'
+import type { SGContext, ModelDefine, LinkedFieldType, ArgsType, BuildOptionConfig } from './Definition'
 
 export type QueryConfig ={
   name:string,
@@ -42,7 +44,7 @@ export default class Context {
 
   options:BuildOptionConfig
 
-  dbModels:{[id:string]:Sequelize.Model}
+  dbModels:{[id:string]:ModelDefine}
 
   nodeInterface:graphql.GraphQLInterfaceType
 
@@ -209,7 +211,7 @@ export default class Context {
     return this.graphQLObjectTypes[typeName]
   }
 
-  dbModel (name:string):Sequelize.Model {
+  dbModel (name:string):ModelDefine {
     const model = this.schemas[name]
     if (!model) {
       throw new Error('Schema ' + name + ' not define.')
@@ -220,6 +222,7 @@ export default class Context {
       self.dbModels[typeName] = self.dbContext.define(model)
       Object.assign(self.dbModels[typeName], {
         ...model.config.statics,
+        ...dbMethods,
         getSGContext: () => self.getSGContext()
       })
       Object.assign(self.dbModels[typeName].prototype, {

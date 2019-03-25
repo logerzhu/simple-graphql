@@ -7,12 +7,14 @@ import Schema from '../definition/Schema'
 import toSequelizeModel from './toSequelizeModel.js'
 import plugin from './plugin'
 
+import type { ModelDefine } from '../Definition'
+
 export default class SequelizeContext {
-  sequelize:Sequelize
+  sequelize: Sequelize
 
-  plugins:{[string]:(Schema<any>, any)=>void}
+  plugins: { [string]: (Schema<any>, any)=>void }
 
-  constructor (sequelize:Sequelize) {
+  constructor (sequelize: Sequelize) {
     this.sequelize = sequelize
     this.plugins = {
       singularQuery: plugin.singularQueryPlugin,
@@ -27,11 +29,11 @@ export default class SequelizeContext {
     }
   }
 
-  define (schema:Schema<any>):Sequelize.Model {
+  define (schema: Schema<any>): ModelDefine {
     return toSequelizeModel(this.sequelize, schema)
   }
 
-  applyPlugin (schema:Schema<any>):void {
+  applyPlugin (schema: Schema<any>): void {
     const defaultPluginConfig = {
       hasManyLinkedField: {},
       hasOneLinkedField: {}

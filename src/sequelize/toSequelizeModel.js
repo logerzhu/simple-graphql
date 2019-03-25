@@ -6,12 +6,13 @@ import Sequelize from 'sequelize'
 import Type from '../type'
 import Schema from '../definition/Schema'
 import StringHelper from '../utils/StringHelper'
-import dbMethods from './method'
 
-export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any>):Sequelize.Model {
+import type { ModelDefine } from '../Definition'
+
+export default function toSequelizeModel (sequelize: Sequelize, schema: Schema<any>): ModelDefine {
   const dbDefinition = {}
 
-  const dbType = (fieldType:any) => {
+  const dbType = (fieldType: any) => {
     if (fieldType instanceof Type.ScalarFieldType) {
       return fieldType.columnType
     }
@@ -85,7 +86,7 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
         } else {
           dbDefinition[key] = { type: type }
         }
-        if (sequelize.options.define.underscored && dbDefinition[key].field == null) {
+        if ((sequelize.options.define || {}).underscored && dbDefinition[key].field == null) {
           dbDefinition[key].field = StringHelper.toUnderscoredName(key)
         }
       } else {
@@ -96,6 +97,5 @@ export default function toSequelizeModel (sequelize:Sequelize, schema:Schema<any
   // console.log("Create Sequlize Model with config", model.name, dbDefinition, model.config.options["table"])
   const dbModel = sequelize.define(schema.name, dbDefinition, schema.config.options['table'])
 
-  Object.assign(dbModel, dbMethods)
   return dbModel
 }

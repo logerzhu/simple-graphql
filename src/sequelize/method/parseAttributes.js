@@ -1,6 +1,12 @@
 // @flow
 import _ from 'lodash'
-export default function (args:{attributes:Array<string>, selections:Array<any>}) {
+
+type Selection = { name: string, selections?: Array<Selection> }
+
+export default function (args: { attributes: Array<string>, selections: Array<any> }): {
+  attributes: Array<string>,
+  additionSelections: Array<Selection>
+} {
   const dbModel = this
   const schema = dbModel.getSGContext().schemas[this.name]
 
@@ -25,7 +31,7 @@ export default function (args:{attributes:Array<string>, selections:Array<any>})
     }
   }
 
-  const fieldToSelection = (field) => {
+  const fieldToSelection = (field: string): Selection => {
     const index = field.indexOf('.')
     if (index === -1) { return { name: field } } else {
       return {
@@ -35,7 +41,7 @@ export default function (args:{attributes:Array<string>, selections:Array<any>})
     }
   }
 
-  const getDependentOptions = (option:{additionFields:Array<string>, attributes:Array<string>}, fieldName) => {
+  const getDependentOptions = (option: { additionFields: Array<string>, attributes: Array<string> }, fieldName) => {
     const hasManyConfig = schema.config.associations.hasMany[fieldName]
     if (hasManyConfig && hasManyConfig.outputStructure === 'Array' &&
       (hasManyConfig.conditionFields == null || hasManyConfig.conditionFields.length === 0)) {
@@ -77,7 +83,10 @@ export default function (args:{attributes:Array<string>, selections:Array<any>})
     return option
   }
 
-  let option = { additionFields: [], attributes: [...(args.attributes || []), 'id'] }
+  let option: { additionFields: Array<string>, attributes: Array<string> } = {
+    additionFields: [],
+    attributes: [...(args.attributes || []), 'id']
+  }
 
   if (args.selections) {
     args.selections.forEach(selection => {
@@ -87,6 +96,6 @@ export default function (args:{attributes:Array<string>, selections:Array<any>})
 
   return {
     attributes: _.uniq(option.attributes),
-    additionSelections: option.additionFields.map(field => fieldToSelection(field))
+    additionSelections: option.additionFields.map((field) => fieldToSelection(field))
   }
 }
