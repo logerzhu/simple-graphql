@@ -182,7 +182,7 @@ const toGraphQLFieldConfig = function (name:string,
 
   if (fieldType instanceof Object) {
     if (fieldType['$type']) {
-      const result = toGraphQLFieldConfig(name, postfix, fieldType['$type'], context)
+      const result:any = toGraphQLFieldConfig(name, postfix, fieldType['$type'], context)
       if (fieldType['enumValues']) {
         const values = {}
         fieldType['enumValues'].forEach(
