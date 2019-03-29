@@ -52,7 +52,6 @@ const SimpleGraphQL = {
   build: (args: {
     sequelize: Sequelize,
     schemas?: Array<Schema<any>>,
-    schemas?: Array<Schema<any>>,
     services?: Array<Service<any>>,
     options?: BuildOptionConfig
   }): { graphQLSchema: graphql.GraphQLSchema, sgContext: any } => {
