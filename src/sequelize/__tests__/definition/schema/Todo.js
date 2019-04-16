@@ -7,6 +7,11 @@ const TodoType = 'Todo'
 export default SG.schema('Todo', {
   table: {
     underscored: true
+  },
+  plugin: {
+    addMutation: true,
+    singularQuery: true,
+    pluralQuery: true
   }
 }).fields({
   owner: {
@@ -40,7 +45,7 @@ export default SG.schema('Todo', {
         required: true
       }
     },
-    resolve: async function ({ownerId, dueBefore}, context, info, {models: {Todo}}) {
+    resolve: async function ({ ownerId, dueBefore }, context, info, { models: { Todo } }) {
       return Todo.find({
         where: {
           completed: false,
@@ -64,8 +69,8 @@ export default SG.schema('Todo', {
     outputFields: {
       changedTodo: TodoType
     },
-    mutateAndGetPayload: async function ({todoId}, context, info, {models: {Todo}}) {
-      const todo = await Todo.findOne({where: {id: todoId}})
+    mutateAndGetPayload: async function ({ todoId }, context, info, { models: { Todo } }) {
+      const todo = await Todo.findOne({ where: { id: todoId } })
       if (!todo) {
         throw new Error('Todo entity not found.')
       }
@@ -73,7 +78,7 @@ export default SG.schema('Todo', {
         todo.completed = true
         await todo.save()
       }
-      return {changedTodo: todo}
+      return { changedTodo: todo }
     }
   }
 })

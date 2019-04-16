@@ -3,7 +3,7 @@ import Sequelize from 'sequelize'
 import cls from 'continuation-local-storage'
 
 const namespace = cls.createNamespace('my-db-namespace')
-Sequelize.useCLS(namespace)
+Sequelize['useCLS'](namespace)
 
 const sequelize = new Sequelize('clinic', 'tester', 'password', {
   host: 'localhost',

@@ -9,7 +9,7 @@ import StringHelper from '../utils/StringHelper'
 
 import type { ModelDefine } from '../Definition'
 
-export default function toSequelizeModel (sequelize: Sequelize, schema: Schema<any>): ModelDefine {
+export default function toSequelizeModel (sequelize: Sequelize, schema: Schema): ModelDefine {
   const dbDefinition = {}
 
   const dbType = (fieldType: any) => {

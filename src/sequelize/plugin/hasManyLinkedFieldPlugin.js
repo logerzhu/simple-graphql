@@ -4,7 +4,7 @@ import _ from 'lodash'
 import Schema from '../../definition/Schema'
 // import StringHelper from '../../utils/StringHelper'
 
-export default function hasManyLinkedField (schema:Schema<any>, options:any):void {
+export default function hasManyLinkedField (schema:Schema, options:any):void {
   // const name = StringHelper.toInitialLowerCase(schema.name)
   // Conver model association to field config
   _.forOwn(schema.config.associations.hasMany, (config, key) => {

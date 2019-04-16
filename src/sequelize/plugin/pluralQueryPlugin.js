@@ -95,7 +95,7 @@ const getSearchFields = (schema) => {
   return searchFields
 }
 
-export default function pluralQuery (schema:Schema<any>, options:any):void {
+export default function pluralQuery (schema:Schema, options:any):void {
   const name = StringHelper.toInitialLowerCase(schema.name) + 's'
 
   const searchFields = { ...getSearchFields(schema), ...((options && options.conditionFields) || {}) }

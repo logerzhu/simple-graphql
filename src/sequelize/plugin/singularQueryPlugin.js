@@ -5,7 +5,7 @@ import * as graphql from 'graphql'
 import Schema from '../../definition/Schema'
 import StringHelper from '../../utils/StringHelper'
 
-export default function singularQuery (schema:Schema<any>, options:any):void {
+export default function singularQuery (schema:Schema, options:any):void {
   const name = StringHelper.toInitialLowerCase(schema.name)
   const searchFields = {
     id: {

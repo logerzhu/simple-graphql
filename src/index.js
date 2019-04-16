@@ -42,17 +42,17 @@ const SimpleGraphQL = {
    * @param name
    * @param options
    */
-  schema: <T> (name: string, options: SchemaOptionConfig = {}): Schema<T> => new Schema(name, options),
+  schema: (name: string, options: SchemaOptionConfig = {}): Schema => new Schema(name, options),
 
-  service: <T> (name: string): Service<T> => new Service(name),
+  service: (name: string): Service => new Service(name),
 
   /**
    * Build the GraphQL Schema
    */
   build: (args: {
     sequelize: Sequelize,
-    schemas?: Array<Schema<any>>,
-    services?: Array<Service<any>>,
+    schemas?: Array<Schema>,
+    services?: Array<Service>,
     options?: BuildOptionConfig
   }): { graphQLSchema: graphql.GraphQLSchema, sgContext: any } => {
     const { sequelize, schemas = [], services = [], options = {} } = args
@@ -193,8 +193,7 @@ const SimpleGraphQL = {
           name: 'RootMutation',
           fields: () => {
             const fields: {
-              [fieldName: string]: graphql.GraphQLFieldConfig
-              <any, any>
+              [fieldName: string]: graphql.GraphQLFieldConfig<any, any>
             } = {}
             _.forOwn(context.mutations, (value, key) => {
               const inputFields = Transformer.toGraphQLInputFieldMap(StringHelper.toInitialUpperCase(key), value.inputFields)

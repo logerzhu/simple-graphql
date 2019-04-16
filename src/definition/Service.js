@@ -1,16 +1,16 @@
 // @flow
-import type { QueryConfig, MutationConfig } from '../Definition'
+import type { MutationOptions, QueryOptions } from '../Definition2'
 
-export default class Service<T> {
-  name:string
+export default class Service {
+  name: string
 
-  config:{
-    queries:{[id:string]: QueryConfig<T>},
-    mutations:{[id:string]: MutationConfig<T>},
-    statics:{[id:string]: any}
+  config: {
+    queries: { [id: string]: QueryOptions },
+    mutations: { [id: string]: MutationOptions },
+    statics: { [id: string]: any }
   }
 
-  constructor (name:string) {
+  constructor (name: string) {
     this.name = name
     this.config = {
       queries: {},
@@ -22,8 +22,7 @@ export default class Service<T> {
   /**
    * Add the GraphQL query methods.
    */
-  queries (queries:{[string]:QueryConfig<T>}):Service<T> {
-    // TODO duplicate check
+  queries (queries: { [string]: QueryOptions }): Service {
     this.config.queries = Object.assign(this.config.queries, queries)
     return this
   }
@@ -31,8 +30,7 @@ export default class Service<T> {
   /**
    * Add the GraphQL mutataion methods.
    */
-  mutations (mutations:{[string]:MutationConfig<T>}):Service<T> {
-    // TODO duplicate check
+  mutations (mutations: { [string]: MutationOptions }): Service {
     this.config.mutations = Object.assign(this.config.mutations, mutations)
     return this
   }
@@ -40,7 +38,7 @@ export default class Service<T> {
   /**
    * Add statics method to current Service.
    */
-  statics (statics:{[string]:any}):Service<T> {
+  statics (statics: { [string]: any }): Service {
     this.config.statics = Object.assign(this.config.statics, statics)
     return this
   }

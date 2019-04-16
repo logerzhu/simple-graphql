@@ -1,10 +1,9 @@
 // @flow
 import Sequelize from 'sequelize'
+import type { GraphQLObjectType } from 'graphql'
 import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
 import _ from 'lodash'
-
-import type { GraphQLObjectType } from 'graphql'
 
 import Schema from './definition/Schema'
 import Service from './definition/Service'
@@ -15,52 +14,52 @@ import dbMethods from './sequelize/method'
 
 import SequelizeContext from './sequelize/SequelizeContext'
 
-import type { SGContext, ModelDefine, LinkedFieldType, ArgsType, BuildOptionConfig } from './Definition'
+import type { ArgsType, BuildOptionConfig, LinkedFieldType, ModelDefine, SGContext } from './Definition'
 
-export type QueryConfig ={
-  name:string,
-  $type:LinkedFieldType,
-  description?:string,
-  args?:ArgsType,
-  resolve: (args:{[argName: string]: any},
-            context:any,
-            info:graphql.GraphQLResolveInfo,
-            sgContext:SGContext) => any
+export type QueryConfig = {
+  name: string,
+  $type: LinkedFieldType,
+  description?: string,
+  args?: ArgsType,
+  resolve: (args: { [argName: string]: any },
+            context: any,
+            info: graphql.GraphQLResolveInfo,
+            sgContext: SGContext) => any
 }
 
-export type MutationConfig ={
-  name:string,
-  description?:string,
-  inputFields:ArgsType,
-  outputFields:{[string]:LinkedFieldType},
-  mutateAndGetPayload:(args:{[argName: string]: any},
-                       context:any,
-                       info:graphql.GraphQLResolveInfo,
-                       sgContext:SGContext) => any
+export type MutationConfig = {
+  name: string,
+  description?: string,
+  inputFields: ArgsType,
+  outputFields: { [string]: LinkedFieldType },
+  mutateAndGetPayload: (args: { [argName: string]: any },
+                        context: any,
+                        info: graphql.GraphQLResolveInfo,
+                        sgContext: SGContext) => any
 }
 
 export default class Context {
-  dbContext:SequelizeContext
+  dbContext: SequelizeContext
 
-  options:BuildOptionConfig
+  options: BuildOptionConfig
 
-  dbModels:{[id:string]:ModelDefine}
+  dbModels: { [id: string]: ModelDefine }
 
-  nodeInterface:graphql.GraphQLInterfaceType
+  nodeInterface: graphql.GraphQLInterfaceType
 
-  schemas:{[id:string]: Schema<any> }
+  schemas: { [id: string]: Schema }
 
-  services:{[id:string]: Service<any> }
+  services: { [id: string]: Service }
 
-  graphQLObjectTypes:{[id:string]: GraphQLObjectType}
+  graphQLObjectTypes: { [id: string]: GraphQLObjectType }
 
-  queries:{[id:string]:QueryConfig}
+  queries: { [id: string]: QueryConfig }
 
-  mutations:{[id:string]:MutationConfig}
+  mutations: { [id: string]: MutationConfig }
 
-  connectionDefinitions:{[id:string]:{connectionType:graphql.GraphQLObjectType, edgeType:graphql.GraphQLObjectType}}
+  connectionDefinitions: { [id: string]: { connectionType: graphql.GraphQLObjectType, edgeType: graphql.GraphQLObjectType } }
 
-  constructor (sequelize:Sequelize, options:BuildOptionConfig) {
+  constructor (sequelize: Sequelize, options: BuildOptionConfig) {
     this.dbContext = new SequelizeContext(sequelize)
     this.options = { ...options }
 
@@ -92,7 +91,7 @@ export default class Context {
     }
   }
 
-  addSchema (schema:Schema<any>) {
+  addSchema (schema: Schema) {
     if (this.schemas[schema.name]) {
       throw new Error('Schema ' + schema.name + ' already define.')
     }
@@ -105,22 +104,29 @@ export default class Context {
 
     schema.fields({
       createdAt: {
-        $type: Date,
-        initializable: false,
-        mutable: false
+        $type: 'Date',
+        config: {
+          initializable: false,
+          mutable: false
+        }
+
       },
       updatedAt: {
-        $type: Date,
-        initializable: false,
-        mutable: false
+        $type: 'Date',
+        config: {
+          initializable: false,
+          mutable: false
+        }
       }
     })
 
     if (schema.config.options && schema.config.options.table && schema.config.options.table.paranoid) {
       schema.fields({
         deletedAt: {
-          $type: Date,
-          initializable: false
+          $type: 'Date',
+          config: {
+            initializable: false
+          }
         }
       })
     }
@@ -141,7 +147,7 @@ export default class Context {
     this.dbModel(schema.name)
   }
 
-  addService (service:Service<any>) {
+  addService (service: Service) {
     const self = this
     if (self.services[service.name]) {
       throw new Error('Service ' + service.name + ' already define.')
@@ -169,21 +175,21 @@ export default class Context {
     })
   }
 
-  addQuery (config:QueryConfig) {
+  addQuery (config: QueryConfig) {
     if (this.queries[config.name]) {
       throw new Error('Query ' + config.name + ' already define.')
     }
     this.queries[config.name] = config
   }
 
-  addMutation (config:MutationConfig) {
+  addMutation (config: MutationConfig) {
     if (this.mutations[config.name]) {
       throw new Error('Mutation ' + config.name + ' already define.')
     }
     this.mutations[config.name] = config
   }
 
-  graphQLObjectType (name:string):GraphQLObjectType {
+  graphQLObjectType (name: string): GraphQLObjectType {
     const model = this.schemas[name]
     if (!model) {
       throw new Error('Schema ' + name + ' not define.')
@@ -211,7 +217,7 @@ export default class Context {
     return this.graphQLObjectTypes[typeName]
   }
 
-  dbModel (name:string):ModelDefine {
+  dbModel (name: string): ModelDefine {
     const model = this.schemas[name]
     if (!model) {
       throw new Error('Schema ' + name + ' not define.')
@@ -233,7 +239,7 @@ export default class Context {
     return self.dbModels[typeName]
   }
 
-  wrapQueryResolve (config:QueryConfig):any {
+  wrapQueryResolve (config: QueryConfig): any {
     const self = this
 
     let hookFun = (action, invokeInfo, next) => next()
@@ -263,17 +269,17 @@ export default class Context {
     )
   }
 
-  wrapFieldResolve (config:{
-    name:string,
-    $type:LinkedFieldType,
-    description?:string,
-    args?:ArgsType,
-    resolve: (source:any,
-              args:{[argName: string]: any},
-              context:any,
-              info:graphql.GraphQLResolveInfo,
-              sgContext:SGContext) => any
-  }):any {
+  wrapFieldResolve (config: {
+    name: string,
+    $type: LinkedFieldType,
+    description?: string,
+    args?: ArgsType,
+    resolve: (source: any,
+              args: { [argName: string]: any },
+              context: any,
+              info: graphql.GraphQLResolveInfo,
+              sgContext: SGContext) => any
+  }): any {
     const self = this
 
     let hookFun = (action, invokeInfo, next) => next()
@@ -300,7 +306,7 @@ export default class Context {
     )
   }
 
-  wrapMutateAndGetPayload (config:MutationConfig):any {
+  wrapMutateAndGetPayload (config: MutationConfig): any {
     const self = this
 
     let hookFun = (action, invokeInfo, next) => next()
@@ -326,7 +332,7 @@ export default class Context {
     )
   }
 
-  connectionDefinition (schemaName:string):{connectionType:graphql.GraphQLObjectType, edgeType:graphql.GraphQLObjectType} {
+  connectionDefinition (schemaName: string): { connectionType: graphql.GraphQLObjectType, edgeType: graphql.GraphQLObjectType } {
     if (!this.connectionDefinitions[schemaName]) {
       this.connectionDefinitions[schemaName] = relay.connectionDefinitions({
         name: StringHelper.toInitialUpperCase(schemaName),
@@ -341,15 +347,15 @@ export default class Context {
     return this.connectionDefinitions[schemaName]
   }
 
-  connectionType (schemaName:string):graphql.GraphQLObjectType {
+  connectionType (schemaName: string): graphql.GraphQLObjectType {
     return this.connectionDefinition(schemaName).connectionType
   }
 
-  edgeType (schemaName:string):graphql.GraphQLObjectType {
+  edgeType (schemaName: string): graphql.GraphQLObjectType {
     return this.connectionDefinition(schemaName).edgeType
   }
 
-  buildModelAssociations ():void {
+  buildModelAssociations (): void {
     const self = this
     _.forOwn(self.schemas, (schema, schemaName) => {
       _.forOwn(schema.config.associations.hasMany, (config, key) => {

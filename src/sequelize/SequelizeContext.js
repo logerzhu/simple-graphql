@@ -12,7 +12,7 @@ import type { ModelDefine } from '../Definition'
 export default class SequelizeContext {
   sequelize: Sequelize
 
-  plugins: { [string]: (Schema<any>, any)=>void }
+  plugins: { [string]: (Schema, any)=>void }
 
   constructor (sequelize: Sequelize) {
     this.sequelize = sequelize
@@ -29,11 +29,11 @@ export default class SequelizeContext {
     }
   }
 
-  define (schema: Schema<any>): ModelDefine {
+  define (schema: Schema): ModelDefine {
     return toSequelizeModel(this.sequelize, schema)
   }
 
-  applyPlugin (schema: Schema<any>): void {
+  applyPlugin (schema: Schema): void {
     const defaultPluginConfig = {
       hasManyLinkedField: {},
       hasOneLinkedField: {}

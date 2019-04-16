@@ -1,24 +1,116 @@
 // @flow
 import _ from 'lodash'
-import type { LinkedFieldConfig, QueryConfig, MutationConfig,
-  FieldType, SchemaOptionConfig, HasOneConfig, BelongsToConfig, HasManyConfig,
-  BelongsToManyConfig, AssociationConfig } from '../Definition'
+import type { FieldOptions, InputFieldOptions, LinkedFieldOptions, MutationOptions, QueryOptions } from '../Definition2'
+import type { DefineOptions } from 'sequelize'
 
-export default class Schema<T> {
-  name:string
+export type SchemaOptionConfig = {
+  description?: string,
+  plugin?: Object,
+  table?: DefineOptions<any>
+}
 
-  config:{
-    fields:{[id:string]: FieldType},
-    links:{[id:string]:LinkedFieldConfig},
-    associations:AssociationConfig<T>,
-    options:SchemaOptionConfig,
-    queries:{[id:string]: QueryConfig<T>},
-    mutations:{[id:string]: MutationConfig<T>},
-    methods:{[id:string]: any},
-    statics:{[id:string]: any}
+/**
+ * @public
+ */
+export type HasOneConfig = {
+  [string]: {
+    config?: Object,
+    hidden?: boolean,
+    target: string,
+    foreignField?: string,
+    foreignKey?: string,
+    onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
+    onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
+    constraints?: boolean
+  }
+}
+
+/**
+ * @public
+ */
+export type BelongsToConfig = {
+  [string]: {
+    hidden?: boolean,
+    target: string,
+    foreignField?: string,
+    foreignKey?: string | { name: string, allowNull?: boolean },
+    targetKey?: string,
+    onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
+    onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
+    constraints?: boolean
+  }
+}
+
+type HasManyConfig = {
+  [string]: {
+    config?: Object,
+    hidden?: boolean,
+    conditionFields?: InputFieldOptions,
+    target: string,
+    through?: string | {
+      model: string,
+      scope?: Object,
+      unique?: boolean
+    },
+    foreignField?: string,
+    foreignKey?: string,
+    sourceKey?: string,
+    scope?: Object,
+    onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
+    onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
+    constraints?: boolean,
+    order?: Array<Array<any>>,
+    outputStructure?: 'Connection' | 'Array'
+  }
+}
+
+/**
+ * @public
+ */
+type BelongsToManyConfig = {
+  [string]: {
+    hidden?: boolean,
+    target: string,
+    through?: string | {
+      model: string,
+      scope?: Object,
+      unique?: boolean
+    },
+    foreignField?: string | Object,
+    otherKey?: string | Object,
+    scope?: Object,
+    timestamps?: boolean,
+    onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
+    onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
+    constraints?: boolean
+  }
+}
+
+/**
+ * @public
+ */
+type AssociationConfig = {
+  hasOne: HasOneConfig,
+  belongsTo: BelongsToConfig,
+  hasMany: HasManyConfig,
+  belongsToMany: BelongsToManyConfig,
+}
+
+export default class Schema {
+  name: string
+
+  config: {
+    fields: { [id: string]: FieldOptions },
+    links: { [id: string]: LinkedFieldOptions },
+    associations: AssociationConfig,
+    options: SchemaOptionConfig,
+    queries: { [id: string]: QueryOptions },
+    mutations: { [id: string]: MutationOptions },
+    methods: { [id: string]: any },
+    statics: { [id: string]: any }
   }
 
-  constructor (name:string, options:SchemaOptionConfig = {}) {
+  constructor (name: string, options: SchemaOptionConfig = {}) {
     this.name = name
     this.config = {
       fields: {},
@@ -41,7 +133,7 @@ export default class Schema<T> {
    * Add the model base fields, and each field has a corresponding database column.
    * In default, each field generate a GraphQL field, unless it config with "hidden:true".
    */
-  fields (fields:{[id:string]: FieldType}):Schema<T> {
+  fields (fields: { [id: string]: FieldOptions }): Schema {
     this.config.fields = Object.assign(this.config.fields, fields)
     return this
   }
@@ -49,7 +141,7 @@ export default class Schema<T> {
   /**
    * Add the model link fields, and each link generate a GraphQL field but no corresponding database column.
    */
-  links (links:{[id:string]: LinkedFieldConfig}):Schema<T> {
+  links (links: { [id: string]: LinkedFieldOptions }): Schema {
     this.config.links = Object.assign(this.config.links, links)
     return this
   }
@@ -57,7 +149,7 @@ export default class Schema<T> {
   /**
    * Add the GraphQL query methods.
    */
-  queries (queries:{[string]:QueryConfig<T>}):Schema<T> {
+  queries (queries: { [string]: QueryOptions }): Schema {
     // TODO duplicate check
     this.config.queries = Object.assign(this.config.queries, queries)
     return this
@@ -66,7 +158,7 @@ export default class Schema<T> {
   /**
    * Add the GraphQL mutataion methods.
    */
-  mutations (mutations:{[string]:MutationConfig<T>}):Schema<T> {
+  mutations (mutations: { [string]: MutationOptions }): Schema {
     // TODO duplicate check
     this.config.mutations = Object.assign(this.config.mutations, mutations)
     return this
@@ -75,7 +167,7 @@ export default class Schema<T> {
   /**
    * Add instance method to current Schema.
    */
-  methods (methods:{[string]:any}):Schema<T> {
+  methods (methods: { [string]: any }): Schema {
     this.config.methods = Object.assign(this.config.methods, methods)
     return this
   }
@@ -83,7 +175,7 @@ export default class Schema<T> {
   /**
    * Add statics method to current Schema.
    */
-  statics (statics:{[string]:any}):Schema<T> {
+  statics (statics: { [string]: any }): Schema {
     this.config.statics = Object.assign(this.config.statics, statics)
     return this
   }
@@ -91,7 +183,7 @@ export default class Schema<T> {
   /**
    * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#hasone|HasOne} relations to current Schema.
    */
-  hasOne (config:HasOneConfig<T>):Schema<T> {
+  hasOne (config: HasOneConfig): Schema {
     _.forOwn(config, (value, key) => {
       this.config.associations.hasOne[key] = value
     })
@@ -101,7 +193,7 @@ export default class Schema<T> {
   /**
    * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#belongsto|BelongsTo} relations to current Schema.
    */
-  belongsTo (config:BelongsToConfig):Schema<T> {
+  belongsTo (config: BelongsToConfig): Schema {
     _.forOwn(config, (value, key) => {
       this.config.associations.belongsTo[key] = value
     })
@@ -111,7 +203,7 @@ export default class Schema<T> {
   /**
    * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#one-to-many-associations|HasMany} relations to current Schema.
    */
-  hasMany (config:HasManyConfig<T>):Schema<T> {
+  hasMany (config: HasManyConfig): Schema {
     _.forOwn(config, (value, key) => {
       this.config.associations.hasMany[key] = value
     })
@@ -121,14 +213,14 @@ export default class Schema<T> {
   /**
    * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#belongs-to-many-associations|BelongsToMany} relations to current Schema.
    */
-  belongsToMany (config:BelongsToManyConfig):Schema<T> {
+  belongsToMany (config: BelongsToManyConfig): Schema {
     _.forOwn(config, (value, key) => {
       this.config.associations.belongsToMany[key] = value
     })
     return this
   }
 
-  plugin<E> (plugin:(schema:Schema<any>, options:E)=>void, options:E) {
+  plugin<E> (plugin: (schema: Schema, options: E)=>void, options: E) {
     plugin(this, options)
   }
 }
