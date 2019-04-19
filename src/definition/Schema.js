@@ -1,6 +1,13 @@
 // @flow
 import _ from 'lodash'
-import type { FieldOptions, InputFieldOptions, LinkedFieldOptions, MutationOptions, QueryOptions } from '../Definition'
+import type {
+  ColumnFieldOptions,
+  FieldOptions,
+  InputFieldOptions,
+  LinkedFieldOptions,
+  MutationOptions,
+  QueryOptions
+} from '../Definition'
 import type { DefineOptions } from 'sequelize'
 
 export type SchemaOptionConfig = {
@@ -100,7 +107,7 @@ export default class Schema {
   name: string
 
   config: {
-    fields: { [id: string]: FieldOptions },
+    fields: { [id: string]: ColumnFieldOptions },
     links: { [id: string]: LinkedFieldOptions },
     associations: AssociationConfig,
     options: SchemaOptionConfig,

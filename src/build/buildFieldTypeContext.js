@@ -116,6 +116,12 @@ export default function (fieldTypes: ?Array<FieldType>, schemas: Array<Schema>, 
           typeMap[schema.name + 'Connection'] = {
             name: schema.name + 'Connection',
             description: schema.name + 'Connection',
+            argFieldMap: {
+              after: 'String',
+              first: 'Integer',
+              before: 'String',
+              last: 'Integer'
+            },
             inputType: undefined,
             outputType: connectionInfo.connectionType
           }

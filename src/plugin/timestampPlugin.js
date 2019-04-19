@@ -6,7 +6,7 @@ export default ({
   defaultOptions: true,
   priority: 100,
   description: 'Add createdAt/updatedAt field to Schema',
-  apply: (schema, options) => {
+  apply: (schema, options, schemas) => {
     schema.fields({
       createdAt: {
         $type: 'Date',

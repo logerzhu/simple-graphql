@@ -51,21 +51,14 @@ export type FieldType = {|
   outputType?: GraphQLOutputType,
   outputResolve?: FieldResolve,
   columnOptions?: DefineAttributeColumnOptions | (schema: any, fieldName: string, options: ColumnFieldOptions) => ?DefineAttributeColumnOptions
-|} | (typeContext: FieldTypeContext) => {|
-  name: string,
-  description?: string,
-  inputType?: GraphQLInputType,
-  argFieldMap?: { [string]: InputFieldOptions },
-  outputType?: GraphQLOutputType,
-  outputResolve?: FieldResolve,
-  columnOptions?: DefineAttributeColumnOptions | (schema: any, fieldName: string, options: ColumnFieldOptions) => ?DefineAttributeColumnOptions
 |}
 
 export type InputFieldOptions = string | Array<InputFieldOptions> | {
   $type: InputFieldOptions,
   description?: string,
   required?: boolean,
-  default?: any
+  default?: any,
+  mapper: (option: { where: Object, attributes: Array<string> }, any)=>void
 } | { [string]: InputFieldOptions }
 
 export type FieldOptions = string | Array<FieldOptions> | {
@@ -84,6 +77,7 @@ export type LinkedFieldOptions = {
   description?: string,
   required?: boolean,
   default?: any,
+  dependentFields?: [string],
   args?: { [string]: InputFieldOptions },
   resolve: FieldResolve
 }
@@ -136,7 +130,8 @@ export type Plugin = {
   description?: string,
   priority?: number,
   defaultOptions: ?(boolean | Object),
-  apply: (schema: Schema, options: ?(boolean | Object)) => void
+  fieldTypes?: Array<FieldType>,
+  apply: (schema: Schema, options: (boolean | Object), schemas: Array<Schema>) => void
 }
 
 export type BuildOptionConfig = {
