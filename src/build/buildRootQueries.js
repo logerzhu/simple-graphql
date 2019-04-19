@@ -23,11 +23,13 @@ export default (schemas: Array<Schema>, services: Array<Service>,
       description: options.description
     }
     if (options.args || fieldConfig.args) {
-      queries[name].args = toGraphQLInputFieldConfigMap(
-        StringHelper.toInitialUpperCase(name), {
-          ...fieldConfig.args,
-          ...options.args
-        }, context)
+      queries[name].args = {
+        ...fieldConfig.args,
+        ...toGraphQLInputFieldConfigMap(
+          StringHelper.toInitialUpperCase(name), {
+            ...options.args
+          }, context)
+      }
     }
   }
   for (let schema of schemas) {

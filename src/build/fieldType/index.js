@@ -7,7 +7,7 @@ import Boolean from './Boolean'
 import Date from './Date'
 import JSON from './JSON'
 import Number from './Number'
-import String from './String'
+import StringField from './String'
 
 export default ({
   Id: Id,
@@ -16,5 +16,5 @@ export default ({
   Date: Date,
   JSON: JSON,
   Number: Number,
-  String: String
+  'String': StringField
 }: { [id: string]: FieldType })

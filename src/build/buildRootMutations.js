@@ -21,7 +21,7 @@ export default (schemas: Array<Schema>,
       throw new Error(`Mutation ${name} already defined.`)
     }
 
-    const inputFields = toGraphQLInputFieldConfigMap(StringHelper.toInitialUpperCase(name), options.inputFields, context)
+    const inputFields = toGraphQLInputFieldConfigMap(StringHelper.toInitialUpperCase(name), options.inputFields || {}, context)
     const outputFields = toGraphQLFieldConfigMap(name, 'Payload', { ...options.outputFields }, context)
     const payloadFields = _.get(options, 'mutation.payloadFields', [])
 

@@ -8,18 +8,17 @@ export default SG.schema('User', {
     addMutation: true,
     singularQuery: true,
     pluralQuery: {
-      conditionFields: {
-        passwordLike: {
-          $type: String,
-          enumValues: ['A', 'B'],
-          mapper: function ({ where, attributes }, argValue, sgContext) {
-            if (argValue) {
-              where.$and = where.$and || []
-              where['password'] = { $like: `%${argValue}%` }
-            }
-          }
-        }
-      }
+      // conditionFields: {
+      //   passwordLike: {
+      //     $type: ['A', 'B'],
+      //     mapper: function ({ where, attributes }, argValue, sgContext) {
+      //       if (argValue) {
+      //         where.$and = where.$and || []
+      //         where['password'] = { $like: `%${argValue}%` }
+      //       }
+      //     }
+      //   }
+      // }
     }
   },
   table: {
@@ -27,34 +26,34 @@ export default SG.schema('User', {
   }
 }).fields({
   userName: {
-    $type: String,
+    $type: 'String',
     required: true
   },
   password: {
-    $type: String,
+    $type: 'String',
     required: true
   },
   tags: {
-    $type: [String]
+    $type: '[String]'
   },
   blocked: {
-    $type: Boolean,
+    $type: 'Boolean',
     default: false
   },
   registerAt: {
-    $type: Date,
+    $type: 'Date',
     default: () => new Date()
   }
 }).links({
   p1: {
-    $type: String,
+    $type: 'String',
     dependentFields: ['p2', 'blocked'],
     resolve: async function ({ password, blocked }) {
       return password + ',' + blocked
     }
   },
   p2: {
-    $type: JSON,
+    $type: 'JSON',
     dependentFields: ['dueTodos.title'],
     resolve: async function ({ dueTodos }) {
       return dueTodos.map(t => t.title)
@@ -68,9 +67,9 @@ export default SG.schema('User', {
       completed: false
     },
     // conditionFields: {
-    //  completed: Boolean,
+    //  completed: 'Boolean',
     //  keyword: {
-    //    $type: String,
+    //    $type: 'String',
     //    mapper: function ({where}, argValue, sgContext) {
     //      if (argValue) {
     //        where.$and = where.$and || []

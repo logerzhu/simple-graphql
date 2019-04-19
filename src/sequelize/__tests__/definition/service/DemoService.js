@@ -5,7 +5,7 @@ let gWeather = '晴天'
 
 export default SG.service('DemoService').queries({
   weather: {
-    $type: String,
+    $type: 'String',
     resolve: async function (args, context, info) {
       return gWeather
     }
@@ -14,13 +14,13 @@ export default SG.service('DemoService').queries({
   setWeather: {
     inputFields: {
       weather: {
-        $type: String,
+        $type: 'String',
         required: true
       }
     },
     outputFields: {
       weather: {
-        $type: String,
+        $type: 'String',
         required: true
       }
     },

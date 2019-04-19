@@ -133,21 +133,6 @@ export type Plugin = {
   apply: (schema: Schema, options: (boolean | Object), schemas: Array<Schema>) => void
 }
 
-export type BuildOptionConfig = {
-  plugin?: { [id: string]: boolean | Object },
-  query?: {
-    viewer?: 'AllQuery' | 'FromModelQuery' | QueryOptions,
-  },
-  mutation?: {
-    payloadFields?: Array<string | {
-      name: string,
-      $type: LinkedFieldOptions,
-      description?: string,
-      args?: { [string]: InputFieldOptions },
-      resolve: (args: { [argName: string]: any },
-                context: any,
-                info: GraphQLResolveInfo,
-                sgContext: SGContext) => any
-    }>
-  }
+export type BuildOptions = {
+  plugin?: { [id: string]: boolean | Object }
 }

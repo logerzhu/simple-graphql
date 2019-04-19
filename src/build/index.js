@@ -10,7 +10,7 @@ import Schema from '../definition/Schema'
 import Service from '../definition/Service'
 
 import type {
-  BuildOptionConfig,
+  BuildOptions,
   FieldType,
   FieldTypeContext,
   Hook,
@@ -31,14 +31,15 @@ import buildRootMutations from './buildRootMutations'
 
 export default function (sequelize: Sequelize, config: {
   fieldTypes?: Array<FieldType>,
+  // TODO support Data Type
   schemas?: Array<Schema>,
   services?: Array<Service>,
   hooks?: Array<Hook>,
   plugins?: Array<Plugin>
-}, options: BuildOptionConfig): { graphQLSchema: GraphQLSchema, sgContext: any } {
+}, buildOptions: BuildOptions): { graphQLSchema: GraphQLSchema, sgContext: any } {
   const sgContext: SGContext = {
     sequelize: sequelize,
-    schemas: applyPlugins(config.schemas || [], config.plugins || [], options.plugin || {}),
+    schemas: applyPlugins(config.schemas || [], config.plugins || [], buildOptions.plugin || {}),
     models: {},
     services: {},
     fieldType: (typeName) => null
@@ -86,6 +87,7 @@ export default function (sequelize: Sequelize, config: {
     }
     schemaConfig.query = rootQueryObject
   }
+
   const rootMutations = buildRootMutations(config.schemas || [], config.services || [], payloadFields, context)
   if (_.keys(rootMutations).length > 0) {
     schemaConfig.mutation = new GraphQLObjectType({
@@ -93,6 +95,7 @@ export default function (sequelize: Sequelize, config: {
       fields: () => rootMutations
     })
   }
+
   return {
     sgContext: sgContext,
     graphQLSchema: new GraphQLSchema(schemaConfig)

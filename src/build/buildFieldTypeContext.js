@@ -6,25 +6,27 @@ import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
 import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
 import globalIdType from './fieldType/globalIdType'
+import Sequelize from 'sequelize'
 
 type Context = ResolverContext & InterfaceContext
 
 function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, context: Context): FieldType {
   const typeName = schema.name
-  const fieldType = fieldTypeContext.fieldType(typeName)
-  if (fieldType) { return fieldType }
   return {
     name: typeName,
     description: schema.config.options.description,
-    inputType: buildModelTypeId(schema, fieldTypeContext, context).inputType,
+    inputType: (fieldTypeContext.fieldType(schema.name + 'Id'): any).inputType,
     outputType: new graphql.GraphQLObjectType({
       name: typeName,
       interfaces: [context.interface('node')],
       fields: () => toGraphQLFieldConfigMap(typeName, '',
         {
           id: {
-            $type: `${typeName}Id`,
-            required: true
+            $type: `Id`,
+            required: true,
+            resolve: async function (root) {
+              return relay.toGlobalId(schema.name, root.id)
+            }
           },
           ...schema.config.fields,
           ...schema.config.links
@@ -74,8 +76,6 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
 
 function buildModelTypeId (schema: Schema, fieldTypeContext: FieldTypeContext, context: Context): FieldType {
   const typeName = schema.name + 'Id'
-  const fieldType = fieldTypeContext.fieldType(typeName)
-  if (fieldType) { return fieldType }
   const idType = globalIdType(schema.name)
   return {
     name: typeName,
@@ -90,6 +90,22 @@ export default function (fieldTypes: ?Array<FieldType>, schemas: Array<Schema>, 
   const fieldTypeContext: FieldTypeContext = {
     fieldType: (typeName) => {
       if (!typeMap[typeName]) {
+        if (typeName.startsWith('[') && typeName.endsWith(']')) {
+          const fieldType = fieldTypeContext.fieldType(typeName.substr(1, typeName.length - 2))
+          if (!fieldType) {
+            return null
+          }
+          typeMap[typeName] = {
+            name: typeName,
+            description: `Array of type ${typeName.substr(1, typeName.length - 2)}`,
+            inputType: fieldType.inputType ? new graphql.GraphQLList(fieldType.inputType) : null,
+            outputType: fieldType.outputType ? new graphql.GraphQLList(fieldType.outputType) : null,
+            columnOptions: { type: Sequelize.JSON }
+          }
+          // TODO check Model array resolve
+          return typeMap[typeName]
+        }
+
         let schema = schemas.find(s => s.name === typeName)
         if (schema) {
           typeMap[typeName] = buildModelType(schema, fieldTypeContext, context)
@@ -104,9 +120,13 @@ export default function (fieldTypes: ?Array<FieldType>, schemas: Array<Schema>, 
 
         schema = schemas.find(s => s.name + 'Connection' === typeName || s.name + 'Edge' === typeName)
         if (schema) {
+          const fieldType = fieldTypeContext.fieldType(schema.name)
+          if (!fieldType) {
+            return null
+          }
           const connectionInfo = relay.connectionDefinitions({
             name: schema.name,
-            nodeType: (buildModelType(schema, fieldTypeContext, context).outputType: any),
+            nodeType: (fieldType.outputType: any),
             connectionFields: {
               count: {
                 type: graphql.GraphQLFloat
@@ -132,11 +152,6 @@ export default function (fieldTypes: ?Array<FieldType>, schemas: Array<Schema>, 
             outputType: connectionInfo.edgeType
           }
           return typeMap[typeName]
-        }
-
-        schema = schemas.find(s => `[${s.name}]` === typeName)
-        if (schema) {
-          // TODO implement 数组的实现
         }
       }
       return typeMap[typeName]

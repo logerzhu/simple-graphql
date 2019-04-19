@@ -1,19 +1,17 @@
 import SG from '../../../../'
 
-const UserType = 'User'
 export default SG.schema('UserProfile', {
   plugin: {
     singularQuery: true
   }
 }).fields({
   owner: {
-    $type: UserType,
+    $type: 'User',
     required: true
   },
-  realName: String,
-  age: SG.ScalarFieldTypes.Int,
+  realName: 'String',
+  age: 'Integer',
   gender: {
-    $type: String,
-    enumValues: ['Male', 'Female']
+    $type: ['Male', 'Female']
   }
 })

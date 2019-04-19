@@ -25,7 +25,7 @@ export default (schemas: Array<Schema>, plugins: Array<Plugin>, defaultOptions: 
       if (options === undefined) {
         options = plugin.defaultOptions
       }
-      if (options !== undefined) {
+      if (options != null && options !== false) {
         plugin.apply(schema, options, schemas)
       }
     }

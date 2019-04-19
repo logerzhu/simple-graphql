@@ -8,9 +8,9 @@ const getSearchFields = (schema, schemas) => {
 
   const isModelType = (fieldOptions: ColumnFieldOptions) => {
     if (typeof fieldOptions === 'string') {
-      return schemas.find(s => s.name === fieldOptions) !== null
+      return schemas.find(s => s.name === fieldOptions) != null
     } else if (typeof fieldOptions === 'object') {
-      return schemas.find(s => s.name === (fieldOptions: any).$type) !== null
+      return schemas.find(s => s.name === (fieldOptions: any).$type) != null
     }
     return false
   }

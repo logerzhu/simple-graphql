@@ -1,9 +1,6 @@
 // @flow
 import SG from '../../../../'
 
-const UserType = 'User'
-const TodoType = 'Todo'
-
 export default SG.schema('Todo', {
   table: {
     underscored: true
@@ -11,37 +8,37 @@ export default SG.schema('Todo', {
   plugin: {
     addMutation: true,
     singularQuery: true,
-    pluralQuery: true
+    pluralQuery: false
   }
 }).fields({
   owner: {
-    $type: UserType,
+    $type: 'User',
     required: true
   },
   title: {
-    $type: String,
+    $type: 'String',
     required: true
   },
-  description: String,
+  description: 'String',
   completed: {
-    $type: Boolean,
+    $type: 'Boolean',
     required: true
   },
-  dueAt: Date
+  dueAt: 'Date'
 }).queries({
   dueTodos: {
     description: 'Find all due todos',
-    $type: [TodoType],
+    $type: '[Todo]',
     config: {
       acl: 'User'
     },
     args: {
       ownerId: {
-        $type: UserType,
+        $type: 'UserId',
         required: true
       },
       dueBefore: {
-        $type: Date,
+        $type: 'Date',
         required: true
       }
     },
@@ -62,12 +59,12 @@ export default SG.schema('Todo', {
     description: 'Mark the todo task completed.',
     inputFields: {
       todoId: {
-        $type: TodoType,
+        $type: 'Todo',
         required: true
       }
     },
     outputFields: {
-      changedTodo: TodoType
+      changedTodo: 'Todo'
     },
     mutateAndGetPayload: async function ({ todoId }, context, info, { models: { Todo } }) {
       const todo = await Todo.findOne({ where: { id: todoId } })
