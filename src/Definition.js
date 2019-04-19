@@ -130,7 +130,6 @@ export type Plugin = {
   description?: string,
   priority?: number,
   defaultOptions: ?(boolean | Object),
-  dataTypes?: {[string]:FieldOptions},
   apply: (schema: Schema, options: (boolean | Object), schemas: Array<Schema>) => void
 }
 

@@ -14,9 +14,10 @@ export default ({
 
     const inputFields = {}
     const isModelType = (fieldOptions: ColumnFieldOptions) => {
-      const typeName = typeof fieldOptions === 'string' ? fieldOptions : fieldOptions && fieldOptions.$type
-      if (typeof typeName === 'string') {
-        return schemas.find(s => s.name === typeName) !== null
+      if (typeof fieldOptions === 'string') {
+        return schemas.find(s => s.name === fieldOptions) !== null
+      } else if (typeof fieldOptions === 'object') {
+        return schemas.find(s => s.name === (fieldOptions:any).$type) !== null
       }
       return false
     }

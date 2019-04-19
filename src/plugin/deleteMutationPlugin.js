@@ -1,9 +1,7 @@
 // @flow
 import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
-
-import Schema from '../../definition/Schema'
-import StringHelper from '../../utils/StringHelper'
+import StringHelper from '../utils/StringHelper'
 import type { Plugin } from '../Definition'
 
 export default ({
@@ -11,7 +9,7 @@ export default ({
   defaultOptions: false,
   priority: 0,
   description: 'Gen `delete mutation` for Schema',
-  apply: function deleteMutation (schema: Schema, options: any): void {
+  apply: function (schema, options, schemas): void {
     const name = 'delete' + StringHelper.toInitialUpperCase(schema.name)
     let config = {}
     if ((typeof options) === 'object') {

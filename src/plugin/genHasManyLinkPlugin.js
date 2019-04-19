@@ -17,7 +17,7 @@ export default ({
       const conditionFields = {}
       _.forOwn(config.conditionFields || {}, async function (value, key) {
         if (!value.$type) {
-          value = { $type: value }
+          value = { $type: value, mapper: (null: any) }
         }
         if (!value.mapper) {
           value.mapper = function (option: { where: Object, attributes: Array<string> }, argValue) {
