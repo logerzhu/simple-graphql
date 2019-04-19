@@ -52,7 +52,7 @@ type HasManyConfig = {
   [string]: {
     config?: Object,
     hidden?: boolean,
-    conditionFields?: InputFieldOptions,
+    conditionFields?: { [string]: InputFieldOptions },
     target: string,
     through?: string | {
       model: string,

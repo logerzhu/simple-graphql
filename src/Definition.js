@@ -53,7 +53,7 @@ export type FieldType = {|
   columnOptions?: DefineAttributeColumnOptions | (schema: any, fieldName: string, options: ColumnFieldOptions) => ?DefineAttributeColumnOptions
 |}
 
-export type InputFieldOptions = string | Array<InputFieldOptions> | {
+export type InputFieldOptions = string | Array<string> | {
   $type: InputFieldOptions,
   description?: string,
   required?: boolean,
@@ -61,7 +61,7 @@ export type InputFieldOptions = string | Array<InputFieldOptions> | {
   mapper: (option: { where: Object, attributes: Array<string> }, any)=>void
 } | { [string]: InputFieldOptions }
 
-export type FieldOptions = string | Array<FieldOptions> | {
+export type FieldOptions = string | Array<string> | {
   config?: Object,
   $type: FieldOptions,
   description?: string,
@@ -82,7 +82,7 @@ export type LinkedFieldOptions = {
   resolve: FieldResolve
 }
 
-export type ColumnFieldOptions = string | Array<FieldOptions> | {
+export type ColumnFieldOptions = string | Array<string> | {
   config?: Object,
   $type: FieldOptions,
   description?: string,
@@ -130,7 +130,7 @@ export type Plugin = {
   description?: string,
   priority?: number,
   defaultOptions: ?(boolean | Object),
-  fieldTypes?: Array<FieldType>,
+  dataTypes?: {[string]:FieldOptions},
   apply: (schema: Schema, options: (boolean | Object), schemas: Array<Schema>) => void
 }
 

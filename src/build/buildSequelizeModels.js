@@ -1,4 +1,5 @@
 // @flow
+import type { DefineAttributeColumnOptions } from 'sequelize'
 import Sequelize from 'sequelize'
 import Schema from '../definition/Schema'
 import type { FieldTypeContext, ModelDefine, SGContext } from '../Definition'
@@ -15,15 +16,21 @@ function toSequelizeModel (sequelize: Sequelize, schema: Schema, context: FieldT
       typeName = value.$type
     }
 
-    const fieldType = context.fieldType(typeName)
-    if (!fieldType) {
-      throw new Error(`Type "${typeName}" has not register.`)
+    let columnOptions: ?DefineAttributeColumnOptions = null
+    if (_.isArray(typeName)) {
+      columnOptions = {
+        type: Sequelize.STRING(191)
+      }
+    } else {
+      const fieldType = context.fieldType(typeName)
+      if (!fieldType) {
+        throw new Error(`Type "${typeName}" has not register.`)
+      }
+      if (!fieldType.columnOptions) {
+        throw new Error(`Column type of "${typeName}" is not supported.`)
+      }
+      columnOptions = typeof fieldType.columnOptions === 'function' ? fieldType.columnOptions(schema, key, value) : fieldType.columnOptions
     }
-    if (!fieldType.columnOptions) {
-      throw new Error(`Column type of "${typeName}" is not supported.`)
-    }
-
-    let columnOptions = typeof fieldType.columnOptions === 'function' ? fieldType.columnOptions(schema, key, value) : fieldType.columnOptions
     if (columnOptions) {
       dbDefinition[key] = columnOptions
       if (value && value.$type) {
