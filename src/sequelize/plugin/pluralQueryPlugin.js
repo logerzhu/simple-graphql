@@ -53,8 +53,8 @@ const getSearchFields = (schema) => {
         key = key + 'Id'
       }
     }
-    if (!searchFields[key] && (!value['$type'] || (value['searchable'] !== false && value['hidden'] !== true && !value['resolve']))) {
-      if (!value['$type']) {
+    if (!searchFields[key] && (!value.$type || (value['searchable'] !== false && value['hidden'] !== true && !value['resolve']))) {
+      if (!value.$type) {
         searchFields[key] = { $type: value }
       } else {
         if (value['required']) {
@@ -68,17 +68,17 @@ const getSearchFields = (schema) => {
       }
 
       let type = searchFields[key]
-      while (type['$type'] || _.isArray(type)) {
-        if (type['$type']) {
-          type = type['$type']
+      while (type.$type || _.isArray(type)) {
+        if (type.$type) {
+          type = type.$type
         } else if (_.isArray(type)) {
           type = type[0]
         }
       }
-      if (type === Date || type['$type'] === Date) {
+      if (type === Date || type.$type === Date) {
         type = DateConditionType
       }
-      if (searchFields[key]['$type']) {
+      if (searchFields[key].$type) {
         searchFields[key] = { ...searchFields[key], ...{ $type: type } }
       } else {
         searchFields[key] = { $type: type }

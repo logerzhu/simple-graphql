@@ -15,7 +15,7 @@ export default function hasManyLinkedField (schema:Schema, options:any):void {
 
     const conditionFields = {}
     _.forOwn(config.conditionFields || {}, async function (config:any, key) {
-      if (!config['$type']) {
+      if (!config.$type) {
         config = { $type: config }
       }
       if (!config.mapper) {

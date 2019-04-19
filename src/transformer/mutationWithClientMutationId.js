@@ -1,15 +1,15 @@
 // @flow
 
-import { GraphQLNonNull, GraphQLString, GraphQLObjectType, GraphQLInputObjectType } from 'graphql'
 import type { GraphQLFieldConfig } from 'graphql'
+import { GraphQLInputObjectType, GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql'
 
-export default function mutationWithClientMutationId (config:{
-  name:string,
-  description:?string,
-  inputFields:any,
-  outputFields:any,
-  mutateAndGetPayload:any
-}):GraphQLFieldConfig<any, any> {
+export default function mutationWithClientMutationId (config: {
+  name: string,
+  description: ?string,
+  inputFields: any,
+  outputFields: any,
+  mutateAndGetPayload: any
+}): GraphQLFieldConfig<any, any> {
   let { name, description, inputFields, outputFields, mutateAndGetPayload } = config
 
   let augmentedInputFields = Object.assign({}, inputFields, {
@@ -39,7 +39,7 @@ export default function mutationWithClientMutationId (config:{
     args: {
       input: { type: new GraphQLNonNull(inputType) }
     },
-    resolve: function resolve (_:any, _ref:any, context:any, info:any) {
+    resolve: function resolve (_: any, _ref: any, context: any, info: any) {
       let input = _ref['input']
       return Promise.resolve(mutateAndGetPayload(input, context, info)).then(
         function (payload) {

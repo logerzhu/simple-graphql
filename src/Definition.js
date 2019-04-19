@@ -1,292 +1,155 @@
 // @flow
-/* global Class */
-
-import type { GraphQLInputType, GraphQLOutputType, GraphQLResolveInfo } from 'graphql'
-
+import type {
+  GraphQLFieldResolver,
+  GraphQLInputType,
+  GraphQLInterfaceType,
+  GraphQLOutputType,
+  GraphQLResolveInfo
+} from 'graphql'
 import type { DefineAttributeColumnOptions, DefineOptions } from 'sequelize'
 import Sequelize from 'sequelize'
-
-import Type from './type'
-
-// class SGModel extends Sequelize.Model<{ id: any }> {
-//   static resolveQueryOption: any
-// }
+import Schema from './definition/Schema'
 
 export type ModelDefine = any// Class<SGModel>
 
 export type SGContext = {
   sequelize: Sequelize,
+  schemas: { [string]: Schema },
   models: { [string]: ModelDefine },
-  services: { [string]: Object }
+  services: { [string]: Object },
+  fieldType: (string) => ?FieldType
 }
 
-/**
- * @public
- */
-export type LinkedFieldType =
-  Class<String>
-  | Class<Number>
-  | Class<Boolean>
-  | Class<Date>
-  | Class<JSON>
-  | GraphQLOutputType
-  |
-  Type.ScalarFieldType
-  | string
-  | Array<LinkedFieldType>
-  | {
-  [string]: LinkedFieldType,
-  $type?: LinkedFieldType,
+export type ResolverContext = {
+  hookFieldResolve: (string, LinkedFieldOptions) => GraphQLFieldResolver<any, any>,
+  hookQueryResolve: (string, QueryOptions) => GraphQLFieldResolver<any, any>,
+  hookMutationResolve: (string, MutationOptions) => GraphQLFieldResolver<any, any>
+}
+
+export type InterfaceContext = {
+  interface: (string) => GraphQLInterfaceType,
+  registerInterface: (string, GraphQLInterfaceType) => void
+}
+
+export type FieldTypeContext = { fieldType: (string) => ?FieldType }
+
+export type FieldResolve = (source: any, args: { [string]: any },
+                            context: any,
+                            info: GraphQLResolveInfo,
+                            sgContext: SGContext) => any
+
+export type RootResolve = (args: { [string]: any },
+                           context: any,
+                           info: GraphQLResolveInfo,
+                           sgContext: SGContext) => any
+
+export type FieldType = {|
+  name: string,
+  description?: string,
+  inputType?: GraphQLInputType,
+  argFieldMap?: { [string]: InputFieldOptions },
+  outputType?: GraphQLOutputType,
+  outputResolve?: FieldResolve,
+  columnOptions?: DefineAttributeColumnOptions | (schema: any, fieldName: string, options: ColumnFieldOptions) => ?DefineAttributeColumnOptions
+|} | (typeContext: FieldTypeContext) => {|
+  name: string,
+  description?: string,
+  inputType?: GraphQLInputType,
+  argFieldMap?: { [string]: InputFieldOptions },
+  outputType?: GraphQLOutputType,
+  outputResolve?: FieldResolve,
+  columnOptions?: DefineAttributeColumnOptions | (schema: any, fieldName: string, options: ColumnFieldOptions) => ?DefineAttributeColumnOptions
+|}
+
+export type InputFieldOptions = string | Array<InputFieldOptions> | {
+  $type: InputFieldOptions,
+  description?: string,
+  required?: boolean,
+  default?: any
+} | { [string]: InputFieldOptions }
+
+export type FieldOptions = string | Array<FieldOptions> | {
+  config?: Object,
+  $type: FieldOptions,
+  description?: string,
   required?: boolean,
   default?: any,
-  enumValues?: Array<string>,
-  // description?:string,
-  args?: { [string]: LinkedFieldType },
-  resolve?: (source: any, args: { [string]: any },
-             context: any,
-             info: GraphQLResolveInfo,
-             sgContext: SGContext) => any
-}
+  args?: { [string]: InputFieldOptions },
+  resolve?: FieldResolve
+} | { [string]: FieldOptions }
 
-type InputFieldType = Class<String> | Class<Number> | Class<Boolean> | Class<Date> | Class<JSON> | GraphQLInputType |
-  Type.ScalarFieldType | string | Array<InputFieldType> | {
-  [string]: InputFieldType,
-  $type?: InputFieldType,
+export type LinkedFieldOptions = {
+  config?: Object,
+  $type: FieldOptions,
+  description?: string,
   required?: boolean,
   default?: any,
-  enumValues?: Array<string>,
-  mapper?: (option: { where: Object, bind: Array<any>, attributes: Array<string> }, argValue: any, sgContext: SGContext) => void
-  // description?:string
+  args?: { [string]: InputFieldOptions },
+  resolve: FieldResolve
 }
 
-/**
- * @public
- */
-export type ArgsType = { [string]: InputFieldType }
-
-/**
- * @public
- */
-export type LinkedFieldConfig = {
-  $type: LinkedFieldType,
+export type ColumnFieldOptions = string | Array<FieldOptions> | {
+  config?: Object,
+  $type: FieldOptions,
   description?: string,
-  dependentFields?: Array<string>,
-  args?: ArgsType,
-  resolve: (source: any, args: { [string]: any },
-            context: any,
-            info: GraphQLResolveInfo,
-            sgContext: SGContext) => any
-}
-
-/**
- * @public
- */
-export type QueryConfig<T> = {
-  $type: LinkedFieldType,
-  description?: string,
-  config?: T,
-  args?: ArgsType,
-  resolve: (args: { [string]: any },
-            context: any,
-            info: GraphQLResolveInfo,
-            sgContext: SGContext) => any
-}
-
-/**
- * @public
- */
-export type MutationConfig<T> = {
-  description?: string,
-  config?: T,
-  inputFields: ArgsType,
-  outputFields: { [string]: LinkedFieldType },
-  mutateAndGetPayload: (args: { [string]: any },
-                        context: any,
-                        info: GraphQLResolveInfo,
-                        sgContext: SGContext) => any
-}
-
-/**
- * ValidateConfig, for {@link https://github.com/chriso/validator.js|validator.js}
- */
-type ValidateConfig = {
-  is?: [string, string] | RegExp,
-  not?: [string, string],
-  isEmail?: boolean,
-  isUrl?: boolean,
-  isIP?: boolean,
-  isIPv4?: boolean,
-  isIPv6?: boolean,
-  isAlpha?: boolean,
-  isAlphanumeric?: boolean,
-  isNumeric?: boolean,
-  isInt?: boolean,
-  isFloat?: boolean,
-  isDecimal?: boolean,
-  isLowercase?: boolean,
-  isUppercase?: boolean,
-  notNull?: boolean,
-  isNull?: boolean,
-  notEmpty?: boolean,
-  equals?: string | boolean | number,
-  contains?: string,
-  notIn?: [Array<string | boolean | number>],
-  isIn?: [Array<string | boolean | number>],
-  notContains?: string,
-  len?: [number, number],
-  isUUID?: number,
-  isDate?: boolean,
-  isAfter?: string,
-  isBefore?: string,
-  max?: number,
-  min?: number,
-  isCreditCard?: boolean,
-  [string]: (string) => void
-}
-
-/** DB Column config */
-type ColumnConfig = DefineAttributeColumnOptions
-
-/**
- * @public
- */
-type BaseFieldType =
-  Class<String>
-  | Class<Number>
-  | Class<Boolean>
-  | Class<Date>
-  | Class<JSON>
-  | GraphQLOutputType
-  | Type.ScalarFieldType
-  | string
-
-/**
- * @public
- */
-export type FieldType = BaseFieldType | Array<LinkedFieldType> | {
-  $type: LinkedFieldType,
-  description?: string,
-  enumValues?: Array<string>,
-  default?: any,
   required?: boolean,
-  hidden?: boolean, // hidden为true, 对应的field将不会出现在graphql schema中
-  validate?: ValidateConfig,
-  column?: ColumnConfig
+  default?: any,
+  hidden?: boolean,
+  column?: DefineAttributeColumnOptions
 }
 
-/**
- * @public
- */
+export type QueryOptions = {
+  $type: FieldOptions,
+  description?: string,
+  config?: Object,
+  args?: { [string]: InputFieldOptions },
+  resolve: RootResolve
+}
+
+export type MutationOptions = {
+  description?: string,
+  config?: Object,
+  inputFields: { [string]: InputFieldOptions },
+  outputFields: { [string]: FieldOptions },
+  mutateAndGetPayload: RootResolve
+}
+
 export type SchemaOptionConfig = {
   description?: string,
   plugin?: Object,
   table?: DefineOptions<any>
 }
 
-/**
- * @public
- */
-export type HasOneConfig<T> = {
-  [string]: {
-    config?: T,
-    hidden?: boolean,
-    target: string,
-    foreignField?: string,
-    foreignKey?: string,
-    onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
-    onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
-    constraints?: boolean
-  }
+export type HookAction = { type: 'field' | 'query' | 'mutation', name: string, options: LinkedFieldOptions | QueryOptions | MutationOptions }
+
+export type Hook = {
+  description?: string,
+  priority?: number,
+  filter: (action: HookAction)=>boolean,
+  hook: (action: HookAction,
+         invokeInfo: { source?: any, args?: ?{ [string]: any }, context?: any, info?: GraphQLResolveInfo, sgContext?: SGContext },
+         next: ()=>any)=>any
 }
 
-/**
- * @public
- */
-export type BelongsToConfig = {
-  [string]: {
-    hidden?: boolean,
-    target: string,
-    foreignField?: string,
-    foreignKey?: string | { name: string, allowNull?: boolean },
-    targetKey?: string,
-    onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
-    onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
-    constraints?: boolean
-  }
-}
-
-export type HasManyConfig<T> = {
-  [string]: {
-    config?: T,
-    hidden?: boolean,
-    conditionFields?: ArgsType,
-    target: string,
-    through?: string | {
-      model: string,
-      scope?: Object,
-      unique?: boolean
-    },
-    foreignField?: string,
-    foreignKey?: string,
-    sourceKey?: string,
-    scope?: Object,
-    onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
-    onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
-    constraints?: boolean,
-    order?: Array<Array<any>>,
-    outputStructure?: 'Connection' | 'Array'
-  }
-}
-
-/**
- * @public
- */
-export type BelongsToManyConfig = {
-  [string]: {
-    hidden?: boolean,
-    target: string,
-    through?: string | {
-      model: string,
-      scope?: Object,
-      unique?: boolean
-    },
-    foreignField?: string | Object,
-    otherKey?: string | Object,
-    scope?: Object,
-    timestamps?: boolean,
-    onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
-    onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
-    constraints?: boolean
-  }
-}
-
-/**
- * @public
- */
-export type AssociationConfig<T> = {
-  hasOne: HasOneConfig<T>,
-  belongsTo: BelongsToConfig,
-  hasMany: HasManyConfig<T>,
-  belongsToMany: BelongsToManyConfig,
+export type Plugin = {
+  key: string,
+  description?: string,
+  priority?: number,
+  defaultOptions: ?(boolean | Object),
+  apply: (schema: Schema, options: ?(boolean | Object)) => void
 }
 
 export type BuildOptionConfig = {
-  hooks?: Array<{
-    description?: string,
-    filter: (action: { type: 'field' | 'query' | 'mutation', config: any })=>boolean,
-    hook: (action: { type: 'field' | 'query' | 'mutation', config: any },
-           invokeInfo: { source?: any, args: any, context: any, info: GraphQLResolveInfo, sgContext: SGContext },
-           next: ()=>any)=>any
-  }>,
+  plugin?: { [id: string]: boolean | Object },
   query?: {
-    viewer?: 'AllQuery' | 'FromModelQuery' | QueryConfig<any>,
+    viewer?: 'AllQuery' | 'FromModelQuery' | QueryOptions,
   },
   mutation?: {
     payloadFields?: Array<string | {
       name: string,
-      $type: LinkedFieldType,
+      $type: LinkedFieldOptions,
       description?: string,
-      args?: ArgsType,
+      args?: { [string]: InputFieldOptions },
       resolve: (args: { [argName: string]: any },
                 context: any,
                 info: GraphQLResolveInfo,

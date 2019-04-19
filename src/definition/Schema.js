@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash'
-import type { FieldOptions, InputFieldOptions, LinkedFieldOptions, MutationOptions, QueryOptions } from '../Definition2'
+import type { FieldOptions, InputFieldOptions, LinkedFieldOptions, MutationOptions, QueryOptions } from '../Definition'
 import type { DefineOptions } from 'sequelize'
 
 export type SchemaOptionConfig = {

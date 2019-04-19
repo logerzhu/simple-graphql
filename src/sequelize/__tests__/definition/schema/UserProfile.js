@@ -1,4 +1,3 @@
-// @flow
 import SG from '../../../../'
 
 const UserType = 'User'

@@ -1,13 +1,17 @@
 // @flow
-import { GraphQLScalarType, GraphQLError, Kind } from 'graphql'
-import { fromGlobalId } from 'graphql-relay'
+import { GraphQLError, GraphQLScalarType, Kind } from 'graphql'
+import { fromGlobalId, toGlobalId } from 'graphql-relay'
 
-function defGlobalIdInputType (typeName:string):GraphQLScalarType {
+function defGlobalIdInputType (typeName: string): GraphQLScalarType {
   return new GraphQLScalarType({
     name: typeName + 'Id',
     description: 'Global id of ' + typeName,
     serialize (value) {
-      throw new Error('Unsupported!!')
+      if (typeof value === 'string') {
+        return toGlobalId(typeName, value)
+      } else {
+        return value
+      }
     },
     parseValue (value) {
       if (typeof value === 'string') {
@@ -38,9 +42,9 @@ function defGlobalIdInputType (typeName:string):GraphQLScalarType {
   })
 }
 
-const types:{[id:string]:GraphQLScalarType} = {}
+const types: { [id: string]: GraphQLScalarType } = {}
 
-export default function globalIdInputType (typeName:string):GraphQLScalarType {
+export default function globalIdType (typeName: string): GraphQLScalarType {
   if (!types[typeName]) {
     types[typeName] = defGlobalIdInputType(typeName)
   }

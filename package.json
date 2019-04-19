@@ -51,7 +51,7 @@
     "eslint-plugin-flowtype": "^3.4.2",
     "express": "^4.16.4",
     "express-graphql": "^0.7.1",
-    "flow-bin": "^0.95.1",
+    "flow-bin": "^0.97.0",
     "graphql": "^14.1.1",
     "graphql-relay": "^0.6.0",
     "jest": "^24.5.0",
@@ -68,7 +68,7 @@
       "/lib/",
       "/flow-typed/",
       "/docs/",
-      "/demo/"
+      "/src/Definition.js"
     ]
   },
   "pre-commit": [

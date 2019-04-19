@@ -12,8 +12,8 @@ export default function (args: { attributes: Array<string>, selections: Array<an
 
   const getFieldName = (key, config) => {
     let fType = config
-    if (config && config['$type']) {
-      fType = config['$type']
+    if (config && config.$type) {
+      fType = config.$type
     }
     if (typeof fType === 'string') {
       return key + 'Id'

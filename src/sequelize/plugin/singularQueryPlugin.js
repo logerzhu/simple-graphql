@@ -14,7 +14,7 @@ export default function singularQuery (schema:Schema, options:any):void {
     }
   }
   _.forOwn(schema.config.fields, (value, key) => {
-    if (!value['$type'] || (value['searchable'] !== false && value['hidden'] !== true && !value['resolve'])) {
+    if (!value.$type || (value['searchable'] !== false && value['hidden'] !== true && !value['resolve'])) {
       if (value['unique']) {
         searchFields[key] = Object.assign({}, value, { required: false })
       }
