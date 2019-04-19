@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash'
-import StringHelper from '../../utils/StringHelper'
+import StringHelper from '../utils/StringHelper'
 import type { ColumnFieldOptions, Plugin } from '../Definition'
 
 const getSearchFields = (schema, schemas) => {
@@ -81,7 +81,6 @@ const getSearchFields = (schema, schemas) => {
           option.where.$and.push({ [key]: keyCondition })
         }
       }
-
     }
   })
   return searchFields

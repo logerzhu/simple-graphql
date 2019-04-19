@@ -1,17 +1,26 @@
 // @flow
 import * as _ from 'lodash'
 
-import Schema from '../../definition/Schema'
-import StringHelper from '../../utils/StringHelper'
-import type { Plugin } from '../Definition'
+import StringHelper from '../utils/StringHelper'
+import type { ColumnFieldOptions, Plugin } from '../Definition'
 
 export default ({
   key: 'singularQuery',
   defaultOptions: false,
   priority: 0,
   description: 'Gen `singular query` for Schema',
-  apply: function singularQuery (schema: Schema, options: any): void {
+  apply: function singularQuery (schema, options, schemas): void {
     const name = StringHelper.toInitialLowerCase(schema.name)
+
+    const isModelType = (fieldOptions: ColumnFieldOptions) => {
+      if (typeof fieldOptions === 'string') {
+        return schemas.find(s => s.name === fieldOptions) !== null
+      } else if (typeof fieldOptions === 'object') {
+        return schemas.find(s => s.name === (fieldOptions: any).$type) !== null
+      }
+      return false
+    }
+
     const searchFields = {
       id: {
         $type: schema.name + 'Id',
@@ -20,7 +29,12 @@ export default ({
     }
     _.forOwn(schema.config.fields, (value, key) => {
       if (value.$type && (value.column && value.column.unique) && value.hidden !== true) {
-        searchFields[key] = Object.assign({}, value, { required: false })
+        if (isModelType(value)) {
+          if (!key.endsWith('Id')) {
+            key = key + 'Id'
+          }
+        }
+        searchFields[key] = { ...value, required: false, default: null }
       }
     })
 

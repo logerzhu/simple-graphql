@@ -5,14 +5,16 @@ import _ from 'lodash'
 import type { GraphQLFieldConfig, GraphQLFieldConfigMap } from 'graphql'
 import * as graphql from 'graphql'
 import StringHelper from '../utils/StringHelper'
-import type { FieldOptions, FieldResolve, FieldTypeContext, ResolverContext } from '../Definition'
+import type { FieldOptions, FieldTypeContext, ResolverContext } from '../Definition'
 import toGraphQLInputFieldConfigMap from './toGraphQLInputFieldConfigMap'
+
+type Context = ResolverContext & FieldTypeContext
 
 const toGraphQLFieldConfigMap = function (
   name: string,
   postfix: string,
   fields: { [id: string]: FieldOptions },
-  context: ResolverContext & FieldTypeContext): GraphQLFieldConfigMap<any, any> {
+  context: Context): GraphQLFieldConfigMap<any, any> {
   const toTypeName = (name: string, path: string) => {
     return name + path.replace(/\.\$type/g, '').replace(/\[\d*\]/g, '').split('.').map(v => StringHelper.toInitialUpperCase(v)).join('')
   }
@@ -27,10 +29,11 @@ const toGraphQLFieldConfigMap = function (
         type: fieldType.outputType,
         args: toGraphQLInputFieldConfigMap(toTypeName(fieldName, fieldPath), fieldType.argFieldMap || {}, context)
       }
-      if (fieldType.outputResolve) {
+      const outputResolve = fieldType.outputResolve
+      if (outputResolve) {
         config.resolve = context.hookFieldResolve(fieldName.split('.').slice(-1)[0], {
           $type: typeName,
-          resolve: (fieldType.outputResolve: FieldResolve)
+          resolve: outputResolve
         })
       }
       return config

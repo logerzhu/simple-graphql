@@ -1,19 +1,25 @@
 // @flow
 import _ from 'lodash'
-import * as graphql from 'graphql'
-
-import Schema from '../../definition/Schema'
-import StringHelper from '../../utils/StringHelper'
-import type { Plugin } from '../Definition'
+import StringHelper from '../utils/StringHelper'
+import type { ColumnFieldOptions, Plugin } from '../Definition'
 
 export default ({
   key: 'updateMutation',
   defaultOptions: false,
   priority: 0,
   description: 'Gen `update mutation` for Schema',
-  apply: function updateMutation (schema: Schema, options: any): void {
+  apply: function updateMutation (schema, options, schemas): void {
     const name = 'update' + StringHelper.toInitialUpperCase(schema.name)
     const changedName = 'changed' + StringHelper.toInitialUpperCase(schema.name)
+
+    const isModelType = (fieldOptions: ColumnFieldOptions) => {
+      if (typeof fieldOptions === 'string') {
+        return schemas.find(s => s.name === fieldOptions) !== null
+      } else if (typeof fieldOptions === 'object') {
+        return schemas.find(s => s.name === (fieldOptions: any).$type) !== null
+      }
+      return false
+    }
 
     const inputFields = {
       id: {
@@ -23,19 +29,22 @@ export default ({
       values: {}
     }
     _.forOwn(schema.config.fields, (value, key) => {
-      if (typeof value === 'string' || (value && typeof value.$type === 'string')) {
+      if (isModelType(value)) {
         if (!key.endsWith('Id')) {
           key = key + 'Id'
         }
       }
       if (value && value.$type) {
-        if (!value.hidden && value.mutable !== false) {
+        if (!value.hidden && (!value.config || value.config.initializable !== false)) {
           inputFields.values[key] = { ...value, required: false, default: null }
         }
       } else {
         inputFields.values[key] = value
       }
     })
+    if (_.keys(inputFields.values).length === 0) {
+      return
+    }
 
     let config = {}
     if ((typeof options) === 'object') {
@@ -49,7 +58,7 @@ export default ({
         outputFields: {
           [changedName]: schema.name
         },
-        mutateAndGetPayload: async function (args, context: any, info: graphql.GraphQLResolveInfo, sgContext) {
+        mutateAndGetPayload: async function (args, context, info, sgContext) {
           if (args == null || args.values == null) {
             throw new Error('Missing update values.')
           }
@@ -57,7 +66,7 @@ export default ({
           const values = {}
 
           _.forOwn(schema.config.fields, (value, key) => {
-            if (typeof value === 'string' || (value && typeof value.$type === 'string')) {
+            if (isModelType(value)) {
               if (!key.endsWith('Id')) {
                 key = key + 'Id'
               }
@@ -86,4 +95,4 @@ export default ({
       }
     })
   }
-}:Plugin)
+}: Plugin)
