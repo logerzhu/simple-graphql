@@ -8,17 +8,17 @@ export default SG.schema('User', {
     addMutation: true,
     singularQuery: true,
     pluralQuery: {
-      // conditionFields: {
-      //   passwordLike: {
-      //     $type: ['A', 'B'],
-      //     mapper: function ({ where, attributes }, argValue, sgContext) {
-      //       if (argValue) {
-      //         where.$and = where.$and || []
-      //         where['password'] = { $like: `%${argValue}%` }
-      //       }
-      //     }
-      //   }
-      // }
+      conditionFields: {
+        passwordLike: {
+          $type: new Set(['A', 'B']),
+          mapper: function ({ where, attributes }, argValue, sgContext) {
+            if (argValue) {
+              where.$and = where.$and || []
+              where['password'] = { $like: `%${argValue}%` }
+            }
+          }
+        }
+      }
     }
   },
   table: {
@@ -34,7 +34,7 @@ export default SG.schema('User', {
     required: true
   },
   tags: {
-    $type: '[String]'
+    $type: ['String']
   },
   blocked: {
     $type: 'Boolean',

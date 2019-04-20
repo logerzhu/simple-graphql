@@ -33,15 +33,23 @@ const toGraphQLInputFieldConfigMap = function (
     if (typeof field === 'string') {
       return inputFieldConfig(field)
     }
-    if (_.isArray(field)) {
-      if (field.length === 0) {
-        throw new Error(`Missing enum element`)
-      }
+    if (field instanceof Set) {
       return {
         type: new graphql.GraphQLEnumType({
           name: StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
-          values: _.fromPairs(field.map(f => [f, { value: f, description: f }]))
+          values: _.fromPairs([...field].map(f => [f, { value: f, description: f }]))
         })
+      }
+    } else if (_.isArray(field)) {
+      if (typeof field[0] === 'string' && context.fieldType(`[${field[0]}]`)) {
+        return inputFieldConfig(`[${field[0]}]`)
+      }
+
+      const subField = convert(name, path, field[0])
+      if (subField) {
+        return {
+          type: new graphql.GraphQLList(subField.type)
+        }
       }
     } else if (field instanceof Object) {
       if (field.$type) {

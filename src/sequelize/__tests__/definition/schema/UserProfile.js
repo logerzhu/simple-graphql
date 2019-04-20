@@ -12,6 +12,6 @@ export default SG.schema('UserProfile', {
   realName: 'String',
   age: 'Integer',
   gender: {
-    $type: ['Male', 'Female']
+    $type: new Set(['Male', 'Female'])
   }
 })

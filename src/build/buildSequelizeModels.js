@@ -17,9 +17,13 @@ function toSequelizeModel (sequelize: Sequelize, schema: Schema, context: FieldT
     }
 
     let columnOptions: ?DefineAttributeColumnOptions = null
-    if (_.isArray(typeName)) {
+    if (typeName instanceof Set) {
       columnOptions = {
         type: Sequelize.STRING(191)
+      }
+    } else if (_.isArray(typeName)) {
+      columnOptions = {
+        type: Sequelize.JSON
       }
     } else {
       const fieldType = context.fieldType(typeName)
