@@ -10,9 +10,9 @@ import StringHelper from '../utils/StringHelper'
 import mutationWithClientMutationId from '../transformer/mutationWithClientMutationId'
 
 export default (schemas: Array<Schema>,
-                services: Array<Service>,
-                payloadFields: { [string]: graphql.GraphQLFieldConfig<any, any> },
-                context: ResolverContext & FieldTypeContext
+  services: Array<Service>,
+  payloadFields: { [string]: graphql.GraphQLFieldConfig<any, any> },
+  context: ResolverContext & FieldTypeContext
 ): { [string]: graphql.GraphQLFieldConfig<any, any> } => {
   const mutations: { [string]: graphql.GraphQLFieldConfig<any, any> } = {}
 

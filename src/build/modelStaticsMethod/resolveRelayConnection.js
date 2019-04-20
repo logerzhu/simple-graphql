@@ -1,5 +1,6 @@
 // @flow
 import _ from 'lodash'
+
 const isPrimaryOrder = ({ orderConfig, schema, sgContext }) => {
   if (_.isArray(orderConfig)) {
     for (let i of orderConfig) {
@@ -22,29 +23,29 @@ const isPrimaryOrder = ({ orderConfig, schema, sgContext }) => {
   return true
 }
 
-export default async function (args:{
-  pagination?:{
+export default async function (args: {
+  pagination?: {
     after?: string,
     first?: number,
     before?: string,
     last?: number,
   },
-  selectionInfo?:Object,
-  include?:Array<any>,
-  attributes?:Array<string>,
-  where?:any,
-  bind?:any,
+  selectionInfo?: Object,
+  include?: Array<any>,
+  attributes?: Array<string>,
+  where?: any,
+  bind?: any,
   order?: Array<Array<any>>
-}):Promise<{
+}): Promise<{
   pageInfo: {
-    startCursor:string|number,
-    endCursor:string|number,
+    startCursor: string | number,
+    endCursor: string | number,
     hasPreviousPage: boolean,
     hasNextPage: boolean
   },
-  edges:Array<{
-    node:any,
-    cursor:string|number
+  edges: Array<{
+    node: any,
+    cursor: string | number
   }>,
   count: number
 }> {

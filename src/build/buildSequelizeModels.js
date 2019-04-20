@@ -36,7 +36,7 @@ function toSequelizeModel (sequelize: Sequelize, schema: Schema, context: FieldT
       columnOptions = typeof fieldType.columnOptions === 'function' ? fieldType.columnOptions(schema, key, value) : fieldType.columnOptions
     }
     if (columnOptions) {
-      dbDefinition[key] = columnOptions
+      dbDefinition[key] = { ...columnOptions }
       if (value && value.$type) {
         if (value.required != null) {
           dbDefinition[key].allowNull = !value.required
@@ -51,7 +51,6 @@ function toSequelizeModel (sequelize: Sequelize, schema: Schema, context: FieldT
       }
     }
   })
-
   return sequelize.define(schema.name, dbDefinition, schema.config.options['table'])
 }
 
