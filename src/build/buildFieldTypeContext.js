@@ -1,5 +1,5 @@
 // @flow
-import type { FieldType, FieldTypeContext, InterfaceContext, ResolverContext } from '../Definition'
+import type { FieldOptions, FieldType, FieldTypeContext, InterfaceContext, ResolverContext } from '../Definition'
 import Schema from '../definition/Schema'
 import innerFieldTypes from './fieldType'
 import * as graphql from 'graphql'
@@ -7,6 +7,8 @@ import * as relay from 'graphql-relay'
 import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
 import globalIdType from './fieldType/globalIdType'
 import Sequelize from 'sequelize'
+import _ from 'lodash'
+import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConfigMap'
 
 type Context = ResolverContext & InterfaceContext
 
@@ -74,7 +76,7 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
   }
 }
 
-function buildModelTypeId (schema: Schema, fieldTypeContext: FieldTypeContext, context: Context): FieldType {
+function buildModelTypeId (schema: Schema, fieldTypeContext: FieldTypeContext): FieldType {
   const typeName = schema.name + 'Id'
   const idType = globalIdType(schema.name)
   return {
@@ -85,8 +87,26 @@ function buildModelTypeId (schema: Schema, fieldTypeContext: FieldTypeContext, c
   }
 }
 
-export default function (fieldTypes: ?Array<FieldType>, schemas: Array<Schema>, context: Context) {
+function buildDataType (name: string, options: FieldOptions, fieldTypeContext: FieldTypeContext, context: Context): FieldType {
+  let outputType = toGraphQLFieldConfigMap(name, '', { '': options }, {
+    hookFieldResolve: (name, options) => context.hookFieldResolve(name, options),
+    hookQueryResolve: (name, options) => context.hookQueryResolve(name, options),
+    hookMutationResolve: (name, options) => context.hookMutationResolve(name, options),
+    fieldType: (typeName) => fieldTypeContext.fieldType(typeName)
+  })[''].type
+
+  let inputType = toGraphQLInputFieldConfigMap(name, ({ '': options }: any), fieldTypeContext)[''].type
+  return {
+    name: name,
+    description: name,
+    inputType: inputType,
+    outputType: outputType
+  }
+}
+
+export default function (fieldTypes: Array<FieldType>, schemas: Array<Schema>, context: Context) {
   const typeMap = { ...innerFieldTypes }
+
   const fieldTypeContext: FieldTypeContext = {
     fieldType: (typeName) => {
       if (!typeMap[typeName]) {
@@ -114,7 +134,7 @@ export default function (fieldTypes: ?Array<FieldType>, schemas: Array<Schema>, 
 
         schema = schemas.find(s => s.name + 'Id' === typeName)
         if (schema) {
-          typeMap[typeName] = buildModelTypeId(schema, fieldTypeContext, context)
+          typeMap[typeName] = buildModelTypeId(schema, fieldTypeContext)
           return typeMap[typeName]
         }
 
@@ -156,11 +176,13 @@ export default function (fieldTypes: ?Array<FieldType>, schemas: Array<Schema>, 
       }
       return typeMap[typeName]
     }
-  };
-  (fieldTypes || []).forEach(f => {
-    if (typeof f === 'function') {
-      f = f(fieldTypeContext)
-    }
+  }
+  schemas.forEach(schema => {
+    _.forOwn(schema.config.dataTypes, (value, key) => {
+      typeMap[key] = buildDataType(key, value, fieldTypeContext, context)
+    })
+  })
+  fieldTypes.forEach(f => {
     typeMap[f.name] = f
   })
   return fieldTypeContext

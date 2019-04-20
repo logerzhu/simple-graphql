@@ -99,6 +99,14 @@ export default ({
       config = options
     }
 
+    const conditionInputName = StringHelper.toInitialUpperCase(config.name || schema.name + 's') + 'Condition'
+
+    schema.dataTypes({
+      [conditionInputName]: _.mapValues(searchFields, (fieldConfig) => {
+        const { mapper, ...value } = fieldConfig
+        return value
+      })
+    })
     schema.queries({
       [`${StringHelper.toInitialLowerCase(config.name || schema.name + 's')}`]: {
         config: config,
@@ -106,10 +114,7 @@ export default ({
         args: {
           ...(_.keys(searchFields).length > 0 ? {
             condition: {
-              $type: [_.mapValues(searchFields, (fieldConfig) => {
-                const { mapper, ...value } = fieldConfig
-                return value
-              })],
+              $type: `[${conditionInputName}]`,
               description: 'Query Condition'
             }
           } : {}),
