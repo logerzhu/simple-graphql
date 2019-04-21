@@ -56,20 +56,20 @@ export type FieldType = {|
 export type InputFieldOptions = string | Set<string> | Array<string> | {
   $type: InputFieldOptions,
   description?: string,
-  required?: boolean,
+  required: boolean,
   default?: any,
-  mapper: (option: { where: Object, attributes: Array<string> }, any)=>void
+  mapper?: (option: { where: Object, attributes: Array<string> }, any)=>void
 } | { [string]: InputFieldOptions }
 
-export type FieldOptions = string | Set<string> | Array<string> | {
+export type FieldOptions = string | Set<string> | Array<string> | {|
   config?: Object,
   $type: FieldOptions,
   description?: string,
-  required?: boolean,
+  required: boolean,
   default?: any,
   args?: { [string]: InputFieldOptions },
   resolve?: FieldResolve
-} | { [string]: FieldOptions }
+|} | { [string]: FieldOptions }
 
 export type LinkedFieldOptions = {
   config?: Object,
@@ -77,7 +77,7 @@ export type LinkedFieldOptions = {
   description?: string,
   required?: boolean,
   default?: any,
-  dependentFields?: [string],
+  dependentFields?: Array<string>,
   args?: { [string]: InputFieldOptions },
   resolve: FieldResolve
 }
@@ -86,7 +86,7 @@ export type ColumnFieldOptions = string | Set<string> | Array<string> | {
   config?: Object,
   $type: FieldOptions,
   description?: string,
-  required?: boolean,
+  required: boolean,
   default?: any,
   hidden?: boolean,
   column?: DefineAttributeColumnOptions

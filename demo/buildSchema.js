@@ -2,7 +2,7 @@
 import Sequelize from 'sequelize'
 import path from 'path'
 import fs from 'fs'
-import GS from '../../'
+import GS from '../src'
 import DemoService from './definition/service/DemoService'
 
 export default function (sequelize: Sequelize) {
@@ -50,16 +50,19 @@ export default function (sequelize: Sequelize) {
         priority: 100,
         filter: ({ type, name, options }) => type === 'mutation',
         hook: async function (action, invokeInfo, next) {
-          return sequelize.transaction(function (t) {
+          return (sequelize:any).transaction((t) => {
             return next()
           })
         }
       }, {
         description: '自定义hook',
         priority: 99,
-        filter: ({ type, name, options }) => type === 'mutation' && options.config && options.config.hook,
+        filter: ({ type, name, options }) => type === 'mutation' && options.config != null && options.config.hook != null,
         hook: async function (action, invokeInfo, next) {
-          return action.config.config.hook(action, invokeInfo, next)
+          const config = action.options.config
+          if (config && config.hook) {
+            return config.hook(action, invokeInfo, next)
+          }
         }
       }]
     },

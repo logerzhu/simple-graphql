@@ -1,5 +1,5 @@
 // @flow
-import SG from '../../../../'
+import SG from '../../../src'
 
 let gWeather = '晴天'
 

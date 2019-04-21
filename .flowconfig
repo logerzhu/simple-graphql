@@ -1,6 +1,6 @@
 [ignore]
 <PROJECT_ROOT>/lib/.*
-<PROJECT_ROOT>/src/sequelize/__tests__/.*
+<PROJECT_ROOT>/__tests__/.*
 
 [include]
 

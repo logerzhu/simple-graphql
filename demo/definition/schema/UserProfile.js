@@ -1,4 +1,4 @@
-import SG from '../../../../'
+import SG from '../../../src'
 
 export default SG.schema('UserProfile', {
   plugin: {

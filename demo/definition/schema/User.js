@@ -1,6 +1,5 @@
 // @flow
-import SG from '../../../../'
-import resolveConnection from '../resolveConnection'
+import SG from '../../../src'
 
 export default SG.schema('User', {
   description: '用户',
@@ -34,10 +33,12 @@ export default SG.schema('User', {
     required: true
   },
   tags: {
-    $type: ['String']
+    $type: ['String'],
+    required: false
   },
   blocked: {
     $type: 'Boolean',
+    required: false,
     default: false
   },
   registerAt: {
@@ -101,42 +102,5 @@ export default SG.schema('User', {
   profile: {
     target: 'UserProfile',
     foreignField: 'owner'
-  }
-}).queries({
-  listUsers: {
-    $type: 'UserConnection',
-    resolve: async function ({ after, first, before, last }, context, info, { sequelize }) {
-      let conditionSql = ' from Users'
-
-      const replacements: any = {}
-
-      return resolveConnection(sequelize, 'User', {
-        after: after,
-        first: first,
-        before: before,
-        last: last,
-        conditionSql: conditionSql,
-        orderBySql: ' order by Users.id DESC',
-        replacements: replacements
-      })
-    }
-  },
-  listProfiles: {
-    $type: 'UserProfileConnection',
-    resolve: async function ({ after, first, before, last }, context, info, { sequelize }) {
-      let conditionSql = ' from UserProfiles'
-
-      const replacements: any = {}
-
-      return resolveConnection(sequelize, 'UserProfile', {
-        after: after,
-        first: first,
-        before: before,
-        last: last,
-        conditionSql: conditionSql,
-        orderBySql: ' order by UserProfiles.id DESC',
-        replacements: replacements
-      })
-    }
   }
 })

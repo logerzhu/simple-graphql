@@ -1,5 +1,5 @@
 // @flow
-import SG from '../../../../'
+import SG from '../../../src'
 
 export default SG.schema('Todo', {
   table: {
@@ -28,7 +28,7 @@ export default SG.schema('Todo', {
 }).queries({
   dueTodos: {
     description: 'Find all due todos',
-    $type: '[Todo]',
+    $type: ['Todo'],
     config: {
       acl: 'User'
     },

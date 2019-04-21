@@ -31,12 +31,11 @@ import buildRootMutations from './buildRootMutations'
 
 export default function (sequelize: Sequelize, config: {
   fieldTypes?: Array<FieldType>,
-  // TODO support Data Type
   schemas?: Array<Schema>,
   services?: Array<Service>,
   hooks?: Array<Hook>,
   plugins?: Array<Plugin>
-}, buildOptions: BuildOptions): { graphQLSchema: GraphQLSchema, sgContext: any } {
+}, buildOptions: BuildOptions): { graphQLSchema: GraphQLSchema, sgContext: SGContext } {
   const sgContext: SGContext = {
     sequelize: sequelize,
     schemas: applyPlugins(config.schemas || [], config.plugins || [], buildOptions.plugin || {}),
