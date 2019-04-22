@@ -10,7 +10,7 @@ export default ({
     schema.fields({
       createdAt: {
         $type: 'Date',
-        required: true,
+        required: false,
         config: {
           initializable: false,
           mutable: false
@@ -18,7 +18,7 @@ export default ({
       },
       updatedAt: {
         $type: 'Date',
-        required: true,
+        required: false,
         config: {
           initializable: false,
           mutable: false

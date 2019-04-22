@@ -22,7 +22,7 @@ const toGraphQLFieldConfigMap = function (
   const fieldConfig = (fieldName: string, fieldPath: string, typeName: string): ?GraphQLFieldConfig<any, any> => {
     const fieldType = context.fieldType(typeName)
     if (!fieldType) {
-      throw new Error(`Type "${typeName}" has not register.`)
+      throw new Error(`Type "${typeName}" has not register for ${fieldName}.`)
     }
     if (fieldType.outputType) {
       const config: GraphQLFieldConfig<any, any> = {

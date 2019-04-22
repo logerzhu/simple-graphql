@@ -1,6 +1,4 @@
 // @flow
-import * as graphql from 'graphql'
-import * as relay from 'graphql-relay'
 import StringHelper from '../utils/StringHelper'
 import type { Plugin } from '../Definition'
 
@@ -25,16 +23,14 @@ export default ({
           }
         },
         outputFields: {
-          ['deleted' + schema.name]: schema.name,
-          ['deleted' + schema.name + 'Id']: graphql.GraphQLID
+          ['deleted' + schema.name]: schema.name
         },
         mutateAndGetPayload: async function ({ id }, context, info, sgContext) {
           const entity = await sgContext.models[schema.name].findOne({ where: { id: id } })
           if (entity) {
             await entity.destroy()
             return {
-              ['deleted' + schema.name]: entity,
-              ['deleted' + schema.name + 'Id']: relay.toGlobalId(schema.name, id)
+              ['deleted' + schema.name]: entity
             }
           }
           throw new Error(schema.name + '[' + id + '] not exist.')

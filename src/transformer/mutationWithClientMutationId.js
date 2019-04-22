@@ -41,7 +41,7 @@ export default function mutationWithClientMutationId (config: {
     },
     resolve: function resolve (_: any, _ref: any, context: any, info: any) {
       let input = _ref['input']
-      return Promise.resolve(mutateAndGetPayload(input, context, info)).then(
+      return Promise.resolve(mutateAndGetPayload(_, input, context, info)).then(
         function (payload) {
           payload.clientMutationId = input.clientMutationId
           return payload
