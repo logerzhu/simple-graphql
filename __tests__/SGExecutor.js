@@ -23,7 +23,7 @@ const getDbConfig = () => {
       },
       // SQLite only
       storage: ':memory:',
-      logging: (s: string) => { console.log(s) }
+      logging: (s: string) => { }
     }
   }
 }
