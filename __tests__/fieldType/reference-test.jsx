@@ -8,9 +8,8 @@ test('引用类型生成', async () => {
     schemas: [
       SG.schema('Dummy1', {
         plugin: {
-          addMutation: true,
-          updateMutation: true,
-          deleteMutation: true
+          singularQuery: true,
+          addMutation: true
         }
       }).fields({
         name: 'String'
@@ -23,14 +22,17 @@ test('引用类型生成', async () => {
       }).hasMany({
         dummyB: {
           target: 'Dummy2',
+          foreignField: 'dummyB',
+          outputStructure: 'Array'
+        },
+        dummyC: {
+          target: 'Dummy2',
           foreignField: 'dummyB'
         }
       }),
       SG.schema('Dummy2', {
         plugin: {
-          addMutation: true,
-          updateMutation: true,
-          deleteMutation: true
+          addMutation: true
         }
       }).fields({
         name: 'String',
@@ -118,4 +120,27 @@ test('引用类型生成', async () => {
   expect(dummy2.dummyD.at).toEqual(dummy2Data.dummyD.at)
   expect(dummy2.dummyD.dummyE).toEqual(dummy1)
   expect(dummy2.dummyD.dummyF).toEqual([dummy1])
+
+  const querySingleResult = await executor.exec(`
+  query{
+    dummy1(id:"${dummy1.id}"){
+       id
+       name
+       dummyA{id name}
+       dummyB{id name}
+       dummyC{
+        edges{
+          node{id name}
+        }
+       }
+    }
+  }
+  `, {})
+
+  expect(querySingleResult.errors).toBeUndefined()
+  const qDummy1 = querySingleResult.data.dummy1
+  expect(qDummy1.name).toEqual(dummy1Data.name)
+  expect(qDummy1.dummyA).toEqual({ id: dummy2.id, name: dummy2.name })
+  expect(qDummy1.dummyB).toEqual([{ id: dummy2.id, name: dummy2.name }])
+  expect(qDummy1.dummyC).toEqual({ edges: [{ node: { id: dummy2.id, name: dummy2.name } }] })
 })

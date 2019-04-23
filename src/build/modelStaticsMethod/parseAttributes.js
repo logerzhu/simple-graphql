@@ -15,7 +15,7 @@ export default function (args: { attributes: Array<string>, selections: Array<an
     if (config && config.$type) {
       fType = config.$type
     }
-    if (typeof fType === 'string') {
+    if (typeof fType === 'string' && dbModel.getSGContext().schemas[fType] != null) {
       return key + 'Id'
     } else {
       return key

@@ -121,7 +121,26 @@ export default function (fieldTypes: Array<FieldType>, schemas: Array<Schema>, c
   const fieldTypeContext: FieldTypeContext = {
     fieldType: (typeName) => {
       if (typeof typeName !== 'string') {
-        console.log(typeName, typeof typeName)
+        switch (typeName) {
+          case Date:
+            typeName = 'Date'
+            console.warn('Field type name should be string. Please change Date to \'Date\'.')
+            break
+          case String:
+            typeName = 'String'
+            console.warn('Field type name should be string. Please change String to \'String\'.')
+            break
+          case Number:
+            typeName = 'Number'
+            console.warn('Field type name should be string. Please change Number to \'Number\'.')
+            break
+          case JSON:
+            typeName = 'JSON'
+            console.warn('Field type name should be string. Please change JSON to \'JSON\'.')
+            break
+          default:
+            throw new Error(`Unknown type ${typeName}`)
+        }
       }
       if (!typeMap[typeName]) {
         if (typeName.startsWith('[') && typeName.endsWith(']')) {
