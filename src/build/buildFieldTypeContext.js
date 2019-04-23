@@ -162,7 +162,9 @@ export default function (fieldTypes: Array<FieldType>, schemas: Array<Schema>, c
               if (schemas.find(s => s.name === subTypeName) != null) {
                 if (root[fieldName] != null && root[fieldName].length > 0 &&
                   (typeof root[fieldName][0] === 'string' || typeof root[fieldName][0] === 'number')) {
-                  const list = await sgContext.models[subTypeName].findAll({ where: { id: { $in: root[fieldName] } } })
+                  const list = await sgContext.models[subTypeName].findAll({
+                    where: { id: { [(Sequelize.Op.in: any)]: root[fieldName] } }
+                  })
                   const result = []
                   for (let id of root[fieldName]) {
                     const element = list.find(e => '' + e.id === '' + id)

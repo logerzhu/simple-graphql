@@ -7,9 +7,7 @@ test('基本类型生成', async () => {
   const executor = await SGExecutor.new({
     schemas: [SG.schema('Dummy', {
       plugin: {
-        addMutation: true,
-        updateMutation: true,
-        deleteMutation: true
+        addMutation: true
       }
     }).fields({
       number: 'Number',

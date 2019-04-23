@@ -1,5 +1,6 @@
 // @flow
 import _ from 'lodash'
+import Sequelize from 'sequelize'
 import StringHelper from '../utils/StringHelper'
 import type { ColumnFieldOptions, Plugin } from '../Definition'
 
@@ -73,7 +74,7 @@ const getSearchFields = (schema, schemas) => {
           const keyCondition = {}
           for (let opKey of _.keys(argValue)) {
             if (opKey !== 'contains') {
-              keyCondition['$' + opKey] = argValue[opKey]
+              keyCondition[Sequelize.Op[opKey]] = argValue[opKey]
             } else {
               option.where.$and.push(sgContext.sequelize.literal(`json_contains(\`${key}\`, '${JSON.stringify(argValue[opKey])}' )`))
             }
