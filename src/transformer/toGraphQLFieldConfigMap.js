@@ -96,12 +96,11 @@ const toGraphQLFieldConfigMap = function (
         }
         return result
       } else {
-        const subFields = toGraphQLFieldConfigMap(toTypeName(name, path), postfix, field, context)
-        if (_.keys(subFields).length > 0) {
+        if (_.keys(field).length > 0) {
           return {
             type: new graphql.GraphQLObjectType({
               name: StringHelper.toInitialUpperCase(toTypeName(name, path)) + postfix,
-              fields: subFields
+              fields: () => toGraphQLFieldConfigMap(toTypeName(name, path), postfix, field, context)
             }),
             resolve: context.hookFieldResolve(name.split('.').slice(-1)[0], {
               $type: field,

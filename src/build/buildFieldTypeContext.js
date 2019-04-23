@@ -111,7 +111,10 @@ function buildDataType (name: string, options: FieldOptions, fieldTypeContext: F
     name: name,
     description: name,
     inputType: inputType,
-    outputType: outputType
+    outputType: outputType,
+    columnOptions: {
+      type: Sequelize.JSON
+    }
   }
 }
 

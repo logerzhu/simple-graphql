@@ -68,12 +68,11 @@ const toGraphQLInputFieldConfigMap = function (
         }
         return result
       } else {
-        const subFields = toGraphQLInputFieldConfigMap(toTypeName(name, path), field, context)
-        if (_.keys(subFields).length > 0) {
+        if (_.keys(field).length > 0) {
           return {
             type: new graphql.GraphQLInputObjectType({
               name: StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
-              fields: subFields
+              fields: () => toGraphQLInputFieldConfigMap(toTypeName(name, path), field, context)
             })
           }
         }
