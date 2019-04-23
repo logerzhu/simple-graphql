@@ -41,7 +41,15 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
         }
       )
     }),
-    // outputResolve?: toGraphQLInputFieldConfigMap(),
+    outputResolve: async function (root, args, context, info, sgContext) {
+      const fieldName = info.fieldName
+      if (root[fieldName]) {
+        console.log('Resolve ' + root[fieldName], typeof root[fieldName])
+        return root[fieldName]
+      } else {
+        return sgContext.models[typeName].findOne({ where: { id: root[fieldName + 'Id'] } })
+      }
+    },
     columnOptions: (schema, fieldName, options) => {
       let foreignField = fieldName
       let onDelete = 'RESTRICT'
@@ -109,17 +117,39 @@ export default function (fieldTypes: Array<FieldType>, schemas: Array<Schema>, c
 
   const fieldTypeContext: FieldTypeContext = {
     fieldType: (typeName) => {
+      if (typeof typeName !== 'string') {
+        console.log(typeName, typeof typeName)
+      }
       if (!typeMap[typeName]) {
         if (typeName.startsWith('[') && typeName.endsWith(']')) {
-          const fieldType = fieldTypeContext.fieldType(typeName.substr(1, typeName.length - 2))
+          const subTypeName = typeName.substr(1, typeName.length - 2)
+          const fieldType = fieldTypeContext.fieldType(subTypeName)
           if (!fieldType) {
             return null
           }
           typeMap[typeName] = {
             name: typeName,
-            description: `Array of type ${typeName.substr(1, typeName.length - 2)}`,
+            description: `Array of type ${subTypeName}`,
             inputType: fieldType.inputType ? new graphql.GraphQLList(fieldType.inputType) : null,
             outputType: fieldType.outputType ? new graphql.GraphQLList(fieldType.outputType) : null,
+            outputResolve: async function (root, args, context, info, sgContext) {
+              const fieldName = info.fieldName
+              if (schemas.find(s => s.name === subTypeName) != null) {
+                if (root[fieldName] != null && root[fieldName].length > 0 &&
+                  (typeof root[fieldName][0] === 'string' || typeof root[fieldName][0] === 'number')) {
+                  const list = await sgContext.models[subTypeName].findAll({ where: { id: { $in: root[fieldName] } } })
+                  const result = []
+                  for (let id of root[fieldName]) {
+                    const element = list.find(e => '' + e.id === '' + id)
+                    if (element) {
+                      result.push(element)
+                    }
+                  }
+                  return result
+                }
+              }
+              return root[fieldName]
+            },
             columnOptions: { type: Sequelize.JSON }
           }
           // TODO check Model array resolve

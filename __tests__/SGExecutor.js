@@ -22,8 +22,8 @@ const getDbConfig = () => {
         idle: 10000
       },
       // SQLite only
-      storage: ':memory:',
-      logging: (s: string) => { }
+      storage: ':memory:'
+      // logging: (s: string) => { }
     }
   }
 }
