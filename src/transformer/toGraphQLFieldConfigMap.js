@@ -105,8 +105,8 @@ const toGraphQLFieldConfigMap = function (
             }),
             resolve: context.hookFieldResolve(name.split('.').slice(-1)[0], {
               $type: field,
-              resolve: async function (root) {
-                return root[name.split('.').slice(-1)[0]]
+              resolve: async function (root, args, context, info) {
+                return root[info.fieldName]
               }
             }
             )

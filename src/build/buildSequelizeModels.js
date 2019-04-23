@@ -25,7 +25,7 @@ function toSequelizeModel (sequelize: Sequelize, schema: Schema, context: FieldT
       columnOptions = {
         type: Sequelize.JSON
       }
-    } else {
+    } else if (typeof typeName === 'string') {
       const fieldType = context.fieldType(typeName)
       if (!fieldType) {
         throw new Error(`Type "${typeName}" has not register.`)
@@ -34,6 +34,10 @@ function toSequelizeModel (sequelize: Sequelize, schema: Schema, context: FieldT
         throw new Error(`Column type of "${typeName}" is not supported.`)
       }
       columnOptions = typeof fieldType.columnOptions === 'function' ? fieldType.columnOptions(schema, key, value) : fieldType.columnOptions
+    } else {
+      columnOptions = {
+        type: Sequelize.JSON
+      }
     }
     if (columnOptions) {
       dbDefinition[key] = { ...columnOptions }

@@ -44,8 +44,11 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
     outputResolve: async function (root, args, context, info, sgContext) {
       const fieldName = info.fieldName
       if (root[fieldName]) {
-        console.log('Resolve ' + root[fieldName], typeof root[fieldName])
-        return root[fieldName]
+        if (typeof root[fieldName] === 'string' || typeof root[fieldName] === 'number') {
+          return sgContext.models[typeName].findOne({ where: { id: root[fieldName] } })
+        } else {
+          return root[fieldName]
+        }
       } else {
         return sgContext.models[typeName].findOne({ where: { id: root[fieldName + 'Id'] } })
       }

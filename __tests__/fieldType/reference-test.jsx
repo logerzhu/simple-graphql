@@ -36,7 +36,12 @@ test('引用类型生成', async () => {
         name: 'String',
         dummyA: 'Dummy1',
         dummyB: 'Dummy1',
-        dummyC: ['Dummy1']
+        dummyC: ['Dummy1'],
+        dummyD: {
+          at: 'Date',
+          dummyE: 'Dummy1',
+          dummyF: ['Dummy1']
+        }
       })]
   }, {})
 
@@ -70,7 +75,12 @@ test('引用类型生成', async () => {
     name: 'Loger2',
     dummyAId: dummy1.id,
     dummyBId: dummy1.id,
-    dummyC: [dummy1.id]
+    dummyC: [dummy1.id],
+    dummyD: {
+      at: (new Date()).toJSON(),
+      dummyE: dummy1.id,
+      dummyF: [dummy1.id]
+    }
   }
 
   const addDummy2 = await executor.exec(`
@@ -84,6 +94,11 @@ test('引用类型生成', async () => {
           dummyA{id name}
           dummyB{id name}
           dummyC{id name}
+          dummyD{
+            at
+            dummyE{id name}
+            dummyF{id name}
+          }
         }
       }
     }
@@ -100,4 +115,7 @@ test('引用类型生成', async () => {
   expect(dummy2.dummyA).toEqual(dummy1)
   expect(dummy2.dummyB).toEqual(dummy1)
   expect(dummy2.dummyC).toEqual([dummy1])
+  expect(dummy2.dummyD.at).toEqual(dummy2Data.dummyD.at)
+  expect(dummy2.dummyD.dummyE).toEqual(dummy1)
+  expect(dummy2.dummyD.dummyF).toEqual([dummy1])
 })
