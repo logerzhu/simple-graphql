@@ -53,7 +53,7 @@ export type FieldType = {|
   columnOptions?: DefineAttributeColumnOptions | (schema: any, fieldName: string, options: ColumnFieldOptions) => ?DefineAttributeColumnOptions
 |}
 
-export type InputFieldOptions = string | Set<string> | Array<string> | {
+export type InputFieldOptions = string | Set<string> | Array<InputFieldOptions> | {
   $type: InputFieldOptions,
   description?: string,
   required: boolean,
@@ -61,7 +61,7 @@ export type InputFieldOptions = string | Set<string> | Array<string> | {
   mapper?: (option: { where: Object, attributes: Array<string> }, any)=>void
 } | { [string]: InputFieldOptions }
 
-export type FieldOptions = string | Set<string> | Array<string> | {|
+export type FieldOptions = string | Set<string> | Array<FieldOptions> | {|
   config?: Object,
   $type: FieldOptions,
   description?: string,
@@ -71,7 +71,7 @@ export type FieldOptions = string | Set<string> | Array<string> | {|
   resolve?: FieldResolve
 |} | { [string]: FieldOptions }
 
-export type LinkedFieldOptions = {
+export type LinkedFieldOptions = {|
   config?: Object,
   $type: FieldOptions,
   description?: string,
@@ -80,9 +80,9 @@ export type LinkedFieldOptions = {
   dependentFields?: Array<string>,
   args?: { [string]: InputFieldOptions },
   resolve: FieldResolve
-}
+|}
 
-export type ColumnFieldOptions = string | Set<string> | Array<string> | {
+export type ColumnFieldOptions = string | Set<string> | Array<FieldOptions> | {|
   config?: Object,
   $type: FieldOptions,
   description?: string,
@@ -90,23 +90,23 @@ export type ColumnFieldOptions = string | Set<string> | Array<string> | {
   default?: any,
   hidden?: boolean,
   column?: DefineAttributeColumnOptions
-}
+|} | { [string]: FieldOptions }
 
-export type QueryOptions = {
+export type QueryOptions = {|
   $type: FieldOptions,
   description?: string,
   config?: Object,
   args?: { [string]: InputFieldOptions },
   resolve: RootResolve
-}
+|}
 
-export type MutationOptions = {
+export type MutationOptions = {|
   description?: string,
   config?: Object,
   inputFields: { [string]: InputFieldOptions },
   outputFields: { [string]: FieldOptions },
   mutateAndGetPayload: RootResolve
-}
+|}
 
 export type SchemaOptionConfig = {
   description?: string,
@@ -121,7 +121,7 @@ export type Hook = {
   priority?: number,
   filter: (action: HookAction)=>boolean,
   hook: (action: HookAction,
-         invokeInfo: { source?: any, args?: ?{ [string]: any }, context?: any, info?: GraphQLResolveInfo, sgContext?: SGContext },
+         invokeInfo: { source: any, args: ?{ [string]: any }, context: any, info: GraphQLResolveInfo, sgContext: SGContext },
          next: ()=>any)=>any
 }
 

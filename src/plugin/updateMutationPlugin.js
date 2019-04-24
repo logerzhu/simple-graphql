@@ -35,7 +35,7 @@ export default ({
         }
       }
       if (value && value.$type) {
-        if (!value.hidden && (!value.config || value.config.initializable !== false)) {
+        if (!value.hidden && (!value.config || value.config.mutable !== false)) {
           inputFields.values[key] = { ...value, required: false, default: null }
         }
       } else {

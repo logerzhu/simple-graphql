@@ -16,9 +16,11 @@ export default (hooks: Array<Hook>, sgContext: SGContext): ResolverContext => {
 
   const applyHooks = (action) => {
     let hookFunc = (action, invokeInfo, next) => next()
+
     finalHooks.reverse().forEach(hook => {
+      const func = hookFunc
       if (!hook.filter || hook.filter(action)) {
-        hookFunc = (action, invokeInfo, next) => hook.hook(action, invokeInfo, hookFunc.bind(null, action, invokeInfo, next))
+        hookFunc = (action, invokeInfo, next) => hook.hook(action, invokeInfo, func.bind(null, action, invokeInfo, next))
       }
     })
     return hookFunc
