@@ -5,8 +5,9 @@ import SG from '../src'
 import cls from 'continuation-local-storage'
 import Sequelize from 'sequelize'
 
-const namespace = cls.createNamespace('db-transaction-nsp')
-Sequelize.useCLS(namespace)
+const namespace = cls.createNamespace('db-transaction-nsp');
+
+(Sequelize: any).useCLS(namespace)
 
 const getDbConfig = () => {
   return {

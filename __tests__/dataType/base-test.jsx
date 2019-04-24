@@ -11,12 +11,16 @@ test('数据类型生成', async () => {
       }
     }).dataTypes({
       DummyData1: {
-        name: 'String',
-        data: 'DummyData2'
+        $type: {
+          name: 'String',
+          data: 'DummyData2'
+        }
       },
-      DummyData2: [{
-        length: 'Number'
-      }]
+      DummyData2: {
+        $type: [{
+          length: 'Number'
+        }]
+      }
     }).fields({
       name: 'String',
       data: 'DummyData1'

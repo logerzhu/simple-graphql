@@ -1,11 +1,19 @@
 // @flow
-import type { FieldOptions, FieldType, FieldTypeContext, InterfaceContext, ResolverContext } from '../Definition'
+import type {
+  ColumnFieldOptions,
+  DataTypeOptions,
+  FieldType,
+  FieldTypeContext,
+  InterfaceContext,
+  ResolverContext
+} from '../Definition'
 import Schema from '../definition/Schema'
 import innerFieldTypes from './fieldType'
 import * as graphql from 'graphql'
 import * as relay from 'graphql-relay'
 import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
 import globalIdType from './fieldType/globalIdType'
+import type { DefineAttributeColumnOptions } from 'sequelize'
 import Sequelize from 'sequelize'
 import _ from 'lodash'
 import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConfigMap'
@@ -98,22 +106,56 @@ function buildModelTypeId (schema: Schema, fieldTypeContext: FieldTypeContext): 
   }
 }
 
-function buildDataType (name: string, options: FieldOptions, fieldTypeContext: FieldTypeContext, context: Context): FieldType {
-  let outputType = toGraphQLFieldConfigMap(name, '', { '': options }, {
+function buildDataType (name: string, dataTypeOptions: DataTypeOptions, fieldTypeContext: FieldTypeContext, context: Context): FieldType {
+  let outputType = toGraphQLFieldConfigMap(name, '', { '': dataTypeOptions.$type }, {
     hookFieldResolve: (name, options) => context.hookFieldResolve(name, options),
     hookQueryResolve: (name, options) => context.hookQueryResolve(name, options),
     hookMutationResolve: (name, options) => context.hookMutationResolve(name, options),
     fieldType: (typeName) => fieldTypeContext.fieldType(typeName)
   })[''].type
 
-  let inputType = toGraphQLInputFieldConfigMap(name, ({ '': options }: any), fieldTypeContext)[''].type
+  let inputType = toGraphQLInputFieldConfigMap(name, ({ '': dataTypeOptions.$type }: any), fieldTypeContext)[''].type
   return {
     name: name,
     description: name,
     inputType: inputType,
     outputType: outputType,
-    columnOptions: {
-      type: Sequelize.JSON
+    columnOptions: (schema: Schema, fieldName: string, options: ColumnFieldOptions) => {
+      let typeName = dataTypeOptions
+      if (dataTypeOptions && dataTypeOptions.$type) {
+        typeName = dataTypeOptions.$type
+      }
+
+      let columnOptions: ?DefineAttributeColumnOptions = null
+      if (typeName instanceof Set) {
+        columnOptions = {
+          type: Sequelize.STRING(191)
+        }
+      } else if (_.isArray(typeName)) {
+        columnOptions = {
+          type: Sequelize.JSON
+        }
+      } else if (typeof typeName === 'string') {
+        const fieldType = fieldTypeContext.fieldType(typeName)
+        if (!fieldType) {
+          throw new Error(`Type "${typeName}" has not register.`)
+        }
+        if (!fieldType.columnOptions) {
+          throw new Error(`Column type of "${typeName}" is not supported.`)
+        }
+        columnOptions = typeof fieldType.columnOptions === 'function' ? fieldType.columnOptions(schema, fieldName, options) : fieldType.columnOptions
+      } else {
+        columnOptions = {
+          type: Sequelize.JSON
+        }
+      }
+      if (columnOptions) {
+        columnOptions = { ...columnOptions, ...(dataTypeOptions.columnOptions || {}) }
+        if (options.$type != null && options.column != null) {
+          columnOptions = { ...columnOptions, ...((options.column: any) || {}) }
+        }
+        return columnOptions
+      }
     }
   }
 }

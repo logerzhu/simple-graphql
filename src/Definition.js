@@ -50,7 +50,7 @@ export type FieldType = {|
   argFieldMap?: { [string]: InputFieldOptions },
   outputType?: GraphQLOutputType,
   outputResolve?: FieldResolve,
-  columnOptions?: DefineAttributeColumnOptions | (schema: any, fieldName: string, options: ColumnFieldOptions) => ?DefineAttributeColumnOptions
+  columnOptions?: DefineAttributeColumnOptions | (schema: Schema, fieldName: string, options: ColumnFieldOptions) => ?DefineAttributeColumnOptions
 |}
 
 export type InputFieldOptions = string | Set<string> | Array<InputFieldOptions> | {
@@ -91,6 +91,12 @@ export type ColumnFieldOptions = string | Set<string> | Array<FieldOptions> | {|
   hidden?: boolean,
   column?: DefineAttributeColumnOptions
 |} | { [string]: FieldOptions }
+
+export type DataTypeOptions = {|
+  $type: FieldOptions,
+  description?: string,
+  columnOptions?: DefineAttributeColumnOptions
+|}
 
 export type QueryOptions = {|
   $type: FieldOptions,
