@@ -1,6 +1,6 @@
 // @flow
 import { graphql, GraphQLSchema } from 'graphql'
-import type { BuildOptions, FieldType, Hook, Plugin, SGContext } from '../src/Definition'
+import type { BuildOptions, FieldType, HookOptions, PluginOptions, SGContext } from '../src/Definition'
 import SG from '../src'
 import cls from 'continuation-local-storage'
 import Sequelize from 'sequelize'
@@ -38,8 +38,8 @@ class SGExecutor {
     fieldTypes?: Array<FieldType>,
     schemas?: Array<SG.Schema>,
     services?: Array<SG.Service>,
-    hooks?: Array<Hook>,
-    plugins?: Array<Plugin>
+    hooks?: Array<HookOptions>,
+    plugins?: Array<PluginOptions>
   }, buildOptions: BuildOptions)=>Promise<SGExecutor>
 
   graphQLSchema: GraphQLSchema
@@ -62,8 +62,8 @@ SGExecutor.new = async function (config: {
   fieldTypes?: Array<FieldType>,
   schemas?: Array<SG.Schema>,
   services?: Array<SG.Service>,
-  hooks?: Array<Hook>,
-  plugins?: Array<Plugin>
+  hooks?: Array<HookOptions>,
+  plugins?: Array<PluginOptions>
 }, buildOptions: BuildOptions) {
   const sequelize = sequelizeInstance(getDbConfig())
   const result = SG.build(sequelize, config, buildOptions)

@@ -89,7 +89,7 @@ export type ColumnFieldOptions = string | Set<string> | Array<FieldOptions> | {|
   required: boolean,
   default?: any,
   hidden?: boolean,
-  column?: DefineAttributeColumnOptions
+  columnOptions?: DefineAttributeColumnOptions
 |} | { [string]: FieldOptions }
 
 export type DataTypeOptions = {|
@@ -117,12 +117,12 @@ export type MutationOptions = {|
 export type SchemaOptionConfig = {
   description?: string,
   plugin?: Object,
-  table?: DefineOptions<any>
+  tableOptions?: DefineOptions<any>
 }
 
 export type HookAction = { type: 'field' | 'query' | 'mutation', name: string, options: LinkedFieldOptions | QueryOptions | MutationOptions }
 
-export type Hook = {
+export type HookOptions = {
   description?: string,
   priority?: number,
   filter: (action: HookAction)=>boolean,
@@ -131,7 +131,7 @@ export type Hook = {
          next: ()=>any)=>any
 }
 
-export type Plugin = {
+export type PluginOptions = {
   key: string,
   description?: string,
   priority?: number,

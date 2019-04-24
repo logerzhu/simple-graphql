@@ -13,9 +13,9 @@ import type {
   BuildOptions,
   FieldType,
   FieldTypeContext,
-  Hook,
+  HookOptions,
   InterfaceContext,
-  Plugin,
+  PluginOptions,
   ResolverContext,
   SGContext
 } from '../Definition'
@@ -33,8 +33,8 @@ export default function (sequelize: Sequelize, config: {
   fieldTypes?: Array<FieldType>,
   schemas?: Array<Schema>,
   services?: Array<Service>,
-  hooks?: Array<Hook>,
-  plugins?: Array<Plugin>
+  hooks?: Array<HookOptions>,
+  plugins?: Array<PluginOptions>
 }, buildOptions: BuildOptions): { graphQLSchema: GraphQLSchema, sgContext: SGContext } {
   const sgContext: SGContext = {
     sequelize: sequelize,

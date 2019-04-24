@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash'
-import type { Plugin } from '../Definition'
+import type { PluginOptions } from '../Definition'
 
 export default ({
   key: 'genHasOneLink',
@@ -35,4 +35,4 @@ export default ({
       })
     })
   }
-}: Plugin)
+}: PluginOptions)

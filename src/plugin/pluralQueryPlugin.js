@@ -2,7 +2,7 @@
 import _ from 'lodash'
 import Sequelize from 'sequelize'
 import StringHelper from '../utils/StringHelper'
-import type { ColumnFieldOptions, Plugin } from '../Definition'
+import type { ColumnFieldOptions, PluginOptions } from '../Definition'
 
 const getSearchFields = (schema, schemas) => {
   const searchFields: any = {}
@@ -153,4 +153,4 @@ export default ({
       }
     })
   }
-}: Plugin)
+}: PluginOptions)

@@ -1,7 +1,7 @@
 // @flow
-import type { Hook, ResolverContext, SGContext } from '../Definition'
+import type { HookOptions, ResolverContext, SGContext } from '../Definition'
 
-export default (hooks: Array<Hook>, sgContext: SGContext): ResolverContext => {
+export default (hooks: Array<HookOptions>, sgContext: SGContext): ResolverContext => {
   const finalHooks = [...hooks].sort((p1, p2) => {
     const p1n = p1.priority || 0
     const p2n = p2.priority || 0

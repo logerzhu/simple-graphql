@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash'
-import type { InputFieldOptions, Plugin } from '../Definition'
+import type { InputFieldOptions, PluginOptions } from '../Definition'
 
 export default ({
   key: 'genHasManyLink',
@@ -91,4 +91,4 @@ export default ({
       })
     })
   }
-}: Plugin)
+}: PluginOptions)

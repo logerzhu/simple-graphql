@@ -1,5 +1,5 @@
 // @flow
-import type { Plugin } from '../Definition'
+import type { PluginOptions } from '../Definition'
 
 export default ({
   key: 'timestamp',
@@ -26,7 +26,7 @@ export default ({
       }
     })
 
-    if (schema.config.options && schema.config.options.table && schema.config.options.table.paranoid) {
+    if (schema.config.options && schema.config.options.tableOptions && schema.config.options.tableOptions.paranoid) {
       schema.fields({
         deletedAt: {
           $type: 'Date',
@@ -38,4 +38,4 @@ export default ({
       })
     }
   }
-}: Plugin)
+}: PluginOptions)

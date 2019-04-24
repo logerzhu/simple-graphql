@@ -1,21 +1,15 @@
 // @flow
 import _ from 'lodash'
 import type {
-  ColumnFieldOptions, DataTypeOptions,
+  ColumnFieldOptions,
+  DataTypeOptions,
   FieldOptions,
   InputFieldOptions,
   LinkedFieldOptions,
   MutationOptions,
-  QueryOptions
+  QueryOptions,
+  SchemaOptionConfig
 } from '../Definition'
-import type { DefineOptions } from 'sequelize'
-
-export type SchemaOptionConfig = {
-  description?: string,
-  plugin?: Object,
-  table?: DefineOptions<any>
-}
-
 /**
  * @public
  */

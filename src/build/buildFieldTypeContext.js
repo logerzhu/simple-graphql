@@ -151,8 +151,8 @@ function buildDataType (name: string, dataTypeOptions: DataTypeOptions, fieldTyp
       }
       if (columnOptions) {
         columnOptions = { ...columnOptions, ...(dataTypeOptions.columnOptions || {}) }
-        if (options.$type != null && options.column != null) {
-          columnOptions = { ...columnOptions, ...((options.column: any) || {}) }
+        if (options.$type != null && options.columnOptions != null) {
+          columnOptions = { ...columnOptions, ...((options.columnOptions: any) || {}) }
         }
         return columnOptions
       }

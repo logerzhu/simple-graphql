@@ -2,7 +2,7 @@
 import * as _ from 'lodash'
 
 import StringHelper from '../utils/StringHelper'
-import type { ColumnFieldOptions, Plugin } from '../Definition'
+import type { ColumnFieldOptions, PluginOptions } from '../Definition'
 
 export default ({
   key: 'singularQuery',
@@ -66,4 +66,4 @@ export default ({
       }
     })
   }
-}: Plugin)
+}: PluginOptions)

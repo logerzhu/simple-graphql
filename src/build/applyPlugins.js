@@ -1,9 +1,9 @@
 // @flow
 import Schema from '../definition/Schema'
 import innerPlugins from '../plugin'
-import type { Plugin } from '../Definition'
+import type { PluginOptions } from '../Definition'
 
-export default (schemas: Array<Schema>, plugins: Array<Plugin>, defaultOptions: { [id: string]: boolean | Object }) => {
+export default (schemas: Array<Schema>, plugins: Array<PluginOptions>, defaultOptions: { [id: string]: boolean | Object }) => {
   const result: { [string]: Schema } = {};
 
   [...innerPlugins, ...plugins].sort((p1, p2) => {

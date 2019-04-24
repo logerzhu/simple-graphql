@@ -8,8 +8,8 @@ import build from './build'
 
 export type {
   HookAction,
-  Hook,
-  Plugin,
+  HookOptions,
+  PluginOptions,
   SGContext,
   ResolverContext,
   InterfaceContext,

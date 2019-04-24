@@ -1,6 +1,6 @@
 // @flow
 import StringHelper from '../utils/StringHelper'
-import type { Plugin } from '../Definition'
+import type { PluginOptions } from '../Definition'
 
 export default ({
   key: 'deleteMutation',
@@ -38,4 +38,4 @@ export default ({
       }
     })
   }
-}: Plugin)
+}: PluginOptions)

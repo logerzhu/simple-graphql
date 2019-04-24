@@ -55,7 +55,7 @@ function toSequelizeModel (sequelize: Sequelize, schema: Schema, context: FieldT
       }
     }
   })
-  return sequelize.define(schema.name, dbDefinition, schema.config.options['table'])
+  return sequelize.define(schema.name, dbDefinition, schema.config.options.tableOptions)
 }
 
 function buildModelAssociations (schemas: Array<Schema>, models: { [id: string]: ModelDefine }) {

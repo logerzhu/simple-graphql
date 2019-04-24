@@ -2,7 +2,7 @@
 import SG from '../../../src'
 
 export default SG.schema('Todo', {
-  table: {
+  tableOptions: {
     underscored: true
   },
   plugin: {

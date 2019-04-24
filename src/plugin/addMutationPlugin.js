@@ -1,6 +1,6 @@
 // @flow
 import _ from 'lodash'
-import type { ColumnFieldOptions, Plugin } from '../Definition'
+import type { ColumnFieldOptions, PluginOptions } from '../Definition'
 import StringHelper from '../utils/StringHelper'
 
 export default ({
@@ -79,4 +79,4 @@ export default ({
       }
     })
   }
-}: Plugin)
+}: PluginOptions)

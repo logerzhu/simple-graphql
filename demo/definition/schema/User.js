@@ -20,7 +20,7 @@ export default SG.schema('User', {
       }
     }
   },
-  table: {
+  tableOptions: {
     paranoid: true
   }
 }).fields({
