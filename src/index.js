@@ -6,6 +6,27 @@ import Service from './definition/Service'
 import type { SchemaOptionConfig } from './Definition'
 import build from './build'
 
+export type {
+  HookAction,
+  Hook,
+  Plugin,
+  SGContext,
+  ResolverContext,
+  InterfaceContext,
+  FieldTypeContext,
+  FieldResolve,
+  RootResolve,
+  FieldType,
+  InputFieldOptions,
+  FieldOptions,
+  LinkedFieldOptions,
+  ColumnFieldOptions,
+  QueryOptions,
+  MutationOptions,
+  SchemaOptionConfig,
+  BuildOptions
+} from './Definition'
+
 const SimpleGraphQL = {
 
   Schema: Schema,
