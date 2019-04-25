@@ -160,7 +160,7 @@ function buildDataType (name: string, dataTypeOptions: DataTypeOptions, fieldTyp
   }
 }
 
-export default function (fieldTypes: Array<FieldType>, schemas: Array<Schema>, context: Context) {
+export default function (fieldTypes: Array<FieldType>, dataTypes: { [string]: DataTypeOptions }, schemas: Array<Schema>, context: Context) {
   const typeMap = { ...innerFieldTypes }
 
   const fieldTypeContext: FieldTypeContext = {
@@ -276,13 +276,17 @@ export default function (fieldTypes: Array<FieldType>, schemas: Array<Schema>, c
       return typeMap[typeName]
     }
   }
+
+  fieldTypes.forEach(f => {
+    typeMap[f.name] = f
+  })
+  _.forOwn(dataTypes, (value, key) => {
+    typeMap[key] = buildDataType(key, value, fieldTypeContext, context)
+  })
   schemas.forEach(schema => {
     _.forOwn(schema.config.dataTypes, (value, key) => {
       typeMap[key] = buildDataType(key, value, fieldTypeContext, context)
     })
-  })
-  fieldTypes.forEach(f => {
-    typeMap[f.name] = f
   })
   return fieldTypeContext
 }
