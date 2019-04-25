@@ -257,9 +257,9 @@ export default function (fieldTypes: Array<FieldType>, dataTypes: { [string]: Da
             description: schema.name + 'Connection',
             argFieldMap: {
               after: 'String',
-              first: 'Float',
+              first: 'Number',
               before: 'String',
-              last: 'Float'
+              last: 'Number'
             },
             inputType: undefined,
             outputType: connectionInfo.connectionType
