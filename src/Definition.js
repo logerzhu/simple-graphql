@@ -68,6 +68,7 @@ export type FieldOptions = string | Set<string> | Array<FieldOptions> | {|
   required: boolean,
   default?: any,
   args?: { [string]: InputFieldOptions },
+  dependentFields?: Array<string>,
   resolve?: FieldResolve
 |} | { [string]: FieldOptions }
 
@@ -76,7 +77,6 @@ export type LinkedFieldOptions = {|
   $type: FieldOptions,
   description?: string,
   required?: boolean,
-  default?: any,
   dependentFields?: Array<string>,
   args?: { [string]: InputFieldOptions },
   resolve: FieldResolve
