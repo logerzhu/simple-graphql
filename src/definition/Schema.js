@@ -3,7 +3,6 @@ import _ from 'lodash'
 import type {
   ColumnFieldOptions,
   DataTypeOptions,
-  FieldOptions,
   InputFieldOptions,
   LinkedFieldOptions,
   MutationOptions,
@@ -136,7 +135,7 @@ export default class Schema {
    * Add the model base fields, and each field has a corresponding database column.
    * In default, each field generate a GraphQL field, unless it config with "hidden:true".
    */
-  fields (fields: { [id: string]: FieldOptions }): Schema {
+  fields (fields: { [id: string]: ColumnFieldOptions }): Schema {
     this.config.fields = Object.assign(this.config.fields, fields)
     return this
   }
