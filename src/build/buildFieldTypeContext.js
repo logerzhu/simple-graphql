@@ -57,9 +57,10 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
         } else {
           return root[fieldName]
         }
-      } else {
+      } else if (root[fieldName + 'Id']) {
         return sgContext.models[typeName].findOne({ where: { id: root[fieldName + 'Id'] } })
       }
+      return null
     },
     columnOptions: (schema, fieldName, options) => {
       let foreignField = fieldName
