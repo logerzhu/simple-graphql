@@ -8,6 +8,7 @@ import pluralQueryPlugin from './pluralQueryPlugin'
 import singularQueryPlugin from './singularQueryPlugin'
 import timestampPlugin from './timestampPlugin'
 import updateMutationPlugin from './updateMutationPlugin'
+import versionPlugin from './versionPlugin'
 
 export default [
   addMutationPlugin,
@@ -17,5 +18,6 @@ export default [
   pluralQueryPlugin,
   singularQueryPlugin,
   timestampPlugin,
-  updateMutationPlugin
+  updateMutationPlugin,
+  versionPlugin
 ]
