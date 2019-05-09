@@ -21,12 +21,19 @@ export default ({
       return false
     }
 
-    const inputFields = {
+    const inputFields: any = {
       id: {
         $type: schema.name + 'Id',
         required: true
       },
       values: {}
+    }
+    const versionConfig = (schema.config.options.tableOptions || {}).version
+    if (versionConfig === true || typeof versionConfig === 'string') {
+      inputFields[typeof versionConfig === 'string' ? versionConfig : 'version'] = {
+        $type: Number,
+        required: false
+      }
     }
     _.forOwn(schema.config.fields, (value, key) => {
       if (isModelType(value)) {
@@ -86,6 +93,10 @@ export default ({
           if (!instance) {
             throw new Error(schema.name + '[' + args.id + '] not exist.')
           } else {
+            if (versionConfig === true || typeof versionConfig === 'string') {
+              const versionField = typeof versionConfig === 'string' ? versionConfig : 'version'
+              if (args[versionField] != null && instance[versionField] !== [versionField]) { throw new Error('Expired version number.') }
+            }
             await instance.update(values)
           }
           return {
