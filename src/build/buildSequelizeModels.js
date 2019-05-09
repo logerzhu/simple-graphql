@@ -10,7 +10,14 @@ import staticsMethods from './modelStaticsMethod'
 function toSequelizeModel (sequelize: Sequelize, schema: Schema, context: FieldTypeContext): ModelDefine {
   const dbDefinition = {}
 
+  const versionConfig = (schema.config.options.tableOptions || {}).version
+  let versionField = null
+  if (versionConfig === true || typeof versionConfig === 'string') {
+    versionField = typeof versionConfig === 'string' ? versionConfig : 'version'
+  }
+
   _.forOwn(schema.config.fields, (value, key) => {
+    if (key === versionField) return
     let typeName = value
     if (value && value.$type) {
       typeName = value.$type

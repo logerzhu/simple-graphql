@@ -31,7 +31,7 @@ export default ({
     const versionConfig = (schema.config.options.tableOptions || {}).version
     if (versionConfig === true || typeof versionConfig === 'string') {
       inputFields[typeof versionConfig === 'string' ? versionConfig : 'version'] = {
-        $type: Number,
+        $type: 'Integer',
         required: false
       }
     }
@@ -95,7 +95,7 @@ export default ({
           } else {
             if (versionConfig === true || typeof versionConfig === 'string') {
               const versionField = typeof versionConfig === 'string' ? versionConfig : 'version'
-              if (args[versionField] != null && instance[versionField] !== [versionField]) { throw new Error('Expired version number.') }
+              if (args[versionField] != null && instance[versionField] !== args[versionField]) { throw new Error('OptimisticLockingError: Invalid version number.') }
             }
             await instance.update(values)
           }
