@@ -58,7 +58,7 @@ export type InputFieldOptions = string | Set<string> | Array<InputFieldOptions> 
   description?: string,
   required: boolean,
   default?: any,
-  mapper?: (option: { where: Object, attributes: Array<string> }, any)=>void
+  mapper?: (option: { where: Object, attributes: Array<string> }, any)=> void
 } | { [string]: InputFieldOptions }
 
 export type FieldOptions = string | Set<string> | Array<FieldOptions> | {|

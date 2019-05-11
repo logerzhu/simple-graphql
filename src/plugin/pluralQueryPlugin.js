@@ -128,16 +128,16 @@ export default ({
 
           if (condition && condition.length > 0) {
             const where = queryOption.where
-            condition.forEach(c => {
+            for (let c of condition) {
               queryOption.where = {}
-              _.forOwn(searchFields, async (value, key) => {
-                await value.mapper(queryOption, c[key], sgContext)
-              })
+              for (let key of _.keys(searchFields)) {
+                await searchFields[key].mapper(queryOption, c[key], sgContext)
+              }
               if (queryOption.where.$and) {
                 where.$or = where.$or || []
                 where.$or.push(queryOption.where.$and)
               }
-            })
+            }
             queryOption.where = where
           }
 

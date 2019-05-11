@@ -51,9 +51,9 @@ export default ({
             let queryOption = { where: { ...(config.scope || {}) }, bind: [], attributes: [] }
 
             if (args && args.condition) {
-              _.forOwn(conditionFields, async (value, key) => {
-                await value.mapper(queryOption, args.condition[key], sgContext)
-              })
+              for (let key of _.keys(conditionFields)) {
+                await conditionFields[key].mapper(queryOption, args.condition[key], sgContext)
+              }
             }
 
             let sourceKey = config.sourceKey || 'id'
