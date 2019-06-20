@@ -132,7 +132,7 @@ export type HookOptions = {
 }
 
 export type PluginOptions = {
-  key: string,
+  name: string,
   description?: string,
   priority?: number,
   defaultOptions: ?(boolean | Object),

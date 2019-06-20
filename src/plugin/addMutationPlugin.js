@@ -4,7 +4,7 @@ import type { ColumnFieldOptions, PluginOptions } from '../Definition'
 import StringHelper from '../utils/StringHelper'
 
 export default ({
-  key: 'addMutation',
+  name: 'addMutation',
   defaultOptions: false,
   priority: 0,
   description: 'Gen `add mutation` for Schema',

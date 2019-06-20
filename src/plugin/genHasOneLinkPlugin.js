@@ -3,7 +3,7 @@ import _ from 'lodash'
 import type { PluginOptions } from '../Definition'
 
 export default ({
-  key: 'genHasOneLink',
+  name: 'genHasOneLink',
   defaultOptions: true,
   priority: 99,
   description: 'Gen `HasOneLink` for Schema',

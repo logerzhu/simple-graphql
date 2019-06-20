@@ -88,7 +88,7 @@ const getSearchFields = (schema, schemas) => {
 }
 
 export default ({
-  key: 'pluralQuery',
+  name: 'pluralQuery',
   defaultOptions: false,
   priority: 0,
   description: 'Gen `plural query` for Schema',

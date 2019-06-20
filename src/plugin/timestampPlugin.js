@@ -2,7 +2,7 @@
 import type { PluginOptions } from '../Definition'
 
 export default ({
-  key: 'timestamp',
+  name: 'timestamp',
   defaultOptions: true,
   priority: 100,
   description: 'Add createdAt/updatedAt field to Schema',

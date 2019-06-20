@@ -5,7 +5,7 @@ import StringHelper from '../utils/StringHelper'
 import type { ColumnFieldOptions, PluginOptions } from '../Definition'
 
 export default ({
-  key: 'singularQuery',
+  name: 'singularQuery',
   defaultOptions: false,
   priority: 0,
   description: 'Gen `singular query` for Schema',

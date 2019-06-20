@@ -2,7 +2,7 @@
 import type { PluginOptions } from '../Definition'
 
 export default ({
-  key: 'version',
+  name: 'version',
   defaultOptions: true,
   priority: 100,
   description: 'Add version field to Schema',

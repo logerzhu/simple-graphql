@@ -3,7 +3,7 @@ import _ from 'lodash'
 import type { InputFieldOptions, PluginOptions } from '../Definition'
 
 export default ({
-  key: 'genHasManyLink',
+  name: 'genHasManyLink',
   defaultOptions: true,
   priority: 99,
   description: 'Gen `HasManyLink` for Schema',

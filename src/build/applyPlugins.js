@@ -18,9 +18,9 @@ export default (schemas: Array<Schema>, plugins: Array<PluginOptions>, defaultOp
     }
   }).forEach(plugin => {
     for (let schema of schemas) {
-      let options = ((schema.config.options || {}).plugin || {})[plugin.key]
+      let options = ((schema.config.options || {}).plugin || {})[plugin.name]
       if (options === undefined) {
-        options = defaultOptions[plugin.key]
+        options = defaultOptions[plugin.name]
       }
       if (options === undefined) {
         options = plugin.defaultOptions

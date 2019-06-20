@@ -3,7 +3,7 @@ import StringHelper from '../utils/StringHelper'
 import type { PluginOptions } from '../Definition'
 
 export default ({
-  key: 'deleteMutation',
+  name: 'deleteMutation',
   defaultOptions: false,
   priority: 0,
   description: 'Gen `delete mutation` for Schema',
