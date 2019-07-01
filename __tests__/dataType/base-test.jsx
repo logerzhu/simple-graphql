@@ -5,21 +5,21 @@ import SGExecutor from '../SGExecutor'
 
 test('数据类型生成', async () => {
   const executor = await SGExecutor.new({
+    dataTypes: [{
+      name: 'DummyData1',
+      $type: {
+        name: 'String',
+        data: 'DummyData2'
+      }
+    }, {
+      name: 'DummyData2',
+      $type: [{
+        length: 'Number'
+      }]
+    }],
     schemas: [SG.schema('Dummy', {
       plugin: {
         addMutation: true
-      }
-    }).dataTypes({
-      DummyData1: {
-        $type: {
-          name: 'String',
-          data: 'DummyData2'
-        }
-      },
-      DummyData2: {
-        $type: [{
-          length: 'Number'
-        }]
       }
     }).fields({
       name: 'String',

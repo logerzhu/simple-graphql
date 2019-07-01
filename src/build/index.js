@@ -31,7 +31,7 @@ import buildRootQueries from './buildRootQueries'
 import buildRootMutations from './buildRootMutations'
 
 export default function (sequelize: Sequelize, config: {
-  dataTypes?: { [string]: DataTypeOptions },
+  dataTypes?: Array<DataTypeOptions>,
   fieldTypes?: Array<FieldType>,
   schemas?: Array<Schema>,
   services?: Array<Service>,
@@ -64,7 +64,7 @@ export default function (sequelize: Sequelize, config: {
     fieldType: (typeName) => null
   }
 
-  const fieldTypeContext = buildFieldTypeContext(config.fieldTypes || [], config.dataTypes || {}, config.schemas || [], context)
+  const fieldTypeContext = buildFieldTypeContext(config.fieldTypes || [], config.dataTypes || [], config.schemas || [], context)
   context.fieldType = (typeName) => fieldTypeContext.fieldType(typeName)
 
   sgContext.fieldType = (typeName) => fieldTypeContext.fieldType(typeName)

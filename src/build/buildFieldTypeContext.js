@@ -107,18 +107,18 @@ function buildModelTypeId (schema: Schema, fieldTypeContext: FieldTypeContext): 
   }
 }
 
-function buildDataType (name: string, dataTypeOptions: DataTypeOptions, fieldTypeContext: FieldTypeContext, context: Context): FieldType {
-  let outputType = toGraphQLFieldConfigMap(name, '', { '': dataTypeOptions.$type }, {
+function buildDataType (dataTypeOptions: DataTypeOptions, fieldTypeContext: FieldTypeContext, context: Context): FieldType {
+  let outputType = toGraphQLFieldConfigMap(dataTypeOptions.name, '', { '': dataTypeOptions.$type }, {
     hookFieldResolve: (name, options) => context.hookFieldResolve(name, options),
     hookQueryResolve: (name, options) => context.hookQueryResolve(name, options),
     hookMutationResolve: (name, options) => context.hookMutationResolve(name, options),
     fieldType: (typeName) => fieldTypeContext.fieldType(typeName)
   })[''].type
 
-  let inputType = toGraphQLInputFieldConfigMap(name, ({ '': dataTypeOptions.$type }: any), fieldTypeContext)[''].type
+  let inputType = toGraphQLInputFieldConfigMap(dataTypeOptions.name, ({ '': dataTypeOptions.$type }: any), fieldTypeContext)[''].type
   return {
-    name: name,
-    description: name,
+    name: dataTypeOptions.name,
+    description: dataTypeOptions.description || dataTypeOptions.name,
     inputType: inputType,
     outputType: outputType,
     columnOptions: (schema: Schema, fieldName: string, options: ColumnFieldOptions) => {
@@ -161,7 +161,7 @@ function buildDataType (name: string, dataTypeOptions: DataTypeOptions, fieldTyp
   }
 }
 
-export default function (fieldTypes: Array<FieldType>, dataTypes: { [string]: DataTypeOptions }, schemas: Array<Schema>, context: Context) {
+export default function (fieldTypes: Array<FieldType>, dataTypes:Array<DataTypeOptions>, schemas: Array<Schema>, context: Context) {
   const typeMap = { ...innerFieldTypes }
 
   const fieldTypeContext: FieldTypeContext = {
@@ -281,13 +281,8 @@ export default function (fieldTypes: Array<FieldType>, dataTypes: { [string]: Da
   fieldTypes.forEach(f => {
     typeMap[f.name] = f
   })
-  _.forOwn(dataTypes, (value, key) => {
-    typeMap[key] = buildDataType(key, value, fieldTypeContext, context)
-  })
-  schemas.forEach(schema => {
-    _.forOwn(schema.config.dataTypes, (value, key) => {
-      typeMap[key] = buildDataType(key, value, fieldTypeContext, context)
-    })
+  dataTypes.forEach(d => {
+    typeMap[d.name] = buildDataType(d, fieldTypeContext, context)
   })
   return fieldTypeContext
 }

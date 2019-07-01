@@ -35,7 +35,7 @@ const sequelizeInstance = function (dbConfig) {
 
 class SGExecutor {
   static new: (config: {
-    dataTypes?: { [string]: DataTypeOptions },
+    dataTypes?: Array<DataTypeOptions>,
     fieldTypes?: Array<FieldType>,
     schemas?: Array<SG.Schema>,
     services?: Array<SG.Service>,

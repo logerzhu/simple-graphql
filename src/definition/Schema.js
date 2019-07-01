@@ -2,7 +2,6 @@
 import _ from 'lodash'
 import type {
   ColumnFieldOptions,
-  DataTypeOptions,
   InputFieldOptions,
   LinkedFieldOptions,
   MutationOptions,
@@ -104,7 +103,6 @@ export default class Schema {
     links: { [id: string]: LinkedFieldOptions },
     associations: AssociationConfig,
     options: SchemaOptionConfig,
-    dataTypes: { [string]: DataTypeOptions },
     queries: { [id: string]: QueryOptions },
     mutations: { [id: string]: MutationOptions },
     methods: { [id: string]: any },
@@ -145,11 +143,6 @@ export default class Schema {
    */
   links (links: { [id: string]: LinkedFieldOptions }): Schema {
     this.config.links = Object.assign(this.config.links, links)
-    return this
-  }
-
-  dataTypes (dataTypes: { [string]: DataTypeOptions }): Schema {
-    this.config.dataTypes = Object.assign(this.config.dataTypes, dataTypes)
     return this
   }
 

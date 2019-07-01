@@ -93,6 +93,7 @@ export type ColumnFieldOptions = string | Set<string> | Array<FieldOptions> | {|
 |} | { [string]: FieldOptions }
 
 export type DataTypeOptions = {|
+  name: string,
   $type: FieldOptions,
   description?: string,
   columnOptions?: DefineAttributeColumnOptions
