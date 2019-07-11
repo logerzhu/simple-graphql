@@ -16,6 +16,7 @@ export default ({
         [key]: {
           config: config.config,
           $type: config.target,
+          description: config.description,
           dependentFields: ['id'],
           resolve: async function (root, args, context, info, sgContext) {
             if (root[key] !== undefined) {

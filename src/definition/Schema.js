@@ -16,6 +16,7 @@ export type HasOneConfig = {
     config?: Object,
     hidden?: boolean,
     target: string,
+    description?: string,
     foreignField?: string,
     foreignKey?: string,
     onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
@@ -31,6 +32,7 @@ export type BelongsToConfig = {
   [string]: {
     hidden?: boolean,
     target: string,
+    description?: string,
     foreignField?: string,
     foreignKey?: string | { name: string, allowNull?: boolean },
     targetKey?: string,
@@ -46,6 +48,7 @@ type HasManyConfig = {
     hidden?: boolean,
     conditionFields?: { [string]: InputFieldOptions },
     target: string,
+    description?: string,
     through?: string | {
       model: string,
       scope?: Object,
@@ -70,6 +73,7 @@ type BelongsToManyConfig = {
   [string]: {
     hidden?: boolean,
     target: string,
+    description?: string,
     through?: string | {
       model: string,
       scope?: Object,

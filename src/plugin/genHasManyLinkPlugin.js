@@ -40,6 +40,7 @@ export default ({
       schema.links({
         [key]: {
           config: config.config,
+          description: config.description,
           args: args,
           $type: config.outputStructure === 'Array' ? [config.target] : config.target + 'Connection',
           dependentFields: [config.sourceKey || 'id'],
