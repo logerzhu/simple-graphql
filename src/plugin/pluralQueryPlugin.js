@@ -76,7 +76,7 @@ const getSearchFields = (schema, schemas) => {
             if (opKey !== 'contains') {
               keyCondition[Sequelize.Op[opKey]] = argValue[opKey]
             } else {
-              option.where.$and.push(sgContext.sequelize.literal(`json_contains(\`${key}\`, '${JSON.stringify(argValue[opKey])}' )`))
+              option.where.$and.push(Sequelize.literal(`json_contains(\`${key}\`, '${JSON.stringify(argValue[opKey])}' )`))
             }
           }
           option.where.$and.push({ [key]: keyCondition })

@@ -8,6 +8,7 @@ import type {
   QueryOptions,
   SchemaOptionConfig
 } from '../Definition'
+import Sequelize from 'sequelize'
 /**
  * @public
  */
@@ -101,6 +102,8 @@ type AssociationConfig = {
 
 export default class Schema {
   name: string
+
+  sequelize: Sequelize
 
   config: {
     fields: { [id: string]: ColumnFieldOptions },

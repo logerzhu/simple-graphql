@@ -110,7 +110,7 @@ export default (sequelize: Sequelize, schemas: Array<Schema>, context: SGContext
     if (result[schema.name]) {
       throw new Error(`Schema ${schema.name} already define.`)
     }
-    const model = toSequelizeModel(sequelize, schema, context)
+    const model = toSequelizeModel(schema.sequelize || sequelize, schema, context)
     Object.assign(model, {
       ...schema.config.statics,
       ...staticsMethods,
