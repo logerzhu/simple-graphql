@@ -78,7 +78,6 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
             foreignField: foreignField,
             foreignKey: { name: foreignField + 'Id', allowNull: false },
             onDelete: onDelete,
-            scope: options.scope,
             constraints: true
           }
         })
@@ -89,7 +88,6 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
             hidden: true,
             foreignField: foreignField,
             onDelete: onDelete,
-            scope: options.scope,
             constraints: true
           }
         })

@@ -22,7 +22,8 @@ export type HasOneConfig = {
     foreignKey?: string,
     onDelete?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
     onUpdate?: 'SET NULL' | 'CASCADE' | 'RESTRICT' | 'SET DEFAULT' | 'NO ACTION',
-    constraints?: boolean
+    constraints?: boolean,
+    scope?: Object
   }
 }
 
