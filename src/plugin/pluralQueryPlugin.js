@@ -18,7 +18,10 @@ const getSearchFields = (schema, schemas) => {
 
   const advanceType = (type) => {
     if (typeof type === 'string' && type.startsWith('[') && type.endsWith(']')) {
-      return { contains: [type] }
+      return { contains: [type.substring(1, type.length - 2)] }
+    }
+    if (_.isArray(type)) {
+      return { contains: type }
     }
     if (type === 'Boolean') {
       return type

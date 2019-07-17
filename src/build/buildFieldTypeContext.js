@@ -78,6 +78,7 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
             foreignField: foreignField,
             foreignKey: { name: foreignField + 'Id', allowNull: false },
             onDelete: onDelete,
+            scope: options.scope,
             constraints: true
           }
         })
@@ -88,6 +89,7 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
             hidden: true,
             foreignField: foreignField,
             onDelete: onDelete,
+            scope: options.scope,
             constraints: true
           }
         })
@@ -161,7 +163,7 @@ function buildDataType (dataTypeOptions: DataTypeOptions, fieldTypeContext: Fiel
   }
 }
 
-export default function (fieldTypes: Array<FieldType>, dataTypes:Array<DataTypeOptions>, schemas: Array<Schema>, context: Context) {
+export default function (fieldTypes: Array<FieldType>, dataTypes: Array<DataTypeOptions>, schemas: Array<Schema>, context: Context) {
   const typeMap = { ...innerFieldTypes }
 
   const fieldTypeContext: FieldTypeContext = {
