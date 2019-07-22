@@ -25,7 +25,7 @@ export default SG.schema('Dummy', {
   dummyA: 'Dummy',
   dummyB: ['Dummy'],
   dummyC: {
-    at: Date,
+    at: 'Date',
     enum: new Set(['A', 'B', 'C']),
     enums: [new Set(['A', 'B', 'C'])],
     dummyE: 'Dummy',
