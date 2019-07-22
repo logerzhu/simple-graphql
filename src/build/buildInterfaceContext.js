@@ -5,7 +5,7 @@ import { fromGlobalId, nodeDefinitions } from 'graphql-relay'
 
 export default (context: SGContext): InterfaceContext => {
   const interfaces: { [string]: GraphQLInterfaceType } = {
-    node: nodeDefinitions((globalId) => {
+    Node: nodeDefinitions((globalId) => {
       const { type, id } = fromGlobalId(globalId)
       console.log('Warning-------------------- node id Fetcher not implement' + type + ' ' + id)
     }, (obj) => {

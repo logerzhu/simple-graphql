@@ -48,7 +48,7 @@ export default (schemas: Array<Schema>, services: Array<Service>,
     description: 'Default Viewer implement to include all queries.',
     type: new graphql.GraphQLNonNull(new graphql.GraphQLObjectType({
       name: 'Viewer',
-      interfaces: [context.interface('node')],
+      interfaces: [context.interface('Node')],
       fields: {
         id: { type: new graphql.GraphQLNonNull(graphql.GraphQLID) },
         ...queries
@@ -64,7 +64,7 @@ export default (schemas: Array<Schema>, services: Array<Service>,
 
   queries['node'] = {
     description: 'Fetches an object given its ID',
-    type: context.interface('node'),
+    type: context.interface('Node'),
     args: {
       id: {
         type: new graphql.GraphQLNonNull(graphql.GraphQLID),

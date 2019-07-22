@@ -28,7 +28,7 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
     inputType: (fieldTypeContext.fieldType(schema.name + 'Id'): any).inputType,
     outputType: new graphql.GraphQLObjectType({
       name: typeName,
-      interfaces: [context.interface('node')],
+      interfaces: [context.interface('Node')],
       fields: () => toGraphQLFieldConfigMap(typeName, '',
         {
           id: {
@@ -189,6 +189,16 @@ export default function (fieldTypes: Array<FieldType>, dataTypes: Array<DataType
         }
       }
       if (!typeMap[typeName]) {
+        if (typeName.endsWith('Interface')) {
+          const gIntf = context.interface(typeName.substr(0, typeName.length - 'Interface'.length))
+          if (gIntf) {
+            typeMap[typeName] = {
+              name: typeName,
+              outputType: gIntf
+            }
+            return typeMap[typeName]
+          }
+        }
         if (typeName.startsWith('[') && typeName.endsWith(']')) {
           const subTypeName = typeName.substr(1, typeName.length - 2)
           const fieldType = fieldTypeContext.fieldType(subTypeName)
