@@ -45,7 +45,7 @@ const toGraphQLFieldConfigMap = function (
   const convert = (name: string,
     path: string,
     field: any): ?GraphQLFieldConfig<any, any> => {
-    if (typeof field === 'string') {
+    if (typeof field === 'string' || typeof field === 'function') {
       return fieldConfig(name, path, field)
     }
     if (field instanceof Set) {

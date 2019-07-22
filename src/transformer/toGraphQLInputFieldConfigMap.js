@@ -30,7 +30,7 @@ const toGraphQLInputFieldConfigMap = function (
   const convert = (name: string,
     path: string,
     field: any): ?GraphQLInputFieldConfig => {
-    if (typeof field === 'string') {
+    if (typeof field === 'string' || typeof field === 'function') {
       return inputFieldConfig(field)
     }
     if (field instanceof Set) {
