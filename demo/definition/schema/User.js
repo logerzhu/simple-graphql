@@ -46,6 +46,13 @@ export default SG.schema('User', {
     default: () => new Date()
   }
 }).links({
+  node: {
+    $type: 'NodeInterface',
+    dependentFields: ['id'],
+    resolve: async function (root, args, context, info, { models: { User } }) {
+      return User.findOne()
+    }
+  },
   p1: {
     $type: 'String',
     dependentFields: ['p2', 'blocked'],

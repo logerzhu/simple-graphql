@@ -48,7 +48,6 @@ export default (schemas: Array<Schema>, services: Array<Service>,
     description: 'Default Viewer implement to include all queries.',
     type: new graphql.GraphQLNonNull(new graphql.GraphQLObjectType({
       name: 'Viewer',
-      interfaces: [context.interface('Node')],
       fields: {
         id: { type: new graphql.GraphQLNonNull(graphql.GraphQLID) },
         ...queries
@@ -75,11 +74,6 @@ export default (schemas: Array<Schema>, services: Array<Service>,
       $type: { id: 'Id' },
       resolve: async function (args, context, info, sgContext) {
         const id = relay.fromGlobalId(args.id)
-        if (id.type === 'Viewer') {
-          if (queries['viewer'] && queries['viewer'].resolve) {
-            return queries['viewer'].resolve(null, args, context, info)
-          }
-        }
         if (!sgContext.models[id.type]) return null
 
         const dbModel = sgContext.models[id.type]
