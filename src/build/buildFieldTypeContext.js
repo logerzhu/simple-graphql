@@ -108,14 +108,16 @@ function buildModelTypeId (schema: Schema, fieldTypeContext: FieldTypeContext): 
 }
 
 function buildDataType (dataTypeOptions: DataTypeOptions, fieldTypeContext: FieldTypeContext, context: Context): FieldType {
-  let outputType = toGraphQLFieldConfigMap(dataTypeOptions.name, '', { '': dataTypeOptions.$type }, {
+  const outputConfigMap = toGraphQLFieldConfigMap(dataTypeOptions.name, '', { '': dataTypeOptions.$type }, {
     hookFieldResolve: (name, options) => context.hookFieldResolve(name, options),
     hookQueryResolve: (name, options) => context.hookQueryResolve(name, options),
     hookMutationResolve: (name, options) => context.hookMutationResolve(name, options),
     fieldType: (typeName) => fieldTypeContext.fieldType(typeName)
-  })[''].type
+  })['']
+  let outputType = outputConfigMap && outputConfigMap.type
 
-  let inputType = toGraphQLInputFieldConfigMap(dataTypeOptions.name, ({ '': dataTypeOptions.$type }: any), fieldTypeContext)[''].type
+  const inputConfigMap = toGraphQLInputFieldConfigMap(dataTypeOptions.name, ({ '': dataTypeOptions.$type }: any), fieldTypeContext)['']
+  let inputType = inputConfigMap && inputConfigMap.type
   return {
     name: dataTypeOptions.name,
     description: dataTypeOptions.description || dataTypeOptions.name,
