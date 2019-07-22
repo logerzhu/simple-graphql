@@ -118,7 +118,8 @@ export default (sequelize: Sequelize, schemas: Array<Schema>, context: SGContext
     })
     Object.assign(model.prototype, {
       ...schema.config.methods,
-      getSGContext: () => context
+      getSGContext: () => context,
+      _fieldType: schema.name
     })
     result[schema.name] = model
   }

@@ -1,11 +1,12 @@
 // @flow
-export default function parseSelections (fragments:Array<any>, selections:Array<Object>) {
+export default function parseSelections (fragments: Array<any>, selections: Array<Object>, base?: { namedType: string }) {
   const result = []
   if (selections) {
     selections.forEach(selection => {
       if (selection.kind === 'Field') {
         const selectionSet = selection.selectionSet
-        return result.push({
+        result.push({
+          ...(base || {}),
           name: selection.name.value,
           selections: selectionSet && parseSelections(fragments, selectionSet.selections)
         })
@@ -14,6 +15,14 @@ export default function parseSelections (fragments:Array<any>, selections:Array<
         parseSelections(fragments, fragment.selectionSet && fragment.selectionSet.selections).forEach(
           r => result.push(r)
         )
+      } else if (selection.kind === 'InlineFragment') {
+        if (selection.typeCondition && selection.typeCondition.kind === 'NamedType') {
+          const namedType = selection.typeCondition.name.value
+          parseSelections(
+            fragments,
+            selection.selectionSet && selection.selectionSet.selections,
+            { namedType: namedType }).forEach(r => result.push(r))
+        }
       }
     })
   }

@@ -90,7 +90,9 @@ export default function (args: { attributes: Array<string>, selections: Array<an
 
   if (args.selections) {
     args.selections.forEach(selection => {
-      option = getDependentOptions(option, selection.name)
+      if (selection.namedType == null || selection.namedType === schema.name) {
+        option = getDependentOptions(option, selection.name)
+      }
     })
   }
 

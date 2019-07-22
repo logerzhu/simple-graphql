@@ -56,7 +56,7 @@ export default (schemas: Array<Schema>, services: Array<Service>,
     })),
     resolve: () => {
       return {
-        _type: 'Viewer',
+        _fieldType: 'Viewer',
         id: relay.toGlobalId('Viewer', 'viewer')
       }
     }
@@ -88,9 +88,6 @@ export default (schemas: Array<Schema>, services: Array<Service>,
           where: { id: id.id },
           ...option
         })
-        if (record) {
-          record._type = id.type
-        }
         return record
       }
     })
