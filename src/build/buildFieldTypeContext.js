@@ -65,9 +65,9 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
     columnOptions: (schema, fieldName, options) => {
       let foreignField = fieldName
       let onDelete = 'RESTRICT'
-      if (options && options.$type && options.column) {
-        if (options.column.onDelete) {
-          onDelete = options.column.onDelete
+      if (options && options.$type && options.columnOptions) {
+        if (options.columnOptions.onDelete) {
+          onDelete = options.columnOptions.onDelete
         }
       }
       if (options && options.$type && options.required) {

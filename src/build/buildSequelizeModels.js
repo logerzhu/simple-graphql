@@ -55,7 +55,7 @@ function toSequelizeModel (sequelize: Sequelize, schema: Schema, context: FieldT
         if (value.default != null) {
           dbDefinition[key].defaultValue = value.default
         }
-        dbDefinition[key] = { ...dbDefinition[key], ...(value.column || {}) }
+        dbDefinition[key] = { ...dbDefinition[key], ...(value.columnOptions || {}) }
       }
       if ((sequelize.options.define || {}).underscored && dbDefinition[key].field == null) {
         dbDefinition[key].field = StringHelper.toUnderscoredName(key)

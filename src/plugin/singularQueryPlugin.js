@@ -28,7 +28,7 @@ export default ({
       }
     }
     _.forOwn(schema.config.fields, (value, key) => {
-      if (value.$type && (value.column && value.column.unique) && value.hidden !== true) {
+      if (value.$type && (value.columnOptions && value.columnOptions.unique) && value.hidden !== true) {
         if (isModelType(value)) {
           if (!key.endsWith('Id')) {
             key = key + 'Id'
