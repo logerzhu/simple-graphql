@@ -1,6 +1,7 @@
 // @flow
 import _ from 'lodash'
 import type { InputFieldOptions, PluginOptions } from '../Definition'
+import Sequelize from 'sequelize'
 
 export default ({
   name: 'genHasManyLink',
@@ -22,8 +23,8 @@ export default ({
         if (!value.mapper) {
           value.mapper = function (option: { where: Object, attributes: Array<string> }, argValue) {
             if (argValue !== undefined) {
-              option.where.$and = option.where.$and || []
-              option.where.$and.push({ [key]: argValue })
+              option.where[Sequelize.Op.and] = option.where[Sequelize.Op.and] || []
+              option.where[Sequelize.Op.and].push({ [key]: argValue })
             }
           }
         }

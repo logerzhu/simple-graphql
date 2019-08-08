@@ -70,19 +70,19 @@ const getSearchFields = (schema, schemas) => {
 
     searchFields[key].mapper = function (option: { where: Object, attributes: Array<string> }, argValue, sgContext) {
       if (argValue !== undefined) {
-        option.where.$and = option.where.$and || []
+        option.where[Sequelize.Op.and] = option.where[Sequelize.Op.and] || []
         if (argValue == null || typeof argValue === 'boolean') {
-          option.where.$and.push({ [key]: argValue })
+          option.where[Sequelize.Op.and].push({ [key]: argValue })
         } else {
           const keyCondition = {}
           for (let opKey of _.keys(argValue)) {
             if (opKey !== 'contains') {
               keyCondition[Sequelize.Op[opKey]] = argValue[opKey]
             } else {
-              option.where.$and.push(Sequelize.literal(`json_contains(\`${key}\`, '${JSON.stringify(argValue[opKey])}' )`))
+              option.where[Sequelize.Op.and].push(Sequelize.literal(`json_contains(\`${key}\`, '${JSON.stringify(argValue[opKey])}' )`))
             }
           }
-          option.where.$and.push({ [key]: keyCondition })
+          option.where[Sequelize.Op.and].push({ [key]: keyCondition })
         }
       }
     }
@@ -136,9 +136,9 @@ export default ({
               for (let key of _.keys(searchFields)) {
                 await searchFields[key].mapper(queryOption, c[key], sgContext)
               }
-              if (queryOption.where.$and) {
-                where.$or = where.$or || []
-                where.$or.push(queryOption.where.$and)
+              if (queryOption.where[Sequelize.Op.and]) {
+                where[Sequelize.Op.or] = where[Sequelize.Op.or] || []
+                where[Sequelize.Op.or].push({ [Sequelize.Op.and]: queryOption.where[Sequelize.Op.and] })
               }
             }
             queryOption.where = where
