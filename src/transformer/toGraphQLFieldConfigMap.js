@@ -31,7 +31,7 @@ const toGraphQLFieldConfigMap = function (
       }
       const outputResolve = fieldType.outputResolve
       if (outputResolve) {
-        config.resolve = context.hookFieldResolve(fieldName.split('.').slice(-1)[0], {
+        config.resolve = context.hookFieldResolve(fieldPath, {
           $type: typeName,
           resolve: outputResolve
         })
@@ -88,7 +88,14 @@ const toGraphQLFieldConfigMap = function (
             }
           }
           if (field['resolve']) {
-            result['resolve'] = context.hookFieldResolve(name.split('.').slice(-1)[0], field)
+            result['resolve'] = context.hookFieldResolve(path, field)
+          } else {
+            result['resolve'] = result['resolve'] || context.hookFieldResolve(path, {
+              ...field,
+              resolve: async function (root, args, context, info) {
+                return root[info.fieldName]
+              }
+            })
           }
           if (field.args) {
             result.args = { ...result.args, ...toGraphQLInputFieldConfigMap(toTypeName(name, path), field.args, context) }
@@ -102,7 +109,7 @@ const toGraphQLFieldConfigMap = function (
               name: StringHelper.toInitialUpperCase(toTypeName(name, path)) + postfix,
               fields: () => toGraphQLFieldConfigMap(toTypeName(name, path), postfix, field, context)
             }),
-            resolve: context.hookFieldResolve(name.split('.').slice(-1)[0], {
+            resolve: context.hookFieldResolve(path, {
               $type: field,
               resolve: async function (root, args, context, info) {
                 return root[info.fieldName]
