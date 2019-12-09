@@ -8,15 +8,17 @@ import type {
   ResolverContext
 } from '../Definition'
 import Schema from '../definition/Schema'
-import innerFieldTypes from './fieldType'
-import * as graphql from 'graphql'
+import { GraphQLFloat, GraphQLList, GraphQLObjectType, GraphQLString, GraphQLUnionType } from 'graphql'
 import * as relay from 'graphql-relay'
 import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
 import globalIdType from './fieldType/globalIdType'
+import unionInputType from './fieldType/unionInputType'
 import type { DefineAttributeColumnOptions } from 'sequelize'
 import Sequelize from 'sequelize'
 import _ from 'lodash'
 import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConfigMap'
+import innerFieldTypes from './fieldType'
+import innerDataTypes from './dataType'
 
 type Context = ResolverContext & InterfaceContext
 
@@ -26,7 +28,7 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
     name: typeName,
     description: schema.config.options.description,
     inputType: (fieldTypeContext.fieldType(schema.name + 'Id'): any).inputType,
-    outputType: new graphql.GraphQLObjectType({
+    outputType: new GraphQLObjectType({
       name: typeName,
       interfaces: [context.interface('Node')],
       fields: () => toGraphQLFieldConfigMap(typeName, '',
@@ -108,45 +110,73 @@ function buildModelTypeId (schema: Schema, fieldTypeContext: FieldTypeContext): 
 }
 
 function buildDataType (dataTypeOptions: DataTypeOptions, fieldTypeContext: FieldTypeContext, context: Context): FieldType {
-  const outputConfigMap = toGraphQLFieldConfigMap(dataTypeOptions.name, '', { '': dataTypeOptions.$type }, {
-    hookFieldResolve: (name, options) => context.hookFieldResolve(name, options),
-    hookQueryResolve: (name, options) => context.hookQueryResolve(name, options),
-    hookMutationResolve: (name, options) => context.hookMutationResolve(name, options),
-    fieldType: (typeName) => fieldTypeContext.fieldType(typeName)
-  })['']
-  let outputType = outputConfigMap && outputConfigMap.type
+  const toOutputType = (name, $type) => {
+    const outputConfigMap = toGraphQLFieldConfigMap(name, '', { '': $type }, {
+      hookFieldResolve: (name, options) => context.hookFieldResolve(name, options),
+      hookQueryResolve: (name, options) => context.hookQueryResolve(name, options),
+      hookMutationResolve: (name, options) => context.hookMutationResolve(name, options),
+      fieldType: (typeName) => fieldTypeContext.fieldType(typeName)
+    })['']
+    return outputConfigMap && outputConfigMap.type
+  }
 
-  const inputConfigMap = toGraphQLInputFieldConfigMap(dataTypeOptions.name, ({ '': dataTypeOptions.$type }: any), fieldTypeContext)['']
-  let inputType = inputConfigMap && inputConfigMap.type
+  const toInputType = (name, $type) => {
+    const inputConfigMap = toGraphQLInputFieldConfigMap(name, ({ '': $type }: any), fieldTypeContext)['']
+    return inputConfigMap && inputConfigMap.type
+  }
+
+  let outputType, inputType
+  if (dataTypeOptions.$type) {
+    outputType = toOutputType(dataTypeOptions.name, dataTypeOptions.$type)
+    inputType = toInputType(dataTypeOptions.name, dataTypeOptions.$type)
+  } else if (dataTypeOptions.$unionTypes) {
+    const $unionTypes = dataTypeOptions.$unionTypes
+    const unionTypes = _.mapValues($unionTypes, (type, key) => (fieldTypeContext.fieldType(`_Union_${type}`): any).outputType)
+    outputType = new GraphQLUnionType({
+      name: dataTypeOptions.name,
+      types: _.values(unionTypes),
+      resolveType (value) {
+        if (value && value.variant) {
+          return (fieldTypeContext.fieldType(`_Union_${$unionTypes[value.variant]}`): any).outputType
+        }
+      }
+    })
+    inputType = unionInputType({
+      name: `${dataTypeOptions.name}Input`,
+      inputValueTypes: _.mapValues($unionTypes, ($type, key) => toInputType(`${dataTypeOptions.name}${key}`, $type))
+    })
+  }
   return {
     name: dataTypeOptions.name,
     description: dataTypeOptions.description || dataTypeOptions.name,
     inputType: inputType,
     outputType: outputType,
     columnOptions: (schema: Schema, fieldName: string, options: ColumnFieldOptions) => {
-      let typeName = dataTypeOptions
-      if (dataTypeOptions && dataTypeOptions.$type) {
-        typeName = dataTypeOptions.$type
-      }
-
       let columnOptions: ?DefineAttributeColumnOptions = null
-      if (typeName instanceof Set) {
-        columnOptions = {
-          type: Sequelize.STRING(191)
+      if (dataTypeOptions.$type) {
+        let typeName = dataTypeOptions.$type
+        if (typeName instanceof Set) {
+          columnOptions = {
+            type: Sequelize.STRING(191)
+          }
+        } else if (_.isArray(typeName)) {
+          columnOptions = {
+            type: Sequelize.JSON
+          }
+        } else if (typeof typeName === 'string') {
+          const fieldType = fieldTypeContext.fieldType(typeName)
+          if (!fieldType) {
+            throw new Error(`Type "${typeName}" has not register.`)
+          }
+          if (!fieldType.columnOptions) {
+            throw new Error(`Column type of "${typeName}" is not supported.`)
+          }
+          columnOptions = typeof fieldType.columnOptions === 'function' ? fieldType.columnOptions(schema, fieldName, options) : fieldType.columnOptions
+        } else {
+          columnOptions = {
+            type: Sequelize.JSON
+          }
         }
-      } else if (_.isArray(typeName)) {
-        columnOptions = {
-          type: Sequelize.JSON
-        }
-      } else if (typeof typeName === 'string') {
-        const fieldType = fieldTypeContext.fieldType(typeName)
-        if (!fieldType) {
-          throw new Error(`Type "${typeName}" has not register.`)
-        }
-        if (!fieldType.columnOptions) {
-          throw new Error(`Column type of "${typeName}" is not supported.`)
-        }
-        columnOptions = typeof fieldType.columnOptions === 'function' ? fieldType.columnOptions(schema, fieldName, options) : fieldType.columnOptions
       } else {
         columnOptions = {
           type: Sequelize.JSON
@@ -163,138 +193,174 @@ function buildDataType (dataTypeOptions: DataTypeOptions, fieldTypeContext: Fiel
   }
 }
 
-export default function (fieldTypes: Array<FieldType>, dataTypes: Array<DataTypeOptions>, schemas: Array<Schema>, context: Context) {
-  const typeMap = { ...innerFieldTypes }
+function buildUnionWrapType (wrapType: string, fieldTypeContext: FieldTypeContext, context: Context): FieldType {
+  console.log('buildUnionWrapType', wrapType)
+  const name = `_Union_${wrapType}`
+  return {
+    name: name,
+    description: `Union wrap type for ${wrapType}`,
+    inputType: null,
+    outputType: new GraphQLObjectType({
+      name: name,
+      fields: {
+        variant: { type: GraphQLString },
+        value: { type: (fieldTypeContext.fieldType(wrapType): any).outputType }
+      }
+    }),
+    columnOptions: { type: Sequelize.JSON }
+  }
+}
 
-  const fieldTypeContext: FieldTypeContext = {
-    fieldType: (typeName) => {
+export default function (fieldTypes: Array<FieldType>, dataTypes: Array<DataTypeOptions>, schemas: Array<Schema>, context: Context) {
+  const typeMap = {}
+
+  const resolves = [
+    function resolveFunctionType (typeName) {
       if (typeof typeName !== 'string') {
         switch (typeName) {
           case Date:
-            typeName = 'Date'
             console.warn('Field type name should be string. Please change Date to \'Date\'.')
-            break
+            return typeMap['Date']
           case String:
-            typeName = 'String'
             console.warn('Field type name should be string. Please change String to \'String\'.')
-            break
+            return typeMap['String']
           case Number:
-            typeName = 'Number'
             console.warn('Field type name should be string. Please change Number to \'Number\'.')
-            break
+            return typeMap['Number']
           case JSON:
-            typeName = 'JSON'
             console.warn('Field type name should be string. Please change JSON to \'JSON\'.')
-            break
+            return typeMap['JSON']
           default:
             throw new Error(`Unknown type ${typeName}`)
         }
       }
-      if (!typeMap[typeName]) {
-        if (typeName.endsWith('Interface')) {
-          const gIntf = context.interface(typeName.substr(0, typeName.length - 'Interface'.length))
-          if (gIntf) {
-            typeMap[typeName] = {
-              name: typeName,
-              outputType: gIntf
-            }
-            return typeMap[typeName]
-          }
-        }
-        if (typeName.startsWith('[') && typeName.endsWith(']')) {
-          const subTypeName = typeName.substr(1, typeName.length - 2)
-          const fieldType = fieldTypeContext.fieldType(subTypeName)
-          if (!fieldType) {
-            return null
-          }
-          typeMap[typeName] = {
+    },
+    function resolveInterfaceType (typeName) {
+      if (typeName.endsWith('Interface')) {
+        const gIntf = context.interface(typeName.substr(0, typeName.length - 'Interface'.length))
+        if (gIntf) {
+          return {
             name: typeName,
-            description: `Array of type ${subTypeName}`,
-            inputType: fieldType.inputType ? new graphql.GraphQLList(fieldType.inputType) : null,
-            outputType: fieldType.outputType ? new graphql.GraphQLList(fieldType.outputType) : null,
-            outputResolve: async function (root, args, context, info, sgContext) {
-              const fieldName = info.fieldName
-              if (schemas.find(s => s.name === subTypeName) != null) {
-                if (root[fieldName] != null && root[fieldName].length > 0 &&
-                  (typeof root[fieldName][0] === 'string' || typeof root[fieldName][0] === 'number')) {
-                  const list = await sgContext.models[subTypeName].findAll({
-                    where: { id: { [(Sequelize.Op.in: any)]: root[fieldName] } }
-                  })
-                  const result = []
-                  for (let id of root[fieldName]) {
-                    const element = list.find(e => '' + e.id === '' + id)
-                    if (element) {
-                      result.push(element)
-                    }
-                  }
-                  return result
-                }
-              }
-              return root[fieldName]
-            },
-            columnOptions: { type: Sequelize.JSON }
+            outputType: gIntf
           }
-          // TODO check Model array resolve
-          return typeMap[typeName]
-        }
-
-        let schema = schemas.find(s => s.name === typeName)
-        if (schema) {
-          typeMap[typeName] = buildModelType(schema, fieldTypeContext, context)
-          return typeMap[typeName]
-        }
-
-        schema = schemas.find(s => s.name + 'Id' === typeName)
-        if (schema) {
-          typeMap[typeName] = buildModelTypeId(schema, fieldTypeContext)
-          return typeMap[typeName]
-        }
-
-        schema = schemas.find(s => s.name + 'Connection' === typeName || s.name + 'Edge' === typeName)
-        if (schema) {
-          const fieldType = fieldTypeContext.fieldType(schema.name)
-          if (!fieldType) {
-            return null
-          }
-          const connectionInfo = relay.connectionDefinitions({
-            name: schema.name,
-            nodeType: (fieldType.outputType: any),
-            connectionFields: {
-              count: {
-                type: graphql.GraphQLFloat
-              }
-            }
-          })
-          typeMap[schema.name + 'Connection'] = {
-            name: schema.name + 'Connection',
-            description: schema.name + 'Connection',
-            argFieldMap: {
-              after: 'String',
-              first: 'Number',
-              before: 'String',
-              last: 'Number'
-            },
-            inputType: undefined,
-            outputType: connectionInfo.connectionType
-          }
-          typeMap[schema.name + 'Edge'] = {
-            name: schema.name + 'Edge',
-            description: schema.name + 'Edge',
-            inputType: undefined,
-            outputType: connectionInfo.edgeType
-          }
-          return typeMap[typeName]
         }
       }
-      return typeMap[typeName]
+    },
+    function resolveArrayType (typeName) {
+      if (typeName.startsWith('[') && typeName.endsWith(']')) {
+        const subTypeName = typeName.substr(1, typeName.length - 2)
+        const fieldType = fieldTypeContext.fieldType(subTypeName)
+        if (!fieldType) {
+          return null
+        }
+        return {
+          name: typeName,
+          description: `Array of type ${subTypeName}`,
+          inputType: fieldType.inputType ? new GraphQLList(fieldType.inputType) : null,
+          outputType: fieldType.outputType ? new GraphQLList(fieldType.outputType) : null,
+          outputResolve: async function (root, args, context, info, sgContext) {
+            const fieldName = info.fieldName
+            if (schemas.find(s => s.name === subTypeName) != null) {
+              if (root[fieldName] != null && root[fieldName].length > 0 &&
+                (typeof root[fieldName][0] === 'string' || typeof root[fieldName][0] === 'number')) {
+                const list = await sgContext.models[subTypeName].findAll({
+                  where: { id: { [(Sequelize.Op.in: any)]: root[fieldName] } }
+                })
+                const result = []
+                for (let id of root[fieldName]) {
+                  const element = list.find(e => '' + e.id === '' + id)
+                  if (element) {
+                    result.push(element)
+                  }
+                }
+                return result
+              }
+            }
+            return root[fieldName]
+          },
+          columnOptions: { type: Sequelize.JSON }
+        }
+      }
+    },
+    function resolveModelType (typeName) {
+      let schema = schemas.find(s => s.name === typeName)
+      if (schema) {
+        return buildModelType(schema, fieldTypeContext, context)
+      }
+    },
+    function resolveModelIdType (typeName) {
+      let schema = schemas.find(s => s.name + 'Id' === typeName)
+      if (schema) {
+        return buildModelTypeId(schema, fieldTypeContext)
+      }
+    },
+    function resolveModelConnectionType (typeName) {
+      let schema = schemas.find(s => s.name + 'Connection' === typeName || s.name + 'Edge' === typeName)
+      if (schema) {
+        const fieldType = fieldTypeContext.fieldType(schema.name)
+        if (!fieldType) {
+          return null
+        }
+        const connectionInfo = relay.connectionDefinitions({
+          name: schema.name,
+          nodeType: (fieldType.outputType: any),
+          connectionFields: {
+            count: {
+              type: GraphQLFloat
+            }
+          }
+        })
+        typeMap[schema.name + 'Connection'] = {
+          name: schema.name + 'Connection',
+          description: schema.name + 'Connection',
+          argFieldMap: {
+            after: 'String',
+            first: 'Number',
+            before: 'String',
+            last: 'Number'
+          },
+          inputType: undefined,
+          outputType: connectionInfo.connectionType
+        }
+        typeMap[schema.name + 'Edge'] = {
+          name: schema.name + 'Edge',
+          description: schema.name + 'Edge',
+          inputType: undefined,
+          outputType: connectionInfo.edgeType
+        }
+        return typeMap[typeName]
+      }
+    },
+    function resolveUnionWrapType (typeName) {
+      if (typeName.startsWith('_Union_')) {
+        return buildUnionWrapType(typeName.substr('_Union_'.length), fieldTypeContext, context)
+      }
+    }
+  ]
+
+  const fieldTypeContext: FieldTypeContext = {
+    fieldType: (typeName) => {
+      if (typeMap[typeName]) {
+        return typeMap[typeName]
+      }
+      for (let resolve of resolves) {
+        const type = resolve(typeName)
+        if (type) {
+          typeMap[type.name] = type
+          return type
+        }
+      }
+      return null
     }
   }
 
-  fieldTypes.forEach(f => {
+  for (let f of [...innerFieldTypes, ...fieldTypes]) {
     typeMap[f.name] = f
-  })
-  dataTypes.forEach(d => {
+  }
+
+  for (let d of [...innerDataTypes, ...dataTypes]) {
     typeMap[d.name] = buildDataType(d, fieldTypeContext, context)
-  })
+  }
+
   return fieldTypeContext
 }

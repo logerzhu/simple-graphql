@@ -9,12 +9,6 @@ import JSON from './JSON'
 import Number from './Number'
 import StringField from './String'
 
-export default ({
-  Id: Id,
-  Integer: Integer,
-  Boolean: Boolean,
-  Date: Date,
-  JSON: JSON,
-  Number: Number,
-  'String': StringField
-}: { [id: string]: FieldType })
+export default ([
+  Id, Integer, Boolean, Date, JSON, Number, StringField
+]: Array<FieldType>)

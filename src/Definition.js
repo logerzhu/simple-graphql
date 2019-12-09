@@ -46,9 +46,9 @@ export type RootResolve = (args: { [string]: any },
 export type FieldType = {|
   name: string,
   description?: string,
-  inputType?: GraphQLInputType,
+  inputType?: ?GraphQLInputType,
   argFieldMap?: { [string]: InputFieldOptions },
-  outputType?: GraphQLOutputType,
+  outputType?: ?GraphQLOutputType,
   outputResolve?: FieldResolve,
   columnOptions?: DefineAttributeColumnOptions | (schema: Schema, fieldName: string, options: ColumnFieldOptions) => ?DefineAttributeColumnOptions
 |}
@@ -95,6 +95,11 @@ export type ColumnFieldOptions = string | Set<string> | Array<FieldOptions> | {|
 export type DataTypeOptions = {|
   name: string,
   $type: FieldOptions,
+  description?: string,
+  columnOptions?: DefineAttributeColumnOptions
+|} | {|
+  name: string,
+  $unionTypes: { [string]: string },
   description?: string,
   columnOptions?: DefineAttributeColumnOptions
 |}

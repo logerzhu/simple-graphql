@@ -45,12 +45,16 @@ export default function (sequelize: Sequelize) {
     {
       schemas: schemas,
       services: [DemoService],
+      dataTypes: [{
+        name: 'Message',
+        $unionTypes: { '文本': 'String', '数字': 'Number' }
+      }],
       hooks: [{
         description: 'Enable transaction on mutations',
         priority: 100,
         filter: ({ type, name, options }) => type === 'mutation',
         hook: async function (action, invokeInfo, next) {
-          return (sequelize:any).transaction((t) => {
+          return (sequelize: any).transaction((t) => {
             return next()
           })
         }
