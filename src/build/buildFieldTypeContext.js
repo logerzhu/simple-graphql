@@ -194,8 +194,8 @@ function buildDataType (dataTypeOptions: DataTypeOptions, fieldTypeContext: Fiel
 }
 
 function buildUnionWrapType (wrapType: string, fieldTypeContext: FieldTypeContext, context: Context): FieldType {
-  console.log('buildUnionWrapType', wrapType)
   const name = `_Union_${wrapType}`
+  const typeConfig = (fieldTypeContext.fieldType(wrapType): any)
   return {
     name: name,
     description: `Union wrap type for ${wrapType}`,
@@ -204,7 +204,13 @@ function buildUnionWrapType (wrapType: string, fieldTypeContext: FieldTypeContex
       name: name,
       fields: {
         variant: { type: GraphQLString },
-        value: { type: (fieldTypeContext.fieldType(wrapType): any).outputType }
+        value: {
+          type: typeConfig.outputType,
+          resolve: typeConfig.outputResolve ? context.hookFieldResolve('value', {
+            $type: wrapType,
+            resolve: typeConfig.outputResolve
+          }) : undefined
+        }
       }
     }),
     columnOptions: { type: Sequelize.JSON }

@@ -23,7 +23,6 @@ export default function unionInputType (options: {
       return value
     },
     parseValue: function (inputValue: any) {
-      console.log('parseLiteral --------')
       if (inputValue) {
         const type = inputValue[typeKey]
         if (!type) {
@@ -33,9 +32,12 @@ export default function unionInputType (options: {
         if (!valueType) {
           throw new GraphQLError(`${options.name}(UnionInputType): Invalid inputType ${type}'`)
         }
-        const errors = coerceValue(inputValue[valueKey], valueType).errors
+        const { value, errors } = coerceValue(inputValue[valueKey], valueType)
         if (!errors) {
-          return inputValue
+          return {
+            [typeKey]: inputValue[typeKey],
+            [valueKey]: value
+          }
         } else {
           const errorString = errors.map((error) => {
             return '\n' + error.message
@@ -45,7 +47,6 @@ export default function unionInputType (options: {
       }
     },
     parseLiteral: function (ast) {
-      console.log('parseLiteral --------')
       let type
       try {
         const fields = ((ast.fields || []): any)

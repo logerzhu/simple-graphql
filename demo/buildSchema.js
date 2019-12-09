@@ -47,7 +47,7 @@ export default function (sequelize: Sequelize) {
       services: [DemoService],
       dataTypes: [{
         name: 'Message',
-        $unionTypes: { '文本': 'String', '数字': 'Number' }
+        $unionTypes: { '文本': 'String', 'Dummy': 'Dummy' }
       }],
       hooks: [{
         description: 'Enable transaction on mutations',
