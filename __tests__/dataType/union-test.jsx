@@ -11,7 +11,7 @@ test('Union数据类型生成', async () => {
       $type: 'String'
     }, {
       name: 'Union',
-      $unionTypes: { '文本': 'Text', '实体': 'Dummy' }
+      $unionTypes: { '文本': 'Text', '实体': 'Dummy', '短文本': 'Text' }
     }],
     schemas: [SG.schema('Dummy', {
       plugin: {

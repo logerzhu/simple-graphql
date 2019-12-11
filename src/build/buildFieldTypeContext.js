@@ -134,7 +134,7 @@ function buildDataType (dataTypeOptions: DataTypeOptions, fieldTypeContext: Fiel
     const unionTypes = _.mapValues($unionTypes, (type, key) => (fieldTypeContext.fieldType(`_Union_${type}`): any).outputType)
     outputType = new GraphQLUnionType({
       name: dataTypeOptions.name,
-      types: _.values(unionTypes),
+      types: _.uniq(_.values(unionTypes)),
       resolveType (value) {
         if (value && value.variant) {
           return (fieldTypeContext.fieldType(`_Union_${$unionTypes[value.variant]}`): any).outputType
