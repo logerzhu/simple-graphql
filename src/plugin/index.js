@@ -1,6 +1,7 @@
 // @flow
 
 import addMutationPlugin from './addMutationPlugin'
+import bulkAddMutationPlugin from './bulkAddMutationPlugin'
 import deleteMutationPlugin from './deleteMutationPlugin'
 import genHasManyLinkPlugin from './genHasManyLinkPlugin'
 import genHasOneLinkPlugin from './genHasOneLinkPlugin'
@@ -13,6 +14,7 @@ import versionPlugin from './versionPlugin'
 
 export default [
   addMutationPlugin,
+  bulkAddMutationPlugin,
   deleteMutationPlugin,
   genHasManyLinkPlugin,
   genHasOneLinkPlugin,
