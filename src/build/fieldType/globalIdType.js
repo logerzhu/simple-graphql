@@ -17,7 +17,11 @@ function defGlobalIdInputType (typeName: string): GraphQLScalarType {
       if (typeof value === 'string') {
         const { type, id } = fromGlobalId(value)
         if (type === typeName) {
-          return id
+          if (Number.parseInt(id).toString() === id) {
+            return Number.parseInt(id)
+          } else {
+            return id
+          }
         }
         throw new Error('Incorrect globalId type: ' + type)
       } else {
@@ -32,7 +36,11 @@ function defGlobalIdInputType (typeName: string): GraphQLScalarType {
       if (typeof value === 'string') {
         const { type, id } = fromGlobalId(value)
         if (type === typeName) {
-          return id
+          if (Number.parseInt(id).toString() === id) {
+            return Number.parseInt(id)
+          } else {
+            return id
+          }
         }
         throw new Error('Incorrect globalId type: ' + type)
       } else {

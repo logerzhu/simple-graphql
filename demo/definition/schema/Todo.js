@@ -7,8 +7,10 @@ export default SG.schema('Todo', {
   },
   plugin: {
     addMutation: true,
+    bulkAddMutation: true,
+    bulkUpdateMutation: true,
     singularQuery: true,
-    pluralQuery: false
+    pluralQuery: true
   }
 }).fields({
   owner: {
