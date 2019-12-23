@@ -77,6 +77,8 @@ const toGraphQLFieldConfigMap = function (
           values: _.fromPairs(field.map(f => [f, { value: f, description: f }]))
         })
       }
+    } else if (graphql.isOutputType(field)) {
+      return { type: field }
     } else if (field instanceof Object) {
       if (field.$type) {
         let result = convert(name, path, field.$type)

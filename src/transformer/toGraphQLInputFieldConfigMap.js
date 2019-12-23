@@ -51,6 +51,8 @@ const toGraphQLInputFieldConfigMap = function (
           type: new graphql.GraphQLList(subField.type)
         }
       }
+    } else if (graphql.isInputType(field)) {
+      return { type: field }
     } else if (field instanceof Object) {
       if (field.$type) {
         let result = convert(name, path, field.$type)
