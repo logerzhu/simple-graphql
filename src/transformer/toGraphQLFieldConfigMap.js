@@ -66,18 +66,7 @@ const toGraphQLFieldConfigMap = function (
           type: new graphql.GraphQLList(subField.type)
         }
       }
-    }
-    if (_.isArray(field)) {
-      if (field.length === 0) {
-        throw new Error(`Missing enum element`)
-      }
-      return {
-        type: new graphql.GraphQLEnumType({
-          name: StringHelper.toInitialUpperCase(toTypeName(name, path)) + postfix,
-          values: _.fromPairs(field.map(f => [f, { value: f, description: f }]))
-        })
-      }
-    } else if (graphql.isOutputType(field)) {
+    } if (graphql.isOutputType(field)) {
       return { type: field }
     } else if (field instanceof Object) {
       if (field.$type) {

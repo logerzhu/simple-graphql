@@ -17,9 +17,18 @@ export default (schemas: Array<Schema>, services: Array<Service>,
       throw new Error(`Query ${name} already defined.`)
     }
     const fieldConfig = toGraphQLFieldConfigMap(name, 'Payload', { '': options.$type }, context)['']
+    const finalOptions = { ...options }
+    if (fieldConfig.resolve) {
+      const resolve = finalOptions.resolve
+      finalOptions.resolve = async function (args, context, info, sgContext) {
+        return fieldConfig.resolve({
+          [info.fieldName]: await resolve(args, context, info, sgContext)
+        }, args, context, info, sgContext)
+      }
+    }
     queries[name] = {
       type: fieldConfig.type,
-      resolve: context.hookQueryResolve(name, options),
+      resolve: context.hookQueryResolve(name, finalOptions),
       description: options.description
     }
     if (options.args || fieldConfig.args) {
