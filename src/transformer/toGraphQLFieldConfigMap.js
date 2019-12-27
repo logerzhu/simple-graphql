@@ -66,7 +66,8 @@ const toGraphQLFieldConfigMap = function (
           type: new graphql.GraphQLList(subField.type)
         }
       }
-    } if (graphql.isOutputType(field)) {
+    }
+    if (graphql.isOutputType(field)) {
       return { type: field }
     } else if (field instanceof Object) {
       if (field.$type) {
@@ -79,7 +80,16 @@ const toGraphQLFieldConfigMap = function (
             }
           }
           if (field['resolve']) {
-            result['resolve'] = context.hookFieldResolve(path, field)
+            if (result['resolve']) {
+              const resolve = result['resolve']
+              result['resolve'] = async function (source, args, context, info, sgContext) {
+                return resolve({
+                  [info.fieldName]: await field['resolve'](source, args, context, info, sgContext)
+                }, args, context, info, sgContext)
+              }
+            } else {
+              result['resolve'] = context.hookFieldResolve(path, field)
+            }
           } else {
             result['resolve'] = result['resolve'] || context.hookFieldResolve(path, {
               ...field,
