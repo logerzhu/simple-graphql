@@ -54,7 +54,14 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
     outputResolve: async function (root, args, context, info, sgContext) {
       const fieldName = info.fieldName
       if (root[fieldName]) {
-        if (typeof root[fieldName] === 'string' || typeof root[fieldName] === 'number') {
+        if (typeof root[fieldName] === 'string') {
+          const { type, id } = relay.fromGlobalId(root[fieldName])
+          if (type === typeName) {
+            return sgContext.models[typeName].findOne({ where: { id: id } })
+          } else {
+            return sgContext.models[typeName].findOne({ where: { id: root[fieldName] } })
+          }
+        } else if (typeof root[fieldName] === 'number') {
           return sgContext.models[typeName].findOne({ where: { id: root[fieldName] } })
         } else {
           return root[fieldName]
