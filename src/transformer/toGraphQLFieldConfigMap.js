@@ -80,16 +80,16 @@ const toGraphQLFieldConfigMap = function (
             }
           }
           if (field['resolve']) {
+            const finalField = { ...field }
             if (result['resolve']) {
               const resolve = result['resolve']
-              result['resolve'] = async function (source, args, context, info, sgContext) {
+              finalField['resolve'] = async function (source, args, context, info, sgContext) {
                 return resolve({
                   [info.fieldName]: await field['resolve'](source, args, context, info, sgContext)
                 }, args, context, info, sgContext)
               }
-            } else {
-              result['resolve'] = context.hookFieldResolve(path, field)
             }
+            result['resolve'] = context.hookFieldResolve(path, finalField)
           } else {
             result['resolve'] = result['resolve'] || context.hookFieldResolve(path, {
               ...field,
