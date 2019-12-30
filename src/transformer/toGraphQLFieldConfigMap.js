@@ -86,7 +86,7 @@ const toGraphQLFieldConfigMap = function (
               finalField['resolve'] = async function (source, args, context, info, sgContext) {
                 return resolve({
                   [info.fieldName]: await field['resolve'](source, args, context, info, sgContext)
-                }, args, context, info, sgContext)
+                }, args, context, info)
               }
             }
             result['resolve'] = context.hookFieldResolve(path, finalField)

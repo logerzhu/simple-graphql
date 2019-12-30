@@ -18,12 +18,13 @@ export default (schemas: Array<Schema>, services: Array<Service>,
     }
     const fieldConfig = toGraphQLFieldConfigMap(name, 'Payload', { '': options.$type }, context)['']
     const finalOptions = { ...options }
-    if (fieldConfig.resolve) {
+    const fieldResolve = fieldConfig.resolve
+    if (fieldResolve) {
       const resolve = finalOptions.resolve
       finalOptions.resolve = async function (args, context, info, sgContext) {
-        return fieldConfig.resolve({
+        return fieldResolve({
           [info.fieldName]: await resolve(args, context, info, sgContext)
-        }, args, context, info, sgContext)
+        }, args, context, info)
       }
     }
     queries[name] = {
