@@ -70,7 +70,7 @@ export default ({
 
           await dbModel.upsert(attrs)
           return {
-            [savedName]: dbModel.findOne({ where: attrs })
+            [savedName]: dbModel.findOneForGraphQL({ where: attrs }, info, savedName)
           }
         }
       }

@@ -23,13 +23,9 @@ export default ({
               return root[key]
             } else {
               const dbModel = sgContext.models[config.target]
-              const option = dbModel.resolveQueryOption({ info: info })
-              return dbModel.findOne({
-                where: { ...{ ...(config.scope || {}) }, [config.foreignKey || config.foreignField + 'Id']: root.id },
-                include: option.include,
-                attributes: option.attributes,
-                order: option.order
-              })
+              return dbModel.findOneForGraphQL({
+                where: { ...{ ...(config.scope || {}) }, [config.foreignKey || config.foreignField + 'Id']: root.id }
+              }, info)
             }
           }
         }

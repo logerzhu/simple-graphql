@@ -87,11 +87,9 @@ export default (schemas: Array<Schema>, services: Array<Service>,
         if (!sgContext.models[id.type]) return null
 
         const dbModel = sgContext.models[id.type]
-        const option = dbModel.resolveQueryOption({ info: info })
-        const record = await dbModel.findOne({
-          where: { id: id.id },
-          ...option
-        })
+        const record = await dbModel.findOneForGraphQL({
+          where: { id: id.id }
+        }, info)
         return record
       }
     })

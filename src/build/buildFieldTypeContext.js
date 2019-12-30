@@ -57,17 +57,17 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
         if (typeof root[fieldName] === 'string') {
           const { type, id } = relay.fromGlobalId(root[fieldName])
           if (type === typeName) {
-            return sgContext.models[typeName].findOne({ where: { id: id } })
+            return sgContext.models[typeName].findOneForGraphQL({ where: { id: id } }, info)
           } else {
-            return sgContext.models[typeName].findOne({ where: { id: root[fieldName] } })
+            return sgContext.models[typeName].findOneForGraphQL({ where: { id: root[fieldName] } }, info)
           }
         } else if (typeof root[fieldName] === 'number') {
-          return sgContext.models[typeName].findOne({ where: { id: root[fieldName] } })
+          return sgContext.models[typeName].findOneForGraphQL({ where: { id: root[fieldName] } }, info)
         } else {
           return root[fieldName]
         }
       } else if (root[fieldName + 'Id']) {
-        return sgContext.models[typeName].findOne({ where: { id: root[fieldName + 'Id'] } })
+        return sgContext.models[typeName].findOneForGraphQL({ where: { id: root[fieldName + 'Id'] } }, info)
       }
       return null
     },

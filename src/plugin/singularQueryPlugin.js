@@ -52,16 +52,11 @@ export default ({
           if (args === null || Object.keys(args).length === 0) {
             return null
           }
-          const dbModel = sgContext.models[schema.name]
-          const option = dbModel.resolveQueryOption({ info: info })
-          return sgContext.models[schema.name].findOne({
+          return sgContext.models[schema.name].findOneForGraphQL({
             where: {
               ...args
-            },
-            include: option.include,
-            attributes: option.attributes,
-            order: option.order
-          })
+            }
+          }, info)
         }
       }
     })
