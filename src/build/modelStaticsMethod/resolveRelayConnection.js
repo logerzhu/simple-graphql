@@ -65,14 +65,27 @@ export default async function (args: {
   order = option.order
   attributes = option.attributes
 
-  const count = await dbModel.count({
+  const getSelections = (info) => {
+    const fragments = info.fragments || []
+    let selections = [];
+
+    (info.fieldNodes || []).forEach(node => {
+      selections = _.union(selections, dbModel.parseSelections(fragments, node.selectionSet && node.selectionSet.selections))
+    })
+    return selections
+  }
+
+  // 如果需要获取后面分页 或者 count 值,才需要计算
+  const needCount = last != null || before != null || getSelections(selectionInfo).find(s => s.name === 'count') != null
+
+  const count = needCount ? await dbModel.count({
     distinct: 'id',
     include: include,
     where: where,
     bind: bind
-  })
+  }) : 0
 
-  if (last || before) {
+  if (last != null || before != null) {
     first = last || 100
     before = before || (count + 1)
     after = count - (parseInt(before) - 1)
