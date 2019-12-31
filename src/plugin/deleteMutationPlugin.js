@@ -26,7 +26,7 @@ export default ({
           ['deleted' + schema.name]: schema.name
         },
         mutateAndGetPayload: async function ({ id }, context, info, sgContext) {
-          const entity = await sgContext.models[schema.name].findOneForGraphQL({ where: { id: id } }, info, 'deleted' + schema.name)
+          const entity = await sgContext.models[schema.name].findOne({ where: { id: id } })
           if (entity) {
             await entity.destroy()
             return {
