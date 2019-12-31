@@ -1,5 +1,8 @@
 // @flow
 import _ from 'lodash'
+import type { FindOptions } from 'sequelize'
+import Sequelize from 'sequelize'
+import DataLoader from 'dataloader'
 
 const isPrimaryOrder = ({ orderConfig, schema, sgContext }) => {
   if (_.isArray(orderConfig)) {
@@ -21,6 +24,45 @@ const isPrimaryOrder = ({ orderConfig, schema, sgContext }) => {
     }
   }
   return true
+}
+
+const findAll = async function (dbModel, options: FindOptions<any>) {
+  const canEval = function (options) {
+    if (options.offset !== 0) {
+      return false
+    }
+    const where: any = options.where || {}
+    if (_.keys(where).join(',') === 'id' && (typeof where.id === 'number' || typeof where.id === 'string')) {
+      return true
+    }
+    return false
+  }
+
+  const isMatch = function (record, where) {
+    return record.id + '' === where.id + ''
+  }
+
+  if (canEval(options)) {
+    dbModel.__dataLoaders = dbModel.__dataLoaders || {}
+
+    const loaderName = `findAll-${((options.attributes: any) || []).join('_')}`
+
+    if (!dbModel.__dataLoaders[loaderName]) {
+      dbModel.__dataLoaders[loaderName] = new DataLoader(async function (wheres) {
+        const records = await dbModel.findAll({
+          ...options,
+          where: { [Sequelize.Op.or]: wheres },
+          limit: wheres.length
+        })
+        return wheres.map(w => {
+          return records.filter(r => isMatch(r, w))
+        })
+      }, { cache: false })
+    }
+    return dbModel.__dataLoaders[loaderName].load(options.where)
+  }
+
+  return dbModel.findAll(options)
 }
 
 export default async function (args: {
@@ -111,8 +153,8 @@ export default async function (args: {
   const rows = dbModel.hasSelection({
     info: selectionInfo,
     path: 'edges'
-  }) ? await dbModel.findAll({
-      distinct: 'id',
+  }) ? await findAll(dbModel, {
+      distinct: true,
       include: include,
       where: where,
       attributes: attributes,
