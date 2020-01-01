@@ -90,7 +90,8 @@ const toGraphQLFieldConfigMap = function (
               }
             }
             result['resolve'] = context.hookFieldResolve(path, finalField)
-          } else {
+          } else if (field.config != null) {
+            // 性能优化:默认情况下不加hook
             result['resolve'] = result['resolve'] || context.hookFieldResolve(path, {
               ...field,
               resolve: async function (root, args, context, info) {
