@@ -13,5 +13,5 @@ export default (plugins: Array<PluginOptions>): Array<PluginOptions> => {
     } else {
       return 0
     }
-  }).map(plugin => {return { ...plugin }})
+  }).map(plugin => { return { ...plugin } })
 }
