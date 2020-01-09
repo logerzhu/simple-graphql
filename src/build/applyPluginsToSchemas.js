@@ -1,22 +1,11 @@
 // @flow
 import Schema from '../definition/Schema'
-import innerPlugins from '../plugin'
 import type { PluginOptions } from '../Definition'
 
 export default (schemas: Array<Schema>, plugins: Array<PluginOptions>, defaultOptions: { [id: string]: boolean | Object }) => {
-  const result: { [string]: Schema } = {};
+  const result: { [string]: Schema } = {}
 
-  [...innerPlugins, ...plugins].sort((p1, p2) => {
-    const p1n = p1.priority || 0
-    const p2n = p2.priority || 0
-    if (p1n < p2n) {
-      return 1
-    } else if (p1n > p2n) {
-      return -1
-    } else {
-      return 0
-    }
-  }).forEach(plugin => {
+  plugins.forEach(plugin => {
     for (let schema of schemas) {
       let options = ((schema.config.options || {}).plugin || {})[plugin.name]
       if (options === undefined) {
@@ -25,7 +14,7 @@ export default (schemas: Array<Schema>, plugins: Array<PluginOptions>, defaultOp
       if (options === undefined) {
         options = plugin.defaultOptions
       }
-      if (options != null && options !== false) {
+      if (options != null && options !== false && plugin.applyToSchema) {
         plugin.applyToSchema(schema, options, schemas)
       }
     }

@@ -24,6 +24,7 @@ import type {
 import applyPluginsToSchemas from './applyPluginsToSchemas'
 import applyPluginsToModels from './applyPluginsToModels'
 import buildResolverContext from './buildResolverContext'
+import buildPlugins from './buildPlugins'
 import buildInterfaceContext from './buildInterfaceContext'
 import buildFieldTypeContext from './buildFieldTypeContext'
 import buildSequelizeModels from './buildSequelizeModels'
@@ -39,9 +40,10 @@ export default function (sequelize: Sequelize, config: {
   hooks?: Array<HookOptions>,
   plugins?: Array<PluginOptions>
 }, buildOptions: BuildOptions): { graphQLSchema: GraphQLSchema, sgContext: SGContext } {
+  const plugins = buildPlugins(config.plugins || [])
   const sgContext: SGContext = {
     sequelize: sequelize,
-    schemas: applyPluginsToSchemas(config.schemas || [], config.plugins || [], buildOptions.plugin || {}),
+    schemas: applyPluginsToSchemas(config.schemas || [], plugins, buildOptions.plugin || {}),
     models: {},
     services: {},
     fieldType: (typeName) => null
@@ -76,7 +78,7 @@ export default function (sequelize: Sequelize, config: {
   sgContext.fieldType = (typeName) => fieldTypeContext.fieldType(typeName)
   sgContext.models = applyPluginsToModels(
     buildSequelizeModels(sequelize, config.schemas || [], sgContext),
-    config.plugins || [],
+    plugins,
     buildOptions.plugin || {}
   )
 

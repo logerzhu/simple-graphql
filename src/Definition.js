@@ -137,14 +137,14 @@ export type HookOptions = {
          next: ()=>any)=>any
 }
 
-export type PluginOptions = {
+export type PluginOptions = {|
   name: string,
   description?: string,
   priority?: number,
   defaultOptions: ?(boolean | Object),
-  applyToSchema: (schema: Schema, options: (boolean | Object), schemas: Array<Schema>) => void,
-  applyToModel?:(model: ModelDefine, options: (boolean | Object), models: Array<ModelDefine>) => void,
-}
+  applyToSchema?: (schema: Schema, options: (boolean | Object), schemas: Array<Schema>) => void,
+  applyToModel?: (model: ModelDefine, options: (boolean | Object), models: Array<ModelDefine>) => void
+|}
 
 export type BuildOptions = {
   plugin?: { [id: string]: boolean | Object }
