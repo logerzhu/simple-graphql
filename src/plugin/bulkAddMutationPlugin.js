@@ -8,7 +8,7 @@ export default ({
   defaultOptions: false,
   priority: 0,
   description: 'Gen `bulk add mutation` for Schema',
-  apply: function (schema, options, schemas) {
+  applyToSchema: function (schema, options, schemas) {
     const name = 'bulkAdd' + StringHelper.toInitialUpperCase(schema.name)
     const addedName = 'added' + StringHelper.toInitialUpperCase(schema.name) + 'Edges'
 

@@ -9,7 +9,7 @@ export default ({
   defaultOptions: false,
   priority: 0,
   description: 'Gen `singular query` for Schema',
-  apply: function singularQuery (schema, options, schemas): void {
+  applyToSchema: function singularQuery (schema, options, schemas): void {
     const name = StringHelper.toInitialLowerCase(schema.name)
 
     const isModelType = (fieldOptions: ColumnFieldOptions) => {

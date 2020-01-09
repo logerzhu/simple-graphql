@@ -7,7 +7,7 @@ export default ({
   defaultOptions: true,
   priority: 99,
   description: 'Gen `HasOneLink` for Schema',
-  apply: function hasOneFieldsConfig (schema, options, schemas): void {
+  applyToSchema: function hasOneFieldsConfig (schema, options, schemas): void {
     _.forOwn(schema.config.associations.hasOne, (config, key) => {
       if (config.hidden) {
         return

@@ -95,7 +95,7 @@ export default ({
   defaultOptions: false,
   priority: 0,
   description: 'Gen `plural query` for Schema',
-  apply: function pluralQuery (schema, options, schemas): void {
+  applyToSchema: function pluralQuery (schema, options, schemas): void {
     const searchFields = { ...getSearchFields(schema, schemas), ...((options && options.conditionFields) || {}) }
 
     let config = {}

@@ -8,7 +8,7 @@ export default ({
   defaultOptions: true,
   priority: 99,
   description: 'Gen `HasManyLink` for Schema',
-  apply: function hasManyLinkedField (schema, options, schemas): void {
+  applyToSchema: function hasManyLinkedField (schema, options, schemas): void {
     _.forOwn(schema.config.associations.hasMany, (config, key) => {
       if (config.hidden) {
         return

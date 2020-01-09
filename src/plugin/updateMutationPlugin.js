@@ -8,7 +8,7 @@ export default ({
   defaultOptions: false,
   priority: 0,
   description: 'Gen `update mutation` for Schema',
-  apply: function updateMutation (schema, options, schemas): void {
+  applyToSchema: function updateMutation (schema, options, schemas): void {
     const name = 'update' + StringHelper.toInitialUpperCase(schema.name)
     const changedName = 'changed' + StringHelper.toInitialUpperCase(schema.name)
 

@@ -121,7 +121,7 @@ export default ({
   defaultOptions: false,
   priority: 0,
   description: 'Gen `bulk update mutation` for Schema',
-  apply: function (schema, options, schemas): void {
+  applyToSchema: function (schema, options, schemas): void {
     const name = 'bulkUpdate' + StringHelper.toInitialUpperCase(schema.name)
     const changedName = 'changed' + StringHelper.toInitialUpperCase(schema.name)
 
