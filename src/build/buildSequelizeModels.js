@@ -104,7 +104,7 @@ function buildModelAssociations (schemas: Array<Schema>, models: { [id: string]:
   }
 }
 
-export default (sequelize: Sequelize, schemas: Array<Schema>, context: SGContext): { [id: string]: ModelDefine } => {
+export default (sequelize: Sequelize, schemas: Array<Schema>, context: SGContext): Array<ModelDefine> => {
   const result: { [id: string]: ModelDefine } = {}
   for (let schema of schemas) {
     if (result[schema.name]) {
@@ -112,17 +112,18 @@ export default (sequelize: Sequelize, schemas: Array<Schema>, context: SGContext
     }
     const model = toSequelizeModel(schema.sequelize || sequelize, schema, context)
     Object.assign(model, {
-      ...schema.config.statics,
+      schema: schema,
       ...staticsMethods,
+      ...schema.config.statics,
       getSGContext: () => context
     })
     Object.assign(model.prototype, {
-      ...schema.config.methods,
       getSGContext: () => context,
-      _fieldType: schema.name
+      _fieldType: schema.name,
+      ...schema.config.methods
     })
     result[schema.name] = model
   }
   buildModelAssociations(schemas, result)
-  return result
+  return _.values(result)
 }

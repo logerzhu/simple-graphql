@@ -21,7 +21,8 @@ import type {
   SGContext
 } from '../Definition'
 
-import applyPlugins from './applyPlugins'
+import applyPluginsToSchemas from './applyPluginsToSchemas'
+import applyPluginsToModels from './applyPluginsToModels'
 import buildResolverContext from './buildResolverContext'
 import buildInterfaceContext from './buildInterfaceContext'
 import buildFieldTypeContext from './buildFieldTypeContext'
@@ -40,7 +41,7 @@ export default function (sequelize: Sequelize, config: {
 }, buildOptions: BuildOptions): { graphQLSchema: GraphQLSchema, sgContext: SGContext } {
   const sgContext: SGContext = {
     sequelize: sequelize,
-    schemas: applyPlugins(config.schemas || [], config.plugins || [], buildOptions.plugin || {}),
+    schemas: applyPluginsToSchemas(config.schemas || [], config.plugins || [], buildOptions.plugin || {}),
     models: {},
     services: {},
     fieldType: (typeName) => null
@@ -64,11 +65,21 @@ export default function (sequelize: Sequelize, config: {
     fieldType: (typeName) => null
   }
 
-  const fieldTypeContext = buildFieldTypeContext(config.fieldTypes || [], config.dataTypes || [], config.schemas || [], context)
+  const fieldTypeContext = buildFieldTypeContext(
+    config.fieldTypes || [],
+    config.dataTypes || [],
+    config.schemas || [],
+    context
+  )
   context.fieldType = (typeName) => fieldTypeContext.fieldType(typeName)
 
   sgContext.fieldType = (typeName) => fieldTypeContext.fieldType(typeName)
-  sgContext.models = buildSequelizeModels(sequelize, config.schemas || [], sgContext)
+  sgContext.models = applyPluginsToModels(
+    buildSequelizeModels(sequelize, config.schemas || [], sgContext),
+    config.plugins || [],
+    buildOptions.plugin || {}
+  )
+
   sgContext.services = buildServices(config.services || [], sgContext)
 
   const rootQueries = buildRootQueries(config.schemas || [], config.services || [], context)

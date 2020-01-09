@@ -143,7 +143,7 @@ export type PluginOptions = {
   priority?: number,
   defaultOptions: ?(boolean | Object),
   applyToSchema: (schema: Schema, options: (boolean | Object), schemas: Array<Schema>) => void,
-  applyToModel?:(model: Sequelize.Model<any>, options: (boolean | Object), models: Array<Sequelize.Model<any>>) => void,
+  applyToModel?:(model: ModelDefine, options: (boolean | Object), models: Array<ModelDefine>) => void,
 }
 
 export type BuildOptions = {
