@@ -3,6 +3,7 @@
 import addMutationPlugin from './addMutationPlugin'
 import bulkAddMutationPlugin from './bulkAddMutationPlugin'
 import bulkUpdateMutationPlugin from './bulkUpdateMutationPlugin'
+import genCacheMethodsPlugin from './genCacheMethodsPlugin'
 import deleteMutationPlugin from './deleteMutationPlugin'
 import genHasManyLinkPlugin from './genHasManyLinkPlugin'
 import genHasOneLinkPlugin from './genHasOneLinkPlugin'
@@ -17,6 +18,7 @@ export default [
   addMutationPlugin,
   bulkAddMutationPlugin,
   bulkUpdateMutationPlugin,
+  genCacheMethodsPlugin,
   deleteMutationPlugin,
   genHasManyLinkPlugin,
   genHasOneLinkPlugin,

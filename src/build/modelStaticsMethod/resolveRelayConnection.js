@@ -78,7 +78,7 @@ export default async function (args: {
   // 如果需要获取后面分页 或者 count 值,才需要计算
   const needCount = last != null || before != null || getSelections(selectionInfo).find(s => s.name === 'count') != null
 
-  const count = needCount ? await dbModel.count({
+  const count = needCount ? await (dbModel.withCache ? dbModel.withCache : dbModel).count({
     distinct: 'id',
     include: include,
     where: where,
@@ -107,11 +107,12 @@ export default async function (args: {
       return r
     })
   }
+
   const offset = Math.max(after != null ? parseInt(after) : 0, 0)
   const rows = dbModel.hasSelection({
     info: selectionInfo,
     path: 'edges'
-  }) ? await dbModel.findAll({
+  }) ? await (dbModel.withCache ? dbModel.withCache : dbModel).findAll({
       distinct: 'id',
       include: include,
       where: where,
