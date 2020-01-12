@@ -26,7 +26,8 @@ export default ({
         findOne: invokeMethod.bind(null, 'findOne'),
         findAll: invokeMethod.bind(null, 'findAll'),
         count: invokeMethod.bind(null, 'count')
-      }
+      },
+      clearCache: () => self.loaderManage.clear(schema.name)
     })
   },
   applyToModel: function (model, options, models) {
