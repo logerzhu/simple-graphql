@@ -276,7 +276,8 @@ export default function (fieldTypes: Array<FieldType>, dataTypes: Array<DataType
             if (schemas.find(s => s.name === subTypeName) != null) {
               if (root[fieldName] != null && root[fieldName].length > 0 &&
                 (typeof root[fieldName][0] === 'string' || typeof root[fieldName][0] === 'number')) {
-                const list = await sgContext.models[subTypeName].findAll({
+                const dbModel = sgContext.models[subTypeName]
+                const list = await (dbModel.withCache ? dbModel.withCache : dbModel).findAll({
                   where: { id: { [(Sequelize.Op.in: any)]: root[fieldName] } }
                 })
                 const result = []

@@ -70,7 +70,7 @@ export default ({
                 info: info,
                 attributes: queryOption.attributes
               })
-              return dbModel.findAll({
+              return (dbModel.withCache ? dbModel.withCache : dbModel).findAll({
                 where: queryOption.where,
                 bind: queryOption.bind,
                 include: option.include,
