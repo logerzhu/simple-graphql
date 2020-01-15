@@ -12,7 +12,7 @@ export default ({
   applyToSchema: function (schema, options, schemas) {
     const self = this
 
-    const invokeMethod = async function (method: string, options: FindOptions<any>) {
+    const invokeMethod = async function (method: string, options: FindOptions<any> = {}) {
       const func = await self.loaderManage.getMethod({
         method: method,
         model: schema.name,
