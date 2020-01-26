@@ -13,7 +13,7 @@ import * as relay from 'graphql-relay'
 import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
 import globalIdType from './fieldType/globalIdType'
 import unionInputType from './fieldType/unionInputType'
-import type { DefineAttributeColumnOptions } from 'sequelize'
+import type { ModelAttributeColumnOptions } from 'sequelize'
 import Sequelize from 'sequelize'
 import _ from 'lodash'
 import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConfigMap'
@@ -159,7 +159,7 @@ function buildDataType (dataTypeOptions: DataTypeOptions, fieldTypeContext: Fiel
     inputType: inputType,
     outputType: outputType,
     columnOptions: (schema: Schema, fieldName: string, options: ColumnFieldOptions) => {
-      let columnOptions: ?DefineAttributeColumnOptions = null
+      let columnOptions: ?ModelAttributeColumnOptions = null
       if (dataTypeOptions.$type) {
         let typeName = dataTypeOptions.$type
         if (typeName instanceof Set) {

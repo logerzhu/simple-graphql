@@ -6,11 +6,11 @@ import type {
   GraphQLOutputType,
   GraphQLResolveInfo
 } from 'graphql'
-import type { DefineAttributeColumnOptions, DefineOptions } from 'sequelize'
-import Sequelize from 'sequelize'
+import type { ModelAttributeColumnOptions, ModelOptions } from 'sequelize'
+import type {Sequelize, Model} from 'sequelize'
 import Schema from './definition/Schema'
 
-export type ModelDefine = any// Class<SGModel>
+export type ModelDefine = Model
 
 export type SGContext = {
   sequelize: Sequelize,
@@ -50,7 +50,7 @@ export type FieldType = {|
   argFieldMap?: { [string]: InputFieldOptions },
   outputType?: ?GraphQLOutputType,
   outputResolve?: FieldResolve,
-  columnOptions?: DefineAttributeColumnOptions | (schema: Schema, fieldName: string, options: ColumnFieldOptions) => ?DefineAttributeColumnOptions
+  columnOptions?: ModelAttributeColumnOptions | (schema: Schema, fieldName: string, options: ColumnFieldOptions) => ?ModelAttributeColumnOptions
 |}
 
 export type InputFieldOptions = string | Set<string> | Array<InputFieldOptions> | {
@@ -89,19 +89,19 @@ export type ColumnFieldOptions = string | Set<string> | Array<FieldOptions> | {|
   required: boolean,
   default?: any,
   hidden?: boolean,
-  columnOptions?: DefineAttributeColumnOptions
+  columnOptions?: ModelAttributeColumnOptions
 |} | { [string]: FieldOptions }
 
 export type DataTypeOptions = {|
   name: string,
   $type: FieldOptions,
   description?: string,
-  columnOptions?: DefineAttributeColumnOptions
+  columnOptions?: ModelAttributeColumnOptions
 |} | {|
   name: string,
   $unionTypes: { [string]: string },
   description?: string,
-  columnOptions?: DefineAttributeColumnOptions
+  columnOptions?: ModelAttributeColumnOptions
 |}
 
 export type QueryOptions = {|
@@ -123,7 +123,7 @@ export type MutationOptions = {|
 export type SchemaOptionConfig = {
   description?: string,
   plugin?: Object,
-  tableOptions?: DefineOptions<any>
+  tableOptions?: ModelOptions<any>
 }
 
 export type HookAction = { type: 'field' | 'query' | 'mutation', name: string, options: LinkedFieldOptions | QueryOptions | MutationOptions }

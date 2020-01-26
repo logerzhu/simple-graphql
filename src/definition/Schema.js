@@ -104,7 +104,7 @@ type AssociationConfig = {
 export default class Schema {
   name: string
 
-  sequelize: Sequelize
+  sequelize: Sequelize.Sequelize
 
   config: {
     fields: { [id: string]: ColumnFieldOptions },

@@ -1,5 +1,5 @@
 // @flow
-import type { DefineAttributeColumnOptions } from 'sequelize'
+import type { ModelAttributeColumnOptions } from 'sequelize'
 import Sequelize from 'sequelize'
 import Schema from '../definition/Schema'
 import type { FieldTypeContext, ModelDefine, SGContext } from '../Definition'
@@ -23,7 +23,7 @@ function toSequelizeModel (sequelize: Sequelize, schema: Schema, context: FieldT
       typeName = value.$type
     }
 
-    let columnOptions: ?DefineAttributeColumnOptions = null
+    let columnOptions: ?ModelAttributeColumnOptions = null
     if (typeName instanceof Set) {
       columnOptions = {
         type: Sequelize.STRING(191)
@@ -104,7 +104,7 @@ function buildModelAssociations (schemas: Array<Schema>, models: { [id: string]:
   }
 }
 
-export default (sequelize: Sequelize, schemas: Array<Schema>, context: SGContext): Array<ModelDefine> => {
+export default (sequelize: Sequelize.Sequelize, schemas: Array<Schema>, context: SGContext): Array<ModelDefine> => {
   const result: { [id: string]: ModelDefine } = {}
   for (let schema of schemas) {
     if (result[schema.name]) {
