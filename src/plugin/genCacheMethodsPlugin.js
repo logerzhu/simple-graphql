@@ -7,7 +7,7 @@ import getIncludeModeNames from './cache/getIncludeModeNames'
 export default ({
   name: 'genCacheMethods',
   defaultOptions: false,
-  priority: 0,
+  priority: 999,
   description: 'Support cache with dataLoader',
   applyToSchema: function (schema, options, schemas) {
     const self = this
