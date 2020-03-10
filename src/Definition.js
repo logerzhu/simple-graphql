@@ -89,7 +89,8 @@ export type ColumnFieldOptions = string | Set<string> | Array<FieldOptions> | {|
   required: boolean,
   default?: any,
   hidden?: boolean,
-  columnOptions?: ModelAttributeColumnOptions
+  columnOptions?: ModelAttributeColumnOptions,
+  resolve?: FieldResolve
 |} | { [string]: FieldOptions }
 
 export type DataTypeOptions = {|
