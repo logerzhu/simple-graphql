@@ -16,7 +16,10 @@ test('Add/Update/Delete Test', async () => {
       numbers: ['Number'],
       boolean: {
         $type: 'Boolean',
-        required: false
+        required: false,
+        resolve: async function ({ boolean }) {
+          return boolean
+        }
       },
       booleans: {
         $type: ['Boolean'],

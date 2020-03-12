@@ -30,7 +30,7 @@ export default ({
 
       if (value && value.$type) {
         if (!value.hidden && (!value.config || value.config.initializable !== false)) {
-          inputFields[key] = value
+          inputFields[key] = { ...value, resolve: null }
         }
       } else {
         inputFields[key] = value
