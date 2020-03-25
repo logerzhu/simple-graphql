@@ -2,11 +2,12 @@
 import type { PluginOptions } from '../Definition'
 import LoaderManager from './cache/LoaderManager'
 import type { FindOptions } from 'sequelize'
+import Sequelize from 'sequelize'
 import getIncludeModeNames from './cache/getIncludeModeNames'
 
 export default ({
   name: 'genCacheMethods',
-  defaultOptions: false,
+  defaultOptions: true,
   priority: 999,
   description: 'Support cache with dataLoader',
   applyToSchema: function (schema, options, schemas) {
@@ -33,29 +34,43 @@ export default ({
   applyToModel: function (model, options, models) {
     const self = this
     self.loaderManage = new LoaderManager(models) // TODO init limit
-    model.addHook('afterCreate', 'cleanCache', () => {
-      self.loaderManage.clear(model.name)
+
+    const cleanCache = (options) => {
+      let transaction = options.transaction
+      if (transaction === undefined && Sequelize._cls) {
+        // TODO Check if Sequelize update
+        transaction = Sequelize._cls.get('transaction')
+      }
+      if (transaction) {
+        transaction.afterCommit(() => self.loaderManage.clear(model.name))
+      } else {
+        self.loaderManage.clear(model.name)
+      }
+    }
+    model.addHook('afterCreate', 'cleanCache', (instance, options) => {
+      console.log(options)
+      cleanCache(options)
     })
-    model.addHook('afterUpdate', 'cleanCache', () => {
-      self.loaderManage.clear(model.name)
+    model.addHook('afterUpdate', 'cleanCache', (instance, options) => {
+      cleanCache(options)
     })
-    model.addHook('afterDestroy', 'cleanCache', () => {
-      self.loaderManage.clear(model.name)
+    model.addHook('afterDestroy', 'cleanCache', (instance, options) => {
+      cleanCache(options)
     })
-    model.addHook('afterSave', 'cleanCache', () => {
-      self.loaderManage.clear(model.name)
+    model.addHook('afterSave', 'cleanCache', (instance, options) => {
+      cleanCache(options)
     })
-    model.addHook('afterUpsert', 'cleanCache', () => {
-      self.loaderManage.clear(model.name)
+    model.addHook('afterUpsert', 'cleanCache', (instance, options) => {
+      cleanCache(options)
     })
-    model.addHook('afterBulkCreate', 'cleanCache', () => {
-      self.loaderManage.clear(model.name)
+    model.addHook('afterBulkCreate', 'cleanCache', (instances, options) => {
+      cleanCache(options)
     })
-    model.addHook('afterBulkDestroy', 'cleanCache', () => {
-      self.loaderManage.clear(model.name)
+    model.addHook('afterBulkDestroy', 'cleanCache', (options) => {
+      cleanCache(options)
     })
-    model.addHook('afterBulkUpdate', 'cleanCache', () => {
-      self.loaderManage.clear(model.name)
+    model.addHook('afterBulkUpdate', 'cleanCache', (options) => {
+      cleanCache(options)
     })
   }
 
