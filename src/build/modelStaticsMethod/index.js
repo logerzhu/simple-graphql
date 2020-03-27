@@ -5,6 +5,7 @@ import parseSelections from './parseSelections'
 import parseAttributes from './parseAttributes'
 import hasSelection from './hasSelection'
 import findOneForGraphQL from './findOneForGraphQL'
+import findByPkForGraphQL from './findByPkForGraphQL'
 
 export default {
   resolveRelayConnection: resolveRelayConnection,
@@ -12,5 +13,6 @@ export default {
   parseSelections: parseSelections,
   parseAttributes: parseAttributes,
   hasSelection: hasSelection,
-  findOneForGraphQL: findOneForGraphQL
+  findOneForGraphQL: findOneForGraphQL,
+  findByPkForGraphQL: findByPkForGraphQL
 }

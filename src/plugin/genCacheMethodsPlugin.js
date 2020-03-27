@@ -48,7 +48,6 @@ export default ({
       }
     }
     model.addHook('afterCreate', 'cleanCache', (instance, options) => {
-      console.log(options)
       cleanCache(options)
     })
     model.addHook('afterUpdate', 'cleanCache', (instance, options) => {

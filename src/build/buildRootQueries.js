@@ -87,9 +87,7 @@ export default (schemas: Array<Schema>, services: Array<Service>,
         if (!sgContext.models[id.type]) return null
 
         const dbModel = sgContext.models[id.type]
-        const record = await dbModel.findOneForGraphQL({
-          where: { id: id.id }
-        }, info)
+        const record = await dbModel.findByPkForGraphQL(id.id, {}, context, info)
         return record
       }
     })
