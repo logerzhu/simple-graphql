@@ -4,7 +4,7 @@
   "description": "The simple way to generates GraphQL schemas and Sequelize models from your models definition.",
   "main": "lib/index.js",
   "scripts": {
-    "format": "standard --fix",
+    "format": "standardx --fix src/**.ts",
     "test": "jest",
     "demo": "babel-node demo/index.js",
     "flow": "flow; test $? -eq 0 -o $? -eq 2",
@@ -34,6 +34,10 @@
   ],
   "dependencies": {
     "@babel/runtime": "^7.4.3",
+    "@types/bluebird": "^3.5.29",
+    "@types/lodash": "^4.14.149",
+    "@types/node": "^13.1.8",
+    "@types/validator": "^12.0.1",
     "continuation-local-storage": "^3.2.1",
     "dataloader": "^2.0.0",
     "lodash": "^4.17.10",
@@ -56,34 +60,29 @@
     "flow-bin": "^0.97.0",
     "graphql": "^14.1.1",
     "graphql-relay": "^0.6.0",
-    "jest": "^24.5.0",
+    "jest": "^25.1.0",
     "mysql2": "^1.5.3",
     "pre-commit": "^1.2.2",
     "sqlite3": "^4.1.1",
-    "standard": "^12.0.1"
+    "standardx": "^5.0.0",
+    "ts-jest": "^25.0.0",
+    "typescript": "^3.7.5"
   },
-  "standard": {
+  "eslintConfig": {
+    "rules": {
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "error"
+    }
+  },
+  "standardx": {
+    "parser": "@typescript-eslint/parser",
     "plugins": [
-      "flowtype"
+      "@typescript-eslint/eslint-plugin"
     ],
-    "parser": "babel-eslint",
     "ignore": [
-      "/lib/",
+      "/dist/",
       "/flow-typed/",
-      "/docs/",
-      "/src/Definition.js"
-    ]
-  },
-  "pre-commit": [
-    "format"
-  ],
-  "jest": {
-    "verbose": true,
-    "transform": {
-      "^.+\\.jsx?$": "babel-jest"
-    },
-    "testMatch": [
-      "<rootDir>/__tests__/**/*-test.js?(x)"
+      "/docs/"
     ]
   }
 }
