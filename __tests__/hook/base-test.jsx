@@ -36,18 +36,18 @@ test('Hook生成', async () => {
         return result
       }
     },
-    {
-      description: 'Test hook',
-      priority: 2,
-      filter: ({ type, name, options }) => true,
-      hook: async function ({ type, name, options }, { source, args, context, info, sgContext }, next) {
-        const result = await next()
-        if (result === 'OK2') {
-          return 'OK3'
+      {
+        description: 'Test hook',
+        priority: 2,
+        filter: ({ type, name, options }) => true,
+        hook: async function ({ type, name, options }, { source, args, context, info, sgContext }, next) {
+          const result = await next()
+          if (result === 'OK2') {
+            return 'OK3'
+          }
+          return result
         }
-        return result
-      }
-    }]
+      }]
   }, {})
 
   const result = await executor.exec(`

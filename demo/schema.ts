@@ -1,4 +1,3 @@
-
 import buildSchema from "./buildSchema";
 import sequelize from "./sequelize";
 

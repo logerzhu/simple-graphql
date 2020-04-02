@@ -1,11 +1,10 @@
-
-import { FieldType } from "../../Definition";
-import { GraphQLInt } from "graphql";
+import {FieldType} from "../../Definition";
+import {GraphQLInt} from "graphql";
 import Sequelize from "sequelize";
 
 export default ({
-  name: 'Integer',
-  inputType: GraphQLInt,
-  outputType: GraphQLInt,
-  columnOptions: { type: Sequelize.INTEGER }
+    name: 'Integer',
+    inputType: GraphQLInt,
+    outputType: GraphQLInt,
+    columnOptions: {type: Sequelize.INTEGER}
 } as FieldType);

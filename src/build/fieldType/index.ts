@@ -1,5 +1,4 @@
-
-import { FieldType } from "../../Definition";
+import {FieldType} from "../../Definition";
 
 import Id from "./Id";
 import Integer from "./Integer";

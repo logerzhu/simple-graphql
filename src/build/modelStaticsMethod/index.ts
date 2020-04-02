@@ -1,4 +1,3 @@
-
 import resolveRelayConnection from "./resolveRelayConnection";
 import resolveQueryOption from "./resolveQueryOption";
 import parseSelections from "./parseSelections";
@@ -8,11 +7,11 @@ import findOneForGraphQL from "./findOneForGraphQL";
 import findByPkForGraphQL from "./findByPkForGraphQL";
 
 export default {
-  resolveRelayConnection: resolveRelayConnection,
-  resolveQueryOption: resolveQueryOption,
-  parseSelections: parseSelections,
-  parseAttributes: parseAttributes,
-  hasSelection: hasSelection,
-  findOneForGraphQL: findOneForGraphQL,
-  findByPkForGraphQL: findByPkForGraphQL
+    resolveRelayConnection: resolveRelayConnection,
+    resolveQueryOption: resolveQueryOption,
+    parseSelections: parseSelections,
+    parseAttributes: parseAttributes,
+    hasSelection: hasSelection,
+    findOneForGraphQL: findOneForGraphQL,
+    findByPkForGraphQL: findByPkForGraphQL
 };

@@ -12,8 +12,8 @@ test('引用类型生成', async () => {
           addMutation: true
         }
       }).fields({
-        name: 'String'
-      }
+          name: 'String'
+        }
       ).hasOne({
         dummyA: {
           target: 'Dummy2',

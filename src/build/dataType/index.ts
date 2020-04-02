@@ -1,5 +1,3 @@
-
-
-import { DataTypeOptions } from "../../Definition";
+import {DataTypeOptions} from "../../Definition";
 
 export default ([] as Array<DataTypeOptions>);

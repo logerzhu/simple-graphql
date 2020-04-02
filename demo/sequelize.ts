@@ -2,21 +2,23 @@ import Sequelize from "sequelize";
 import cls from "continuation-local-storage";
 
 const dbCfg = {
-  schema: 'test',
-  user: 'user',
-  password: 'pass',
-  options: {
-    host: 'localhost',
-    dialect: 'sqlite',
-    pool: {
-      max: 5,
-      min: 0,
-      idle: 10000
-    },
-    // SQLite only
-    storage: ':memory:',
-    logging: (s: string) => {console.log(s);}
-  }
+    schema: 'test',
+    user: 'user',
+    password: 'pass',
+    options: {
+        host: 'localhost',
+        dialect: 'sqlite',
+        pool: {
+            max: 5,
+            min: 0,
+            idle: 10000
+        },
+        // SQLite only
+        storage: ':memory:',
+        logging: (s: string) => {
+            console.log(s);
+        }
+    }
 };
 
 // 参考: http://docs.sequelizejs.com/manual/tutorial/transactions.html#automatically-pass-transactions-to-all-queries
