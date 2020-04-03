@@ -1,6 +1,6 @@
 import {graphql, GraphQLSchema} from "graphql";
 import {BuildOptions, DataTypeOptions, FieldType, HookOptions, PluginOptions, SGContext} from "../src/Definition";
-import SG from "../src";
+import SG,{Schema,Service} from "../src";
 import cls from "continuation-local-storage";
 import Sequelize from "sequelize";
 
@@ -38,8 +38,8 @@ class SGExecutor {
     static new: (config: {
         dataTypes?: Array<DataTypeOptions>;
         fieldTypes?: Array<FieldType>;
-        schemas?: Array<SG.Schema>;
-        services?: Array<SG.Service>;
+        schemas?: Array<Schema>;
+        services?: Array<Service>;
         hooks?: Array<HookOptions>;
         plugins?: Array<PluginOptions>;
     }, buildOptions: BuildOptions) => Promise<SGExecutor>;
