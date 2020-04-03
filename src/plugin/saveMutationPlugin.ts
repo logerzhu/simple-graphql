@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {ColumnFieldOptions, PluginOptions} from "../Definition";
+import {ColumnFieldOptions, ColumnFieldOptionsType, PluginOptions} from "../Definition";
 import StringHelper from "../utils/StringHelper";
 
 export default ({
@@ -27,15 +27,15 @@ export default ({
                 }
             }
 
-            if (value && value.$type) {
-                if (!value.hidden) {
-                    inputFields[key] = {...value, resolve: null};
+            if (value && (<ColumnFieldOptionsType>value).$type) {
+                if (!(<ColumnFieldOptionsType>value).hidden) {
+                    inputFields[key] = {...(<ColumnFieldOptionsType>value), resolve: null};
                 }
             } else {
                 inputFields[key] = value;
             }
         });
-        let config = {};
+        let config: { [key: string]: any } = {};
         if (typeof options === 'object') {
             config = options;
         }

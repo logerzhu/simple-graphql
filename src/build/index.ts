@@ -1,7 +1,7 @@
-import Sequelize from "sequelize";
+import {Sequelize} from "sequelize";
 import _ from "lodash";
 
-import {GraphQLFieldConfig, GraphQLNonNull, GraphQLObjectType, GraphQLSchema} from "graphql";
+import {GraphQLFieldConfig, GraphQLNonNull, GraphQLObjectType, GraphQLSchema, GraphQLSchemaConfig} from "graphql";
 
 import Schema from "../definition/Schema";
 import Service from "../definition/Service";
@@ -80,7 +80,7 @@ export default function (sequelize: Sequelize, config: {
         name: 'RootQuery',
         fields: () => rootQueries
     });
-    const schemaConfig = {};
+    const schemaConfig: GraphQLSchemaConfig = {query: rootQueryObject};
     if (_.keys(rootQueries).length > 0) {
         payloadFields['relay'] = {
             description: 'Hack to workaround https://github.com/facebook/relay/issues/112 re-exposing the root query object',
@@ -89,7 +89,6 @@ export default function (sequelize: Sequelize, config: {
                 return {};
             }
         };
-        schemaConfig.query = rootQueryObject;
     }
 
     const rootMutations = buildRootMutations(config.schemas || [], config.services || [], payloadFields, context);

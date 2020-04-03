@@ -1,12 +1,12 @@
 import Sequelize from "sequelize";
 import path from "path";
 import fs from "fs";
-import GS from "../src";
+import SG from "../src";
 import DemoService from "./definition/service/DemoService";
 
-export default function (sequelize: Sequelize) {
-    function listSchemas(dir: string): Array<GS.Schema> {
-        const schemas: Array<GS.Schema> = [];
+export default function (sequelize: Sequelize.Sequelize) {
+    function listSchemas(dir: string): Array<SG.Schema> {
+        const schemas: Array<SG.Schema> = [];
         const handleFile = d => fs.readdirSync(path.resolve(__dirname, d)).map(function (file) {
             const stats = fs.statSync(path.resolve(__dirname, dir, file));
             const relativePath = [dir, file].join('/');
@@ -16,14 +16,14 @@ export default function (sequelize: Sequelize) {
                     schemas.push(schema);
                 }
             } else if (stats.isFile()) {
-                if (file.match(/\.js$/) !== null && file !== 'index.js') {
-                    const name = './' + relativePath.replace('.js', '');
+                if (file.match(/\.ts$/) !== null && file !== 'index.ts') {
+                    const name = './' + relativePath.replace('.ts', '');
                     const schemaOrFun = require(name).default;
-                    if (schemaOrFun instanceof GS.Schema) {
+                    if (schemaOrFun instanceof SG.Schema) {
                         schemas.push(schemaOrFun);
                     } else if (typeof schemaOrFun === 'function') {
                         const schema = schemaOrFun(sequelize);
-                        if (schema instanceof GS.Schema) {
+                        if (schema instanceof SG.Schema) {
                             schemas.push(schema);
                         } else {
                             console.log('Incorrect schema definition file: ' + name);
@@ -38,7 +38,7 @@ export default function (sequelize: Sequelize) {
 
     const schemas = listSchemas('definition/schema');
 
-    return GS.build(sequelize, {
+    return SG.build(sequelize, {
         schemas: schemas,
         services: [DemoService],
         dataTypes: [{

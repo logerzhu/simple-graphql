@@ -12,7 +12,7 @@ const cacheKey = (m: MethodKey) => `${m.model}.${m.method}-${m.includes.join(','
 
 export default class LoaderManager {
 
-    loader: DataLoader<MethodKey, DataLoader<FindOptions<any>, any, string>, string>;
+    loader: DataLoader<MethodKey, DataLoader<FindOptions, any, string>, string>;
 
     methodKeyMap: {
         [key: string]: MethodKey;
@@ -27,7 +27,7 @@ export default class LoaderManager {
             for (let methodKey of methodKeys) {
                 self.methodKeyMap[cacheKey(methodKey)] = methodKey;
                 const dbModel: any = models.find(m => m.name === methodKey.model);
-                result.push(new DataLoader(async function (optionses: ReadonlyArray<FindOptions<any>>) {
+                result.push(new DataLoader(async function (optionses: ReadonlyArray<FindOptions>) {
                     const result2: any = [];
                     for (let options of optionses) {
                         result2.push((await dbModel[methodKey.method](options)));
@@ -46,7 +46,7 @@ export default class LoaderManager {
     async getMethod(methodKey: MethodKey) {
         const self = this;
         const loader = await self.loader.load(methodKey);
-        return async (options: FindOptions<any>) => loader.load(options);
+        return async (options: FindOptions) => loader.load(options);
     }
 
     clear(model: string) {

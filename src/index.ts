@@ -25,7 +25,7 @@ export {
     BuildOptions
 } from "./Definition";
 
-const SimpleGraphQL = {
+const SG = {
 
     Schema: Schema,
 
@@ -47,4 +47,4 @@ const SimpleGraphQL = {
     build: build
 };
 
-export default SimpleGraphQL;
+export default SG;

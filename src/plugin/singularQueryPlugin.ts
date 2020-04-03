@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 
 import StringHelper from "../utils/StringHelper";
-import {ColumnFieldOptions, PluginOptions} from "../Definition";
+import {ColumnFieldOptions, ColumnFieldOptionsType, PluginOptions} from "../Definition";
 
 export default ({
     name: 'singularQuery',
@@ -27,17 +27,17 @@ export default ({
             }
         };
         _.forOwn(schema.config.fields, (value, key) => {
-            if (value.$type && (value.columnOptions && value.columnOptions.unique) && value.hidden !== true) {
+            if ((<ColumnFieldOptionsType>value).$type && ((<ColumnFieldOptionsType>value).columnOptions && (<ColumnFieldOptionsType>value).columnOptions.unique) && (<ColumnFieldOptionsType>value).hidden !== true) {
                 if (isModelType(value)) {
                     if (!key.endsWith('Id')) {
                         key = key + 'Id';
                     }
                 }
-                searchFields[key] = {...value, required: false, default: null};
+                searchFields[key] = {...(<ColumnFieldOptionsType>value), required: false, default: null};
             }
         });
 
-        let config = {};
+        let config: { [key: string]: any } = {};
         if (typeof options === 'object') {
             config = options;
         }

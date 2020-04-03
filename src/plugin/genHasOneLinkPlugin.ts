@@ -25,7 +25,7 @@ export default ({
                             return dbModel.findOneForGraphQL({
                                 where: {
                                     ...{...(config.scope || {})},
-                                    [config.foreignKey || config.foreignField + 'Id']: root.id
+                                    [(<string>config.foreignKey) || config.foreignField + 'Id']: root.id
                                 }
                             }, info);
                         }

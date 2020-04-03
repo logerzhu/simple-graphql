@@ -9,7 +9,7 @@ export default ((models: Array<ModelDefine>, plugins: Array<PluginOptions>, defa
 
     plugins.forEach(plugin => {
         for (let model of models) {
-            let options = ((model.schema.config.options || {}).plugin || {})[plugin.name];
+            let options = ((model.sgSchema.config.options || {}).plugin || {})[plugin.name];
             if (options === undefined) {
                 options = defaultOptions[plugin.name];
             }

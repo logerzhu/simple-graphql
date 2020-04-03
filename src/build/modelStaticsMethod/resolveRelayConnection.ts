@@ -104,7 +104,7 @@ export default async function (args: {
     if (last != null || before != null) {
         first = last || 100;
         before = before || count + 1;
-        after = count - (parseInt(before) - 1);
+        after = "" + (count - (parseInt(before) - 1));
         order = order.map(o => {
             const r = [...o];
             if (isPrimaryOrder({orderConfig: r, schema: sgContext.schemas[dbModel.name], sgContext: sgContext})) {

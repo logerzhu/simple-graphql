@@ -1,7 +1,8 @@
 import Sequelize, {FindOptions} from "sequelize";
 import DataLoader from "dataloader";
+import {GraphQLResolveInfo} from "graphql";
 
-export default async function (id: number, options: FindOptions<any>, context: any, info: Object, path?: string) {
+export default async function (id: number, options: FindOptions, context: any, info: GraphQLResolveInfo, path?: string) {
     const dbModel = this;
 
     if (context == null) context = {};

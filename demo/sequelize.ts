@@ -1,4 +1,4 @@
-import Sequelize from "sequelize";
+import {Sequelize} from "sequelize";
 import cls from "continuation-local-storage";
 
 const dbCfg = {

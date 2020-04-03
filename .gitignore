@@ -1,6 +1,6 @@
 .idea/
 node_modules
 **/*.sqlite
-/lib/
+/dist/
 **/package-lock.json
 Demo.js

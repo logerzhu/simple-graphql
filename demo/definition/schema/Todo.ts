@@ -51,7 +51,7 @@ export default SG.schema('Todo', {
                                          Todo
                                      }
                                  }) {
-            return Todo.find({
+            return Todo.findAll({
                 where: {
                     completed: false,
                     ownerId: ownerId,

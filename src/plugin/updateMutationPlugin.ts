@@ -1,6 +1,6 @@
 import _ from "lodash";
 import StringHelper from "../utils/StringHelper";
-import {ColumnFieldOptions, PluginOptions} from "../Definition";
+import {ColumnFieldOptions, ColumnFieldOptionsType, PluginOptions} from "../Definition";
 
 export default ({
     name: 'updateMutation',
@@ -40,9 +40,14 @@ export default ({
                     key = key + 'Id';
                 }
             }
-            if (value && value.$type) {
-                if (!value.hidden && (!value.config || value.config.mutable !== false)) {
-                    inputFields.values[key] = {...value, required: false, default: null, resolve: null};
+            if (value && (<ColumnFieldOptionsType>value).$type) {
+                if (!(<ColumnFieldOptionsType>value).hidden && (!(<ColumnFieldOptionsType>value).config || (<ColumnFieldOptionsType>value).config.mutable !== false)) {
+                    inputFields.values[key] = {
+                        ...(<ColumnFieldOptionsType>value),
+                        required: false,
+                        default: null,
+                        resolve: null
+                    };
                 }
             } else {
                 inputFields.values[key] = value;
@@ -52,7 +57,7 @@ export default ({
             return;
         }
 
-        let config = {};
+        let config: any = {};
         if (typeof options === 'object') {
             config = options;
         }

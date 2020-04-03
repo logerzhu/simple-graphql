@@ -1,6 +1,6 @@
 import {FindOptions} from "sequelize";
 
-export default ((dbModel, options: FindOptions<any>) => {
+export default ((dbModel, options: FindOptions) => {
     options = options || {};
     return JSON.stringify({
         ...options,

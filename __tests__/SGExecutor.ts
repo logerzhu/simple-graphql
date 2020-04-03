@@ -30,7 +30,7 @@ const getDbConfig = () => {
 };
 
 const sequelizeInstance = function (dbConfig) {
-    return new Sequelize(dbConfig.schema, dbConfig.user, dbConfig.password, dbConfig.options);
+    return new Sequelize.Sequelize(dbConfig.schema, dbConfig.user, dbConfig.password, dbConfig.options);
 };
 
 class SGExecutor {
@@ -55,7 +55,7 @@ class SGExecutor {
         this.sgContext = options.sgContext;
     }
 
-    async exec(query: string, variables?: any = {}) {
+    async exec(query: string, variables: any = {}) {
         return graphql(this.graphQLSchema, query, {}, {}, variables);
     }
 }

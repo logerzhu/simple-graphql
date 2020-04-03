@@ -5,10 +5,14 @@ import {
     GraphQLOutputType,
     GraphQLResolveInfo
 } from "graphql";
-import {Model, ModelAttributeColumnOptions, ModelOptions, Sequelize} from "sequelize";
+import {Model, ModelAttributeColumnOptions, ModelCtor, ModelOptions, Sequelize} from "sequelize";
 import Schema from "./definition/Schema";
+import ModelStaticsMethod from './build/modelStaticsMethod'
 
-export type ModelDefine = Model;
+export type ModelDefine = ModelCtor<Model> & typeof ModelStaticsMethod & {
+    withCache: ModelCtor<Model>
+    sgSchema: Schema
+};
 
 export type SGContext = {
     sequelize: Sequelize;
@@ -19,7 +23,7 @@ export type SGContext = {
         [key: string]: ModelDefine;
     };
     services: {
-        [key: string]: Object;
+        [key: string]: any;
     };
     fieldType: (arg0: string) => FieldType | null | undefined;
 };
@@ -57,18 +61,20 @@ export type FieldType = {
     columnOptions?: ModelAttributeColumnOptions | ((schema: Schema, fieldName: string, options: ColumnFieldOptions) => ModelAttributeColumnOptions | null | undefined);
 };
 
-export type InputFieldOptions = string | Set<string> | Array<InputFieldOptions> | {
+export type InputFieldOptionsType = {
     $type: InputFieldOptions;
     description?: string;
     required: boolean;
     default?: any;
-    mapper?: (option: { where: Object; attributes: Array<string>; }, arg1: any) => void;
-} | {
+    mapper?: (option: { where: { [key: string]: any }; attributes: Array<string>; }, arg1: any) => void;
+};
+
+export type InputFieldOptions = string | Set<string> | Array<InputFieldOptions> | InputFieldOptionsType | {
     [key: string]: InputFieldOptions;
 };
 
-export type FieldOptions = string | Set<string> | Array<FieldOptions> | {
-    config?: Object;
+export type FieldOptionsType = {
+    config?: { [key: string]: any };
     $type: FieldOptions;
     description?: string;
     required: boolean;
@@ -78,12 +84,14 @@ export type FieldOptions = string | Set<string> | Array<FieldOptions> | {
     };
     dependentFields?: Array<string>;
     resolve?: FieldResolve;
-} | {
+};
+
+export type FieldOptions = string | Set<string> | Array<FieldOptions> | FieldOptionsType | {
     [key: string]: FieldOptions;
 };
 
 export type LinkedFieldOptions = {
-    config?: Object;
+    config?: { [key: string]: any };
     $type: FieldOptions;
     description?: string;
     required?: boolean;
@@ -94,8 +102,8 @@ export type LinkedFieldOptions = {
     resolve: FieldResolve;
 };
 
-export type ColumnFieldOptions = string | Set<string> | Array<FieldOptions> | {
-    config?: Object;
+export type ColumnFieldOptionsType = {
+    config?: any;
     $type: FieldOptions;
     description?: string;
     required: boolean;
@@ -103,28 +111,34 @@ export type ColumnFieldOptions = string | Set<string> | Array<FieldOptions> | {
     hidden?: boolean;
     columnOptions?: ModelAttributeColumnOptions;
     resolve?: FieldResolve;
-} | {
+}
+
+export type ColumnFieldOptions = string | Set<string> | Array<FieldOptions> | ColumnFieldOptionsType | {
     [key: string]: FieldOptions;
 };
 
-export type DataTypeOptions = {
+export type BaseDataTypeOptions = {
     name: string;
     $type: FieldOptions;
     description?: string;
     columnOptions?: ModelAttributeColumnOptions;
-} | {
+}
+
+export type UnionDataTypeOptions = {
     name: string;
     $unionTypes: {
         [key: string]: string;
     };
     description?: string;
     columnOptions?: ModelAttributeColumnOptions;
-};
+}
+
+export type DataTypeOptions = BaseDataTypeOptions | UnionDataTypeOptions;
 
 export type QueryOptions = {
     $type: FieldOptions;
     description?: string;
-    config?: Object;
+    config?: { [key: string]: any };
     args?: {
         [key: string]: InputFieldOptions;
     };
@@ -133,7 +147,7 @@ export type QueryOptions = {
 
 export type MutationOptions = {
     description?: string;
-    config?: Object;
+    config?: { [key: string]: any };
     inputFields: {
         [key: string]: InputFieldOptions;
     };
@@ -145,7 +159,7 @@ export type MutationOptions = {
 
 export type SchemaOptionConfig = {
     description?: string;
-    plugin?: Object;
+    plugin?: { [key: string]: any };
     tableOptions?: ModelOptions<any>;
 };
 
@@ -166,13 +180,13 @@ export type PluginOptions = {
     name: string;
     description?: string;
     priority?: number;
-    defaultOptions: (boolean | Object) | null | undefined;
-    applyToSchema?: (schema: Schema, options: boolean | Object, schemas: Array<Schema>) => void;
-    applyToModel?: (model: ModelDefine, options: boolean | Object, models: Array<ModelDefine>) => void;
+    defaultOptions: (boolean | { [key: string]: any }) | null | undefined;
+    applyToSchema?: (schema: Schema, options: boolean | { [key: string]: any }, schemas: Array<Schema>) => void;
+    applyToModel?: (model: ModelDefine, options: boolean | { [key: string]: any }, models: Array<ModelDefine>) => void;
 };
 
 export type BuildOptions = {
     plugin?: {
-        [id: string]: boolean | Object;
+        [id: string]: boolean | { [key: string]: any };
     };
 };

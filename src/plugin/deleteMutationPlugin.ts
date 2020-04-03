@@ -8,7 +8,7 @@ export default ({
     description: 'Gen `delete mutation` for Schema',
     applyToSchema: function (schema, options, schemas): void {
         const name = 'delete' + StringHelper.toInitialUpperCase(schema.name);
-        let config = {};
+        let config: { [key: string]: any } = {};
         if (typeof options === 'object') {
             config = options;
         }

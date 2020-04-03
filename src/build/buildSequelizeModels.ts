@@ -1,11 +1,10 @@
-import Sequelize, {ModelAttributeColumnOptions} from "sequelize";
+import Sequelize, {Model, ModelAttributeColumnOptions, ModelCtor} from "sequelize";
 import Schema from "../definition/Schema";
-import {FieldTypeContext, ModelDefine, SGContext} from "../Definition";
+import {ColumnFieldOptionsType, FieldTypeContext, ModelDefine, SGContext} from "../Definition";
 import _ from "lodash";
-import StringHelper from "../utils/StringHelper";
 import staticsMethods from "./modelStaticsMethod";
 
-function toSequelizeModel(sequelize: Sequelize, schema: Schema, context: FieldTypeContext): ModelDefine {
+function toSequelizeModel(sequelize: Sequelize.Sequelize, schema: Schema, context: FieldTypeContext): ModelCtor<Model> {
     const dbDefinition = {};
 
     const versionConfig = (schema.config.options.tableOptions || {}).version;
@@ -17,8 +16,8 @@ function toSequelizeModel(sequelize: Sequelize, schema: Schema, context: FieldTy
     _.forOwn(schema.config.fields, (value, key) => {
         if (key === versionField) return;
         let typeName = value;
-        if (value && value.$type) {
-            typeName = value.$type;
+        if (value && (<ColumnFieldOptionsType>value).$type) {
+            typeName = (<ColumnFieldOptionsType>value).$type;
         }
 
         let columnOptions: ModelAttributeColumnOptions | null | undefined = null;
@@ -46,21 +45,23 @@ function toSequelizeModel(sequelize: Sequelize, schema: Schema, context: FieldTy
         }
         if (columnOptions) {
             dbDefinition[key] = {...columnOptions};
-            if (value && value.$type) {
-                if (value.required != null) {
-                    dbDefinition[key].allowNull = !value.required;
+            if (value && (<ColumnFieldOptionsType>value).$type) {
+                if ((<ColumnFieldOptionsType>value).required != null) {
+                    dbDefinition[key].allowNull = !(<ColumnFieldOptionsType>value).required;
                 }
-                if (value.default != null) {
-                    dbDefinition[key].defaultValue = value.default;
+                if ((<ColumnFieldOptionsType>value).default != null) {
+                    dbDefinition[key].defaultValue = (<ColumnFieldOptionsType>value).default;
                 }
-                dbDefinition[key] = {...dbDefinition[key], ...(value.columnOptions || {})};
+                dbDefinition[key] = {...dbDefinition[key], ...((<ColumnFieldOptionsType>value).columnOptions || {})};
             }
-            if ((sequelize.options.define || {}).underscored && dbDefinition[key].field == null) {
-                dbDefinition[key].field = StringHelper.toUnderscoredName(key);
-            }
+            //TODO underscored support
+            // if ((sequelize.options.define || {}).underscored && dbDefinition[key].field == null) {
+            //     dbDefinition[key].field = StringHelper.toUnderscoredName(key);
+            // }
         }
     });
-    return sequelize.define(schema.name, dbDefinition, schema.config.options.tableOptions);
+    sequelize.define(schema.name, dbDefinition, schema.config.options.tableOptions);
+    return sequelize.model(schema.name)
 }
 
 function buildModelAssociations(schemas: Array<Schema>, models: {
@@ -71,8 +72,7 @@ function buildModelAssociations(schemas: Array<Schema>, models: {
             models[schema.name].hasMany(models[config.target], {
                 ...config,
                 as: key,
-                foreignKey: config.foreignKey || config.foreignField + 'Id',
-                through: undefined
+                foreignKey: config.foreignKey || config.foreignField + 'Id'
             });
         });
 
@@ -81,7 +81,8 @@ function buildModelAssociations(schemas: Array<Schema>, models: {
                 ...config,
                 as: key,
                 foreignKey: config.foreignField + 'Id',
-                through: config.through && {...config.through, model: models[config.through.model]}
+                //through: config.through && {...config.through, model: models[config.through.model]}
+                through: config.through
             });
         });
 
@@ -112,9 +113,9 @@ export default ((sequelize: Sequelize.Sequelize, schemas: Array<Schema>, context
         if (result[schema.name]) {
             throw new Error(`Schema ${schema.name} already define.`);
         }
-        const model = toSequelizeModel(schema.sequelize || sequelize, schema, context);
+        const model: any = toSequelizeModel(schema.sequelize || sequelize, schema, context);
         Object.assign(model, {
-            schema: schema,
+            sgSchema: schema,
             ...staticsMethods,
             ...schema.config.statics,
             getSGContext: () => context

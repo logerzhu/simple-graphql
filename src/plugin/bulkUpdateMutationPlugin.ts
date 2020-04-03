@@ -124,12 +124,12 @@ export default ({
         const name = 'bulkUpdate' + StringHelper.toInitialUpperCase(schema.name);
         const changedName = 'changed' + StringHelper.toInitialUpperCase(schema.name);
 
-        let config = {};
+        let config: { [key: string]: any } = {};
         if (typeof options === 'object') {
             config = options;
         }
 
-        const searchFields = {...getSearchFields(schema, schemas), ...((options && options.conditionFields) || {})};
+        const searchFields = {...getSearchFields(schema, schemas), ...((options && (<{ [key: string]: any }>options).conditionFields) || {})};
         const valueFields = getValueFields(schema, schemas);
 
         if (_.keys(searchFields).length === 0 || _.keys(valueFields).length === 0) {

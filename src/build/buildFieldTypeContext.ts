@@ -1,10 +1,13 @@
 import {
-  ColumnFieldOptions,
-  DataTypeOptions,
-  FieldType,
-  FieldTypeContext,
-  InterfaceContext,
-  ResolverContext
+    BaseDataTypeOptions,
+    ColumnFieldOptions,
+    ColumnFieldOptionsType,
+    DataTypeOptions,
+    FieldType,
+    FieldTypeContext,
+    InterfaceContext,
+    ResolverContext,
+    UnionDataTypeOptions
 } from "../Definition";
 import Schema from "../definition/Schema";
 import {GraphQLFloat, GraphQLList, GraphQLObjectType, GraphQLString, GraphQLUnionType} from "graphql";
@@ -72,12 +75,12 @@ function buildModelType(schema: Schema, fieldTypeContext: FieldTypeContext, cont
         columnOptions: (schema, fieldName, options) => {
             let foreignField = fieldName;
             let onDelete = 'RESTRICT';
-            if (options && options.$type && options.columnOptions) {
-                if (options.columnOptions.onDelete) {
-                    onDelete = options.columnOptions.onDelete;
+            if (options && (<ColumnFieldOptionsType>options).$type && (<ColumnFieldOptionsType>options).columnOptions) {
+                if ((<ColumnFieldOptionsType>options).columnOptions.onDelete) {
+                    onDelete = (<ColumnFieldOptionsType>options).columnOptions.onDelete;
                 }
             }
-            if (options && options.$type && options.required) {
+            if (options && (<ColumnFieldOptionsType>options).$type && (<ColumnFieldOptionsType>options).required) {
                 schema.belongsTo({
                     [fieldName]: {
                         target: typeName,
@@ -99,6 +102,7 @@ function buildModelType(schema: Schema, fieldTypeContext: FieldTypeContext, cont
                     }
                 });
             }
+            return null
         }
     };
 }
@@ -131,11 +135,11 @@ function buildDataType(dataTypeOptions: DataTypeOptions, fieldTypeContext: Field
     };
 
     let outputType, inputType;
-    if (dataTypeOptions.$type) {
-        outputType = toOutputType(dataTypeOptions.name, dataTypeOptions.$type);
-        inputType = toInputType(dataTypeOptions.name, dataTypeOptions.$type);
-    } else if (dataTypeOptions.$unionTypes) {
-        const $unionTypes = dataTypeOptions.$unionTypes;
+    if ((<BaseDataTypeOptions>dataTypeOptions).$type) {
+        outputType = toOutputType(dataTypeOptions.name, (<BaseDataTypeOptions>dataTypeOptions).$type);
+        inputType = toInputType(dataTypeOptions.name, (<BaseDataTypeOptions>dataTypeOptions).$type);
+    } else if ((<UnionDataTypeOptions>dataTypeOptions).$unionTypes) {
+        const $unionTypes = (<UnionDataTypeOptions>dataTypeOptions).$unionTypes;
         const unionTypes = _.mapValues($unionTypes, (type, key) => (fieldTypeContext.fieldType(`_Union_${type}`) as any).outputType);
         outputType = new GraphQLUnionType({
             name: dataTypeOptions.name,
@@ -158,8 +162,8 @@ function buildDataType(dataTypeOptions: DataTypeOptions, fieldTypeContext: Field
         outputType: outputType,
         columnOptions: (schema: Schema, fieldName: string, options: ColumnFieldOptions) => {
             let columnOptions: ModelAttributeColumnOptions | null | undefined = null;
-            if (dataTypeOptions.$type) {
-                let typeName = dataTypeOptions.$type;
+            if ((<BaseDataTypeOptions>dataTypeOptions).$type) {
+                let typeName = (<BaseDataTypeOptions>dataTypeOptions).$type;
                 if (typeName instanceof Set) {
                     columnOptions = {
                         type: Sequelize.STRING(191)
@@ -189,8 +193,8 @@ function buildDataType(dataTypeOptions: DataTypeOptions, fieldTypeContext: Field
             }
             if (columnOptions) {
                 columnOptions = {...columnOptions, ...(dataTypeOptions.columnOptions || {})};
-                if (options.$type != null && options.columnOptions != null) {
-                    columnOptions = {...columnOptions, ...((options.columnOptions as any) || {})};
+                if ((<ColumnFieldOptionsType>options).$type != null && (<ColumnFieldOptionsType>options).columnOptions != null) {
+                    columnOptions = {...columnOptions, ...(((<ColumnFieldOptionsType>options).columnOptions) || {})};
                 }
                 return columnOptions;
             }

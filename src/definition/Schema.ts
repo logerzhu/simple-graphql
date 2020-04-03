@@ -7,7 +7,7 @@ import {
     QueryOptions,
     SchemaOptionConfig
 } from "../Definition";
-import Sequelize from "sequelize";
+import Sequelize, {BelongsToManyOptions, BelongsToOptions, HasManyOptions, HasOneOptions} from "sequelize";
 
 /**
  * @public
@@ -19,12 +19,7 @@ export type HasOneConfig = {
         target: string;
         description?: string;
         foreignField?: string;
-        foreignKey?: string;
-        onDelete?: "SET NULL" | "CASCADE" | "RESTRICT" | "SET DEFAULT" | "NO ACTION";
-        onUpdate?: "SET NULL" | "CASCADE" | "RESTRICT" | "SET DEFAULT" | "NO ACTION";
-        constraints?: boolean;
-        scope?: Object;
-    };
+    } & HasOneOptions;
 };
 
 /**
@@ -36,38 +31,22 @@ export type BelongsToConfig = {
         target: string;
         description?: string;
         foreignField?: string;
-        foreignKey?: string | { name: string; allowNull?: boolean; };
-        targetKey?: string;
-        onDelete?: "SET NULL" | "CASCADE" | "RESTRICT" | "SET DEFAULT" | "NO ACTION";
-        onUpdate?: "SET NULL" | "CASCADE" | "RESTRICT" | "SET DEFAULT" | "NO ACTION";
-        constraints?: boolean;
-    };
+    } & BelongsToOptions;
 };
 
 type HasManyConfig = {
     [key: string]: {
-        config?: Object;
+        config?: { [key: string]: any };
+        target: string;
+        description?: string;
+        foreignField?: string;
         hidden?: boolean;
         conditionFields?: {
             [key: string]: InputFieldOptions;
         };
-        target: string;
-        description?: string;
-        through?: string | {
-            model: string;
-            scope?: Object;
-            unique?: boolean;
-        };
-        foreignField?: string;
-        foreignKey?: string;
-        sourceKey?: string;
-        scope?: Object;
-        onDelete?: "SET NULL" | "CASCADE" | "RESTRICT" | "SET DEFAULT" | "NO ACTION";
-        onUpdate?: "SET NULL" | "CASCADE" | "RESTRICT" | "SET DEFAULT" | "NO ACTION";
-        constraints?: boolean;
         order?: Array<Array<any>>;
         outputStructure?: "Connection" | "Array";
-    };
+    } & HasManyOptions;
 };
 
 /**
@@ -76,21 +55,10 @@ type HasManyConfig = {
 type BelongsToManyConfig = {
     [key: string]: {
         hidden?: boolean;
-        target: string;
         description?: string;
-        through?: string | {
-            model: string;
-            scope?: Object;
-            unique?: boolean;
-        };
-        foreignField?: string | Object;
-        otherKey?: string | Object;
-        scope?: Object;
-        timestamps?: boolean;
-        onDelete?: "SET NULL" | "CASCADE" | "RESTRICT" | "SET DEFAULT" | "NO ACTION";
-        onUpdate?: "SET NULL" | "CASCADE" | "RESTRICT" | "SET DEFAULT" | "NO ACTION";
-        constraints?: boolean;
-    };
+        target: string;
+        foreignField?: string;
+    } & BelongsToManyOptions;
 };
 
 /**
@@ -144,7 +112,6 @@ export default class Schema {
                 belongsToMany: {}
             },
             options: options,
-            dataTypes: {},
             queries: {},
             mutations: {},
             methods: {},

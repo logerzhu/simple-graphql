@@ -1,4 +1,6 @@
-export default function parseSelections(fragments: Array<any>, selections: Array<Object>, base?: { namedType: string; }) {
+import {FragmentDefinitionNode, SelectionNode, SelectionSetNode} from "graphql";
+
+export default function parseSelections(fragments: Array<FragmentDefinitionNode>, selections: ReadonlyArray<SelectionNode>, base?: { namedType: string; }) {
     const result = [];
     if (selections) {
         selections.forEach(selection => {

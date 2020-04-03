@@ -1,6 +1,7 @@
 import {FindOptions} from "sequelize";
+import {GraphQLResolveInfo} from "graphql";
 
-export default async function (options: FindOptions<any>, info: Object, path?: string) {
+export default async function (options: FindOptions, info: GraphQLResolveInfo, path?: string) {
     const dbModel = this;
 
     const option = dbModel.resolveQueryOption({

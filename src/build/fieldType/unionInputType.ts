@@ -2,9 +2,11 @@ import {
     coerceValue,
     GraphQLError,
     GraphQLInputObjectType,
+    GraphQLInputType,
     GraphQLScalarType,
     GraphQLString,
     isValidLiteralValue,
+    ObjectValueNode,
     valueFromAST
 } from "graphql";
 import _ from "lodash";
@@ -15,7 +17,7 @@ const valueKey = 'value';
 export default function unionInputType(options: {
     name: string;
     inputValueTypes: {
-        [key: string]: GraphQLInputObjectType;
+        [key: string]: GraphQLInputType;
     };
 }): GraphQLScalarType {
     return new GraphQLScalarType({
@@ -53,7 +55,7 @@ export default function unionInputType(options: {
         parseLiteral: function (ast) {
             let type;
             try {
-                const fields = ((ast.fields || []) as any);
+                const fields = (((<ObjectValueNode>ast).fields || []) as any);
                 for (let i = 0; i < fields.length; i++) {
                     if (_.get(fields[i], 'name.value') === typeKey) {
                         type = _.get(fields[i], 'value.value');

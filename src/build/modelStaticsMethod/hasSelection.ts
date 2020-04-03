@@ -1,7 +1,8 @@
 import _ from "lodash";
+import {GraphQLResolveInfo} from "graphql";
 
 export default function (args: {
-    info: Object;
+    info: GraphQLResolveInfo;
     path: string;
 }) {
     const dbModel = this;

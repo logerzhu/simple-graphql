@@ -11,7 +11,7 @@ export default ({
     applyToSchema: function (schema, options, schemas) {
         const self = this;
 
-        const invokeMethod = async function (method: string, options: FindOptions<any> = {}) {
+        const invokeMethod = async function (method: string, options: FindOptions = {}) {
             const func = await self.loaderManage.getMethod({
                 method: method,
                 model: schema.name,
@@ -35,9 +35,9 @@ export default ({
 
         const cleanCache = options => {
             let transaction = options.transaction;
-            if (transaction === undefined && Sequelize._cls) {
+            if (transaction === undefined && (<any>Sequelize)._cls) {
                 // TODO Check if Sequelize update
-                transaction = Sequelize._cls.get('transaction');
+                transaction = (<any>Sequelize)._cls.get('transaction');
             }
             if (transaction) {
                 transaction.afterCommit(() => self.loaderManage.clear(model.name));
@@ -55,9 +55,6 @@ export default ({
             cleanCache(options);
         });
         model.addHook('afterSave', 'cleanCache', (instance, options) => {
-            cleanCache(options);
-        });
-        model.addHook('afterUpsert', 'cleanCache', (instance, options) => {
             cleanCache(options);
         });
         model.addHook('afterBulkCreate', 'cleanCache', (instances, options) => {

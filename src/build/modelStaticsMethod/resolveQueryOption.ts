@@ -1,4 +1,5 @@
 import _ from "lodash";
+import {GraphQLResolveInfo} from "graphql";
 
 const fieldToSelection = field => {
     const index = field.indexOf('.');
@@ -135,7 +136,7 @@ export default function (args: {
     attributes?: Array<string>;
     include?: Array<any>;
     order?: Array<Array<any>>;
-    info: Object;
+    info: GraphQLResolveInfo;
     path?: string;
 }) {
     const dbModel = this;

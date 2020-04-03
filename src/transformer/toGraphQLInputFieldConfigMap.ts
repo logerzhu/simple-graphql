@@ -3,7 +3,7 @@ import _ from "lodash";
 import * as graphql from "graphql";
 import {GraphQLInputFieldConfig, GraphQLInputFieldConfigMap} from "graphql";
 import StringHelper from "../utils/StringHelper";
-import {FieldTypeContext, InputFieldOptions} from "../Definition";
+import {FieldTypeContext, InputFieldOptions, InputFieldOptionsType} from "../Definition";
 
 const toGraphQLInputFieldConfigMap = function (name: string, fields: {
     [id: string]: InputFieldOptions;
@@ -81,7 +81,7 @@ const toGraphQLInputFieldConfigMap = function (name: string, fields: {
     const fieldMap: GraphQLInputFieldConfigMap = {};
 
     _.forOwn(fields, (value, key) => {
-        if (value.$type && (value['hidden'] || value['resolve'])) {// Hidden field, ignore
+        if ((<InputFieldOptionsType>value).$type && (value['hidden'] || value['resolve'])) {// Hidden field, ignore
             // Have resolve method, ignore
         } else {
             const inputFieldConfig = convert(name, key, value);
