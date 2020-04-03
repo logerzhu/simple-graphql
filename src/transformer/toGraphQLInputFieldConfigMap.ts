@@ -1,6 +1,14 @@
 import _ from 'lodash'
 
-import graphql, { GraphQLInputFieldConfig, GraphQLInputFieldConfigMap } from 'graphql'
+import {
+  GraphQLEnumType,
+  GraphQLInputFieldConfig,
+  GraphQLInputFieldConfigMap,
+  GraphQLInputObjectType,
+  GraphQLList,
+  GraphQLNonNull,
+  isInputType
+} from 'graphql'
 import StringHelper from '../utils/StringHelper'
 import {
   ColumnFieldOptionsType,
@@ -35,7 +43,7 @@ const toGraphQLInputFieldConfigMap = function (name: string, fields: {
     }
     if (field instanceof Set) {
       return {
-        type: new graphql.GraphQLEnumType({
+        type: new GraphQLEnumType({
           name: StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
           values: _.fromPairs([...field].map(f => [f, { value: f, description: f }]))
         })
@@ -48,10 +56,10 @@ const toGraphQLInputFieldConfigMap = function (name: string, fields: {
       const subField = convert(name, path, field[0])
       if (subField) {
         return {
-          type: new graphql.GraphQLList(subField.type)
+          type: new GraphQLList(subField.type)
         }
       }
-    } else if (graphql.isInputType(field)) {
+    } else if (isInputType(field)) {
       return { type: field }
     } else if (field instanceof Object) {
       if (field.$type) {
@@ -63,8 +71,8 @@ const toGraphQLInputFieldConfigMap = function (name: string, fields: {
             result.description = (result.description ? result.description : '') + ' 默认值:' + result.defaultValue
           }
           if (field.required) {
-            if (!(result.type instanceof graphql.GraphQLNonNull)) {
-              result.type = new graphql.GraphQLNonNull(result.type)
+            if (!(result.type instanceof GraphQLNonNull)) {
+              result.type = new GraphQLNonNull(result.type)
             }
           }
         }
@@ -72,7 +80,7 @@ const toGraphQLInputFieldConfigMap = function (name: string, fields: {
       } else {
         if (_.keys(field).length > 0) {
           return {
-            type: new graphql.GraphQLInputObjectType({
+            type: new GraphQLInputObjectType({
               name: StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
               fields: () => toGraphQLInputFieldConfigMap(toTypeName(name, path), field, context)
             })

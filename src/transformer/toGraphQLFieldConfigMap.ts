@@ -1,6 +1,14 @@
 import _ from 'lodash'
 
-import graphql, { GraphQLFieldConfig, GraphQLFieldConfigMap } from 'graphql'
+import {
+  GraphQLEnumType,
+  GraphQLFieldConfig,
+  GraphQLFieldConfigMap,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  isOutputType
+} from 'graphql'
 import StringHelper from '../utils/StringHelper'
 import { ColumnFieldOptionsType, FieldOptions, FieldOptionsType, FieldTypeContext, ResolverContext } from '../Definition'
 import toGraphQLInputFieldConfigMap from './toGraphQLInputFieldConfigMap'
@@ -8,7 +16,7 @@ import toGraphQLInputFieldConfigMap from './toGraphQLInputFieldConfigMap'
 type Context = ResolverContext & FieldTypeContext;
 
 const toGraphQLFieldConfigMap = function (name: string, postfix: string, fields: {
-    [id: string]: FieldOptions;
+  [id: string]: FieldOptions;
 }, context: Context): GraphQLFieldConfigMap<any, any> {
   const toTypeName = (name: string, path: string) => {
     return name + path.replace(/\.\$type/g, '').replace(/\[\d*\]/g, '').split('.').map(v => StringHelper.toInitialUpperCase(v)).join('')
@@ -43,7 +51,7 @@ const toGraphQLFieldConfigMap = function (name: string, postfix: string, fields:
     }
     if (field instanceof Set) {
       return {
-        type: new graphql.GraphQLEnumType({
+        type: new GraphQLEnumType({
           name: StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
           values: _.fromPairs([...field].map(f => [f, { value: f, description: f }]))
         })
@@ -56,11 +64,11 @@ const toGraphQLFieldConfigMap = function (name: string, postfix: string, fields:
       const subField = convert(name, path, field[0])
       if (subField) {
         return {
-          type: new graphql.GraphQLList(subField.type)
+          type: new GraphQLList(subField.type)
         }
       }
     }
-    if (graphql.isOutputType(field)) {
+    if (isOutputType(field)) {
       return { type: field }
     } else if (field instanceof Object) {
       if (field.$type) {
@@ -68,8 +76,8 @@ const toGraphQLFieldConfigMap = function (name: string, postfix: string, fields:
         if (result) {
           result.description = field.description
           if (field.required) {
-            if (!(result.type instanceof graphql.GraphQLNonNull)) {
-              result.type = new graphql.GraphQLNonNull(result.type)
+            if (!(result.type instanceof GraphQLNonNull)) {
+              result.type = new GraphQLNonNull(result.type)
             }
           }
           if (field.resolve) {
@@ -100,7 +108,7 @@ const toGraphQLFieldConfigMap = function (name: string, postfix: string, fields:
       } else {
         if (_.keys(field).length > 0) {
           return {
-            type: new graphql.GraphQLObjectType({
+            type: new GraphQLObjectType({
               name: StringHelper.toInitialUpperCase(toTypeName(name, path)) + postfix,
               fields: () => toGraphQLFieldConfigMap(toTypeName(name, path), postfix, field, context)
             }),
