@@ -1,4 +1,4 @@
-import {Sequelize} from "sequelize";
+import {Dialect, Sequelize} from "sequelize";
 import cls from "continuation-local-storage";
 
 const dbCfg = {
@@ -7,7 +7,7 @@ const dbCfg = {
     password: 'pass',
     options: {
         host: 'localhost',
-        dialect: 'sqlite',
+        dialect: (<Dialect>'sqlite'),
         pool: {
             max: 5,
             min: 0,

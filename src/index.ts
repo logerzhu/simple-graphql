@@ -1,8 +1,8 @@
-import Schema from "./definition/Schema";
-import Service from "./definition/Service";
+import _Schema from "./definition/Schema";
+import _Service from "./definition/Service";
 
 import {SchemaOptionConfig} from "./Definition";
-import build from "./build";
+import _build from "./build";
 
 export {
     HookAction,
@@ -25,26 +25,15 @@ export {
     BuildOptions
 } from "./Definition";
 
-const SG = {
+export type Schema = _Schema;
+export type Service = _Service;
 
-    Schema: Schema,
-
-    Service: Service,
-
-    /**
-     * Define a Schema
-     *
-     * @param name
-     * @param options
-     */
-    schema: (name: string, options: SchemaOptionConfig = {}): Schema => new Schema(name, options),
-
-    service: (name: string): Service => new Service(name),
-
-    /**
-     * Build the GraphQL Schema
-     */
-    build: build
-};
+namespace SG {
+    export let Schema = _Schema;
+    export let Service = _Service;
+    export const schema = (name: string, options: SchemaOptionConfig = {}): _Schema => new _Schema(name, options);
+    export const service = (name: string): _Service => new _Service(name)
+    export const build = _build
+}
 
 export default SG;

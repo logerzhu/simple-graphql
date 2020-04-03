@@ -6,7 +6,7 @@
   "scripts": {
     "format": "standardx --fix src/**.ts",
     "test": "jest",
-    "demo": "babel-node demo/index.ts",
+    "demo": "babel-node demo/index.ts --extensions '.ts'",
     "build": "rm -rf dist && npm run tsc",
     "buildAndPublish": "npm run format && npm run build && npm publish"
   },

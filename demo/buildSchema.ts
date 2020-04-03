@@ -1,12 +1,12 @@
 import Sequelize from "sequelize";
 import path from "path";
 import fs from "fs";
-import SG from "../src";
+import SG, {Schema} from "../src";
 import DemoService from "./definition/service/DemoService";
 
 export default function (sequelize: Sequelize.Sequelize) {
-    function listSchemas(dir: string): Array<SG.Schema> {
-        const schemas: Array<SG.Schema> = [];
+    function listSchemas(dir: string): Array<Schema> {
+        const schemas: Array<Schema> = [];
         const handleFile = d => fs.readdirSync(path.resolve(__dirname, d)).map(function (file) {
             const stats = fs.statSync(path.resolve(__dirname, dir, file));
             const relativePath = [dir, file].join('/');
