@@ -4,7 +4,7 @@
   "description": "The simple way to generates GraphQL schemas and Sequelize models from your models definition.",
   "main": "dist/index.js",
   "scripts": {
-    "format": "standardx --fix src/**.ts",
+    "format": "standardx --fix src/**/*.ts demo/**/*.ts __tests__/**/*.ts",
     "test": "jest",
     "demo": "babel-node demo/index.ts --extensions '.ts'",
     "build": "rm -rf dist && npm run tsc",
@@ -51,6 +51,8 @@
     "@babel/plugin-transform-runtime": "^7.4.3",
     "@babel/preset-env": "^7.4.3",
     "@babel/preset-typescript": "^7.9.0",
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.9.0",
     "express": "^4.16.4",
@@ -68,7 +70,7 @@
   "eslintConfig": {
     "rules": {
       "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": "error"
+      "@typescript-eslint/no-unused-vars": "off"
     }
   },
   "standardx": {
@@ -80,5 +82,8 @@
       "/dist/",
       "/docs/"
     ]
-  }
+  },
+  "pre-commit": [
+    "format"
+  ]
 }
