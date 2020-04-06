@@ -46,15 +46,15 @@ export type ModelDefine = { new(): SGModel } & typeof SGModel;
 
 export type SGContext<T = {
   [key: string]: ModelDefine;
+}, S = {
+  [key: string]: any;
 }> = {
   sequelize: Sequelize;
   schemas: {
     [key: string]: Schema;
   };
   models: T;
-  services: {
-    [key: string]: any;
-  };
+  services: S;
   fieldType: (arg0: string) => FieldType | null | undefined;
 };
 

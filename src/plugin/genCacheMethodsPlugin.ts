@@ -43,9 +43,8 @@ export default ({
       }
       if (transaction) {
         transaction.afterCommit(() => self.loaderManage.clear(model.name))
-      } else {
-        self.loaderManage.clear(model.name)
       }
+      self.loaderManage.clear(model.name)
     }
     model.addHook('afterCreate', 'cleanCache', (instance, options) => {
       cleanCache(options)
