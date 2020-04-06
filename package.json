@@ -1,13 +1,14 @@
 {
   "name": "simple-graphql",
-  "version": "2.4.2",
+  "version": "3.0.4",
   "description": "The simple way to generates GraphQL schemas and Sequelize models from your models definition.",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "format": "standardx --fix src/**/*.ts demo/**/*.ts __tests__/**/*.ts",
     "test": "jest",
     "demo": "babel-node demo/index.ts --extensions '.ts'",
-    "build": "rm -rf dist && npm run tsc",
+    "build": "rm -rf dist && tsc",
     "buildAndPublish": "npm run format && npm run build && npm publish"
   },
   "author": "logerzhu",
