@@ -74,13 +74,23 @@ export default ({
                 info: info,
                 attributes: queryOption.attributes
               })
-              return (dbModel.withCache ? dbModel.withCache : dbModel).findAll({
-                where: queryOption.where,
-                bind: queryOption.bind,
-                include: option.include,
-                attributes: option.attributes,
-                order: option.order
-              })
+              if (dbModel.withCache) {
+                return dbModel.withCache().findAll({
+                  where: queryOption.where,
+                  bind: queryOption.bind,
+                  include: option.include,
+                  attributes: option.attributes,
+                  order: option.order
+                })
+              } else {
+                return dbModel.findAll({
+                  where: queryOption.where,
+                  bind: queryOption.bind,
+                  include: option.include,
+                  attributes: option.attributes,
+                  order: option.order
+                })
+              }
             } else {
               const {
                 condition,

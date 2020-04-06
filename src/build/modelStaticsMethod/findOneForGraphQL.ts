@@ -12,7 +12,7 @@ export default async function (options: FindOptions, info: GraphQLResolveInfo, p
         path: path
     });
 
-    return (dbModel.withCache ? dbModel.withCache : dbModel).findOne({
+    return (dbModel.withCache ? dbModel.withCache() : dbModel).findOne({
         ...options,
         include: option.include,
         attributes: option.attributes,

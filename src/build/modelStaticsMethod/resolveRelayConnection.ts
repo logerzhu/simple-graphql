@@ -94,7 +94,7 @@ export default async function (args: {
     // 如果需要获取后面分页 或者 count 值,才需要计算
     const needCount = last != null || before != null || getSelections(selectionInfo).find(s => s.name === 'count' || s.name.startsWith('pageInfo')) != null;
 
-    const count = needCount ? await (dbModel.withCache ? dbModel.withCache : dbModel).count({
+    const count = needCount ? await (dbModel.withCache ? dbModel.withCache() : dbModel).count({
         distinct: 'id',
         include: include,
         where: where,
@@ -129,7 +129,7 @@ export default async function (args: {
     const rows = dbModel.hasSelection({
         info: selectionInfo,
         path: 'edges'
-    }) ? await (dbModel.withCache ? dbModel.withCache : dbModel).findAll({
+    }) ? await (dbModel.withCache ? dbModel.withCache() : dbModel).findAll({
         distinct: 'id',
         include: include,
         where: where,

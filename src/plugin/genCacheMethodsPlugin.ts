@@ -21,10 +21,12 @@ export default ({
     }
 
     schema.statics({
-      withCache: {
-        findOne: invokeMethod.bind(null, 'findOne'),
-        findAll: invokeMethod.bind(null, 'findAll'),
-        count: invokeMethod.bind(null, 'count')
+      withCache: () => {
+        return {
+          findOne: invokeMethod.bind(null, 'findOne'),
+          findAll: invokeMethod.bind(null, 'findAll'),
+          count: invokeMethod.bind(null, 'count')
+        }
       },
       clearCache: () => self.loaderManage.clear(schema.name)
     })

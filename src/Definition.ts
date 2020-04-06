@@ -5,14 +5,44 @@ import {
   GraphQLOutputType,
   GraphQLResolveInfo
 } from "graphql";
-import {Model, ModelAttributeColumnOptions, ModelCtor, ModelOptions, Sequelize} from "sequelize";
+import {
+  CountOptions,
+  FindOptions,
+  Model,
+  ModelAttributeColumnOptions,
+  ModelOptions,
+  Promise,
+  Sequelize
+} from "sequelize";
 import Schema from "./definition/Schema";
-import ModelStaticsMethod from './build/modelStaticsMethod'
+import resolveRelayConnection from "./build/modelStaticsMethod/resolveRelayConnection";
+import resolveQueryOption from "./build/modelStaticsMethod/resolveQueryOption";
+import parseSelections from "./build/modelStaticsMethod/parseSelections";
+import parseAttributes from "./build/modelStaticsMethod/parseAttributes";
+import hasSelection from "./build/modelStaticsMethod/hasSelection";
+import findOneForGraphQL from "./build/modelStaticsMethod/findOneForGraphQL";
+import findByPkForGraphQL from "./build/modelStaticsMethod/findByPkForGraphQL";
 
-export type ModelDefine<T extends Model = Model> = ModelCtor<T> & typeof ModelStaticsMethod & {
-  withCache: ModelCtor<T>
-  sgSchema: Schema
-};
+export abstract class SGModel extends Model {
+  static resolveRelayConnection: typeof resolveRelayConnection
+  static resolveQueryOption: typeof resolveQueryOption
+  static parseSelections: typeof parseSelections
+  static parseAttributes: typeof parseAttributes
+  static hasSelection: typeof hasSelection
+  static findOneForGraphQL: typeof findOneForGraphQL
+  static findByPkForGraphQL: typeof findByPkForGraphQL
+
+  static withCache: <M extends SGModel>(this: { new(): M } & typeof Model) => {
+    findAll: (options?: FindOptions) => Promise<M[]>;
+    findOne: (options?: FindOptions) => Promise<M | null>;
+    count: (options?: CountOptions) => Promise<number>;
+  }
+
+  static clearCache: () => void
+  static sgSchema: Schema
+}
+
+export type ModelDefine = { new(): SGModel } & typeof SGModel;
 
 export type SGContext<T = {
   [key: string]: ModelDefine;
