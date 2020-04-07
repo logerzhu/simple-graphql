@@ -57,6 +57,9 @@ export default ({
     })
     model.addHook('afterSave', 'cleanCache', (instance, options) => {
       cleanCache(options)
+    });
+    (<any>model).addHook('afterUpsert', 'cleanCache', (instance, options) => {
+      cleanCache(options)
     })
     model.addHook('afterBulkCreate', 'cleanCache', (instances, options) => {
       cleanCache(options)

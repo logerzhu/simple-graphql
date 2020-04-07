@@ -45,6 +45,7 @@ export default SG.schema('User', {
   },
   registerAt: {
     $type: 'Date',
+    required: false,
     default: () => new Date()
   }
 }).links({
