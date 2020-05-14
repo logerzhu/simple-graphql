@@ -93,7 +93,7 @@ export default ({
             }
           })
 
-          const instance = await dbModel.findOne({ where: { id: args.id } })
+          const instance = await dbModel.findOne({ where: { id: args.id }, lock: true })
           if (!instance) {
             throw new Error(schema.name + '[' + args.id + '] not exist.')
           } else {
