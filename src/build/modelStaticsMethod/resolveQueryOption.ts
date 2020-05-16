@@ -138,6 +138,7 @@ export default function (args: {
     order?: Array<Array<any>>;
     info: GraphQLResolveInfo;
     path?: string;
+    eagerHasMany?: boolean;
 }) {
     const dbModel = this;
     const {
@@ -145,7 +146,8 @@ export default function (args: {
         attributes = [],
         order = [],
         info,
-        path
+        path,
+        eagerHasMany = true
     } = args;
     const fragments = info.fragments || [];
 
@@ -178,7 +180,7 @@ export default function (args: {
         schema: sgContext.schemas[dbModel.name],
         selections: selections,
         orderPaths: [],
-        eagerHasMany: mainOrder.filter(s => typeof s[0] !== 'string').length === 0
+        eagerHasMany: eagerHasMany
     });
 
     // console.log(require('util').inspect(option, {depth: 20}))

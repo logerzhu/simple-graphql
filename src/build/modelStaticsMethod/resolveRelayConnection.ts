@@ -39,6 +39,7 @@ export default async function (args: {
     where?: any;
     bind?: any;
     order?: Array<Array<any>>;
+    subQuery? : boolean
 }): Promise<{
     pageInfo: {
         startCursor: string | number;
@@ -61,7 +62,8 @@ export default async function (args: {
         where = {},
         attributes,
         bind = [],
-        order = [['id', 'ASC']]
+        order = [['id', 'ASC']],
+        subQuery = true
     } = args;
     let {
         after,
@@ -98,7 +100,8 @@ export default async function (args: {
         distinct: 'id',
         include: include,
         where: where,
-        bind: bind
+        bind: bind,
+        subQuery: subQuery
     }) : 0;
 
     if (last != null || before != null) {
@@ -137,7 +140,8 @@ export default async function (args: {
         bind: bind,
         order: order,
         limit: first,
-        offset: offset
+        offset: offset,
+        subQuery: subQuery
     }) : [];
     let index = 0;
     if (last || before) {
