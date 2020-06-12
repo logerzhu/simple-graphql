@@ -18,7 +18,7 @@ export default async function (id: number, options: FindOptions, context: any, i
     const key = dbModel.name + '-' + JSON.stringify(option);
     if (!context._SGLoaders[key]) {
         context._SGLoaders[key] = new DataLoader(async function (ids) {
-            const records = await dbModel.withCache().findAll({
+            const records = await (dbModel.withCache ? dbModel.withCache() : dbModel).findAll({
                 where: {
                     id: {[Sequelize.Op.in]: ids}
                 },

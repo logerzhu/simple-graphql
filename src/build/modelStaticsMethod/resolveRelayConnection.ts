@@ -63,7 +63,7 @@ export default async function (args: {
         attributes,
         bind = [],
         order = [['id', 'ASC']],
-        subQuery = true
+        subQuery
     } = args;
     let {
         after,
