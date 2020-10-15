@@ -5,7 +5,10 @@ import getIncludeModeNames from './cache/getIncludeModeNames'
 
 export default ({
   name: 'genCacheMethods',
-  defaultOptions: true,
+  defaultOptions: {
+    loaderLimit: 100,
+    resultLimit: 100
+  },
   priority: 999,
   description: 'Support cache with dataLoader',
   applyToSchema: function (schema, options, schemas) {
@@ -33,7 +36,10 @@ export default ({
   },
   applyToModel: function (model, options, models) {
     const self = this
-    self.loaderManage = new LoaderManager(models) // TODO init limit
+    self.loaderManage = new LoaderManager(models,
+      (options && (options as any).loaderLimit) || 100,
+      (options && (options as any).resultLimit) || 100
+    )
 
     const cleanCache = options => {
       let transaction = options.transaction

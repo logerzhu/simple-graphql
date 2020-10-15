@@ -1,6 +1,6 @@
 {
   "name": "simple-graphql",
-  "version": "3.0.17",
+  "version": "3.0.18",
   "description": "The simple way to generates GraphQL schemas and Sequelize models from your models definition.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -63,7 +63,7 @@
     "jest": "^25.2.7",
     "mysql2": "^1.7.0",
     "pre-commit": "^1.2.2",
-    "sqlite3": "^4.1.1",
+    "sqlite3": "^4.2.0",
     "standardx": "^5.0.0",
     "ts-jest": "^25.3.0",
     "typescript": "^3.8.3"
