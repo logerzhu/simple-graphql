@@ -55,7 +55,7 @@ export default ({
             where: {
               ...args
             }
-          }, info)
+          }, context, info)
         }
       }
     })

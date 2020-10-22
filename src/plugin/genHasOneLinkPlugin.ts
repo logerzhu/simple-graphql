@@ -27,7 +27,7 @@ export default ({
                   ...{ ...(config.scope || {}) },
                   [(<string>config.foreignKey) || config.foreignField + 'Id']: root.id
                 }
-              }, info)
+              }, context, info)
             }
           }
         }

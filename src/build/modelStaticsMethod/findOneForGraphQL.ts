@@ -1,21 +1,47 @@
 import {FindOptions} from "sequelize";
 import {GraphQLResolveInfo} from "graphql";
+import DataLoader from "dataloader";
+import getFindOptionsKey from "../../plugin/cache/getFindOptionsKey";
+import {SGModel} from "../../Definition";
 
-export default async function (options: FindOptions, info: GraphQLResolveInfo, path?: string) {
-    const dbModel = this;
+export default async function <M extends SGModel>(this: { new(): M } & typeof SGModel, options: FindOptions, context: any, info: GraphQLResolveInfo, path?: string) {
+  const dbModel = this;
 
-    const option = dbModel.resolveQueryOption({
-        attributes: options.attributes,
-        include: options.include,
-        order: options.order,
-        info: info,
-        path: path
+  if (context == null) context = {};
+  if (!context._SGLoaders) context._SGLoaders = {};
+
+  const key = `${dbModel.name}.findOne`
+
+  if (!context._SGLoaders[key]) {
+    context._SGLoaders[key] = new DataLoader(async function (conditions) {
+      const result = [];
+      for (let cond of conditions) {
+        if (dbModel.withCache) {
+          result.push(await dbModel.withCache().findOne(cond))
+        } else {
+          result.push(await dbModel.findOne(cond))
+        }
+      }
+      return result;
+
+    }, {
+      maxBatchSize: 1,
+      cacheKeyFn: k => getFindOptionsKey(dbModel, k)
     });
+  }
 
-    return (dbModel.withCache ? dbModel.withCache() : dbModel).findOne({
-        ...options,
-        include: option.include,
-        attributes: option.attributes,
-        order: option.order
-    });
+  const option = dbModel.resolveQueryOption({
+    attributes: options.attributes as string[],
+    include: options.include,
+    order: options.order as any,
+    info: info,
+    path: path
+  });
+  
+  return context._SGLoaders[key].load({
+    ...options,
+    include: option.include,
+    attributes: option.attributes,
+    order: option.order
+  });
 }

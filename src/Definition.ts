@@ -5,15 +5,7 @@ import {
   GraphQLOutputType,
   GraphQLResolveInfo
 } from "graphql";
-import {
-  CountOptions,
-  FindOptions,
-  Model,
-  ModelAttributeColumnOptions,
-  ModelOptions,
-  Promise,
-  Sequelize
-} from "sequelize";
+import {CountOptions, FindOptions, Model, ModelAttributeColumnOptions, ModelOptions, Sequelize} from "sequelize";
 import Schema from "./definition/Schema";
 import resolveRelayConnection from "./build/modelStaticsMethod/resolveRelayConnection";
 import resolveQueryOption from "./build/modelStaticsMethod/resolveQueryOption";
@@ -220,3 +212,20 @@ export type BuildOptions = {
     [id: string]: boolean | { [key: string]: any };
   };
 };
+
+export interface CacheManager {
+  get: (key: string) => Promise<any>
+
+  set: (key: string, value: any, expire?: number) => Promise<void>
+
+  /*
+  Supported glob-style patterns
+
+  h?llo matches hello, hallo and hxllo
+  h*llo matches hllo and heeeello
+  h[ae]llo matches hello and hallo, but not hillo
+  h[^e]llo matches hallo, hbllo, ... but not hello
+  h[a-b]llo matches hallo and hbllo
+ */
+  del: (pattern: string) => Promise<number>
+}
