@@ -30,7 +30,7 @@ export abstract class SGModel extends Model {
     count: (options?: CountOptions) => Promise<number>;
   }
 
-  static clearCache: () => void
+  static clearCache: () => Promise<void>
   static sgSchema: Schema
 }
 
