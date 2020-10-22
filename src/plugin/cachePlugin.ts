@@ -4,7 +4,7 @@ import LruCacheManager from './cache/LruCacheManager'
 import Cache from './cache/Cache'
 
 export default ({
-  name: 'genCacheMethods',
+  name: 'cache',
   defaultOptions: {
     prefix: 'SG'
   },
@@ -19,7 +19,8 @@ export default ({
     const cache = new Cache({
       prefix: (options && (options as any).prefix) || 'SG',
       cacheManger: self.cacheManager,
-      model: model
+      model: model,
+      expire: options && (options as any).expire
     })
 
     Object.assign(model, {
