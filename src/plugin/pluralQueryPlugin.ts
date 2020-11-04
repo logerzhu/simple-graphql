@@ -6,11 +6,12 @@ import { ColumnFieldOptions, PluginOptions } from '../Definition'
 const getSearchFields = (schema, schemas) => {
   const searchFields: any = {}
 
+  const schemaNames = _.fromPairs(schemas.map(s => [s.name, true]))
   const isModelType = (fieldOptions: ColumnFieldOptions) => {
     if (typeof fieldOptions === 'string') {
-      return schemas.find(s => s.name === fieldOptions) != null
+      return schemaNames[fieldOptions] === true
     } else if (typeof fieldOptions === 'object') {
-      return schemas.find(s => s.name === (fieldOptions as any).$type) != null
+      return schemaNames[(fieldOptions as any).$type] === true
     }
     return false
   }
