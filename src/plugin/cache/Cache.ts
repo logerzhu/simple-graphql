@@ -23,13 +23,15 @@ export default class Cache<M extends SGModel> {
     this.expire = options.expire
   }
 
-  buildCacheKey(method: string, options: FindOptions | CountOptions) {
+  buildCacheKey(method: string, options?: FindOptions | CountOptions) {
+    options = options || {};
     const self = this
     const relateModelNames = [self.model.name, ...getIncludeModeNames(options)]
     return `${self.prefix}|${method}|${relateModelNames.join("|")}|${getFindOptionsKey(self.model, options)}`
   }
 
-  async isCacheValid(options: FindOptions | CountOptions) {
+  async isCacheValid(options?: FindOptions | CountOptions) {
+    options = options || {};
     // 如果当前Transaction中, 关联实体的数据有改动, disable cache
     const self = this
     let transaction = options.transaction
