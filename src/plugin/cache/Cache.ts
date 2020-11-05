@@ -57,8 +57,13 @@ export default class Cache<M extends SGModel> {
     if (cacheValue !== undefined) {
       return cacheValue.map(value => dataToInstance(value, self.model, options ? options.include : []))
     } else {
+      const lockKey = cacheKey + "$LOCK"
+      const lockValue = Date.now()
+      await self.cacheManger.set(lockKey, lockValue, 300)
       const result = await self.model.findAll(options)
-      await self.cacheManger.set(cacheKey, result.map(r => instanceToData(r)), self.expire)
+      if ((await self.cacheManger.get(lockKey) === lockValue)) {
+        await self.cacheManger.set(cacheKey, result.map(r => instanceToData(r)), self.expire)
+      }
       return result as M[]
     }
   }
@@ -75,8 +80,13 @@ export default class Cache<M extends SGModel> {
     if (cacheValue !== undefined) {
       return dataToInstance(cacheValue, self.model, options ? options.include : [])
     } else {
+      const lockKey = cacheKey + "$LOCK"
+      const lockValue = Date.now()
+      await self.cacheManger.set(lockKey, lockValue, 300)
       const result = await self.model.findOne(options)
-      await self.cacheManger.set(cacheKey, instanceToData(result), self.expire)
+      if ((await self.cacheManger.get(lockKey) === lockValue)) {
+        await self.cacheManger.set(cacheKey, instanceToData(result), self.expire)
+      }
       return result as M
     }
   }
@@ -94,8 +104,13 @@ export default class Cache<M extends SGModel> {
     if (cacheValue !== undefined) {
       return cacheValue
     } else {
+      const lockKey = cacheKey + "$LOCK"
+      const lockValue = Date.now()
+      await self.cacheManger.set(lockKey, lockValue, 300)
       const result = await self.model.count(options)
-      await self.cacheManger.set(cacheKey, result, self.expire)
+      if ((await self.cacheManger.get(lockKey) === lockValue)) {
+        await self.cacheManger.set(cacheKey, result, self.expire)
+      }
       return result
     }
   }
