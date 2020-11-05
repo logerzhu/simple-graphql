@@ -11,12 +11,11 @@ export default ({
     const name = 'update' + StringHelper.toInitialUpperCase(schema.name)
     const changedName = 'changed' + StringHelper.toInitialUpperCase(schema.name)
 
-    const schemaNames = _.fromPairs(schemas.map(s => [s.name, true]))
     const isModelType = (fieldOptions: ColumnFieldOptions) => {
       if (typeof fieldOptions === 'string') {
-        return schemaNames[fieldOptions] === true
+        return schemas.find(s => s.name === fieldOptions) != null
       } else if (typeof fieldOptions === 'object') {
-        return schemaNames[(fieldOptions as any).$type] === true
+        return schemas.find(s => s.name === (fieldOptions as any).$type) != null
       }
       return false
     }
