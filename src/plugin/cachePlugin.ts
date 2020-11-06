@@ -47,6 +47,8 @@ export default ({
         if (transaction.clearCaches.indexOf(cache) === -1) {
           transaction.clearCaches.push(cache)
         }
+      } else {
+        await cache.clear()
       }
     }
     model.addHook('afterCreate', 'cleanCache', async (instance, options) => {
