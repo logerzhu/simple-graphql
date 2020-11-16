@@ -2,7 +2,7 @@ import {ModelDefine, SGModel} from "../../Definition";
 import {Includeable, IncludeOptions} from "sequelize";
 
 function restoreTimestamps(data: any, instance: SGModel, include?: Includeable[]) {
-  const timestampFields = ['createdAt', 'updatedAt', 'deletedAt']
+  const timestampFields = ['createdAt', 'updatedAt', 'deletedAt', 'version']
 
   for (const field of timestampFields) {
     const value = data[field]
