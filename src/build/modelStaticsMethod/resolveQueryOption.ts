@@ -88,7 +88,7 @@ const buildQueryOption = function ({
                 const option = buildQueryOption({
                     sgContext: sgContext,
                     attributes: exit.attributes || [],
-                    include: exit.include || [],
+                    include: [...(exit.include || [])],
                     schema: sgContext.schemas[config.target],
                     selections: selection.selections,
                     orderPaths: [...orderPaths, {
