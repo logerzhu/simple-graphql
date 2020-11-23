@@ -71,7 +71,11 @@ export default function (args: { attributes: Array<string>; selections: Array<an
                 });
             }
         } else {
-            const fieldConfig = schema.config.fields[fieldName];
+            let fieldConfig = schema.config.fields[fieldName];
+            if(!fieldConfig && fieldName.endsWith("Id")){
+                fieldName = fieldName.substr(0, fieldName.length-2)
+                fieldConfig = schema.config.fields[fieldName]
+            }
             if (fieldConfig) {
                 push(option.attributes, getFieldName(fieldName, fieldConfig));
             } else if (fieldName === '*') {
