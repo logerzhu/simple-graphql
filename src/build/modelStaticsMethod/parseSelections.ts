@@ -1,6 +1,6 @@
 import {FragmentDefinitionNode, SelectionNode, SelectionSetNode} from "graphql";
 
-export default function parseSelections(fragments: Array<FragmentDefinitionNode>, selections: ReadonlyArray<SelectionNode>, base?: { namedType: string; }) {
+export default function parseSelections(fragments: { [key: string]: FragmentDefinitionNode }, selections: ReadonlyArray<SelectionNode>, base?: { namedType: string; }) {
     const result = [];
     if (selections) {
         selections.forEach(selection => {

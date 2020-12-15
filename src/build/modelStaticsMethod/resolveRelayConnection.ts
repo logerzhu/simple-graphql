@@ -84,7 +84,7 @@ export default async function (args: {
     attributes = option.attributes;
 
     const getSelections = info => {
-        const fragments = info.fragments || [];
+        const fragments = info.fragments || {};
         let selections = [];
 
         (info.fieldNodes || []).forEach(node => {
