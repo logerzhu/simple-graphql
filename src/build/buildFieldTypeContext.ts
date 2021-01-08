@@ -64,6 +64,16 @@ function buildModelType (schema: Schema, fieldTypeContext: FieldTypeContext, con
           }
         } else if (typeof root[fieldName] === 'number') {
           return sgContext.models[typeName].findByPkForGraphQL(root[fieldName], {}, context, info)
+        } else if (typeof root[fieldName].id === 'string') {
+          const {
+            type,
+            id
+          } = relay.fromGlobalId(root[fieldName])
+          if (type === typeName) {
+            return sgContext.models[typeName].findByPkForGraphQL(id, {}, context, info)
+          } else {
+            return root[fieldName]
+          }
         } else {
           return root[fieldName]
         }
