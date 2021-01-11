@@ -283,13 +283,27 @@ export default function (fieldTypes: Array<FieldType>, dataTypes: Array<DataType
         outputResolve: async function (root, args, context, info, sgContext) {
           const fieldName = info.fieldName
           if (schemas.find(s => s.name === subTypeName) != null) {
-            if (root[fieldName] != null && root[fieldName].length > 0 && (typeof root[fieldName][0] === 'string' || typeof root[fieldName][0] === 'number')) {
+            if (root[fieldName] != null && root[fieldName].length > 0 &&
+              (
+                typeof root[fieldName][0] === 'string' ||
+                typeof root[fieldName][0] === 'number' ||
+                (root[fieldName][0] != null && typeof root[fieldName][0].id === 'string' && relay.fromGlobalId(root[fieldName][0].id).type === subTypeName)
+              )
+            ) {
               const dbModel = sgContext.models[subTypeName]
+              const ids = root[fieldName].map(r => {
+                if (typeof r === 'string' && relay.fromGlobalId(r).type === subTypeName) {
+                  return relay.fromGlobalId(r).id
+                } else if (r != null && typeof r.id === 'string' && relay.fromGlobalId(r.id).type === subTypeName) {
+                  return relay.fromGlobalId(r.id).id
+                }
+                return r
+              })
               const list = await (dbModel.withCache ? dbModel.withCache() : dbModel).findAll({
-                where: { id: { [(Sequelize.Op.in as any)]: root[fieldName] } }
+                where: { id: { [(Sequelize.Op.in as any)]: ids } }
               })
               const result = []
-              for (const id of root[fieldName]) {
+              for (const id of ids) {
                 const element = list.find(e => '' + e.id === '' + id)
                 if (element) {
                   result.push(element)
