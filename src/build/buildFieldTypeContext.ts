@@ -299,8 +299,13 @@ export default function (fieldTypes: Array<FieldType>, dataTypes: Array<DataType
                 }
                 return r
               })
+              const option = dbModel.resolveQueryOption({
+                info: info
+              })
               const list = await (dbModel.withCache ? dbModel.withCache() : dbModel).findAll({
-                where: { id: { [(Sequelize.Op.in as any)]: ids } }
+                where: { id: { [(Sequelize.Op.in as any)]: ids } },
+                include: option.include,
+                attributes: option.attributes
               })
               const result = []
               for (const id of ids) {
