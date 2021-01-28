@@ -3,7 +3,7 @@ import Sequelize from 'sequelize'
 import LruCacheManager from './cache/LruCacheManager'
 import Cache from './cache/Cache'
 
-export default ({
+export default {
   name: 'cache',
   defaultOptions: {
     prefix: 'SG'
@@ -13,7 +13,8 @@ export default ({
   applyToModel: function (model, options, models) {
     const self = this
     if (self.cacheManager == null) {
-      self.cacheManager = (options && (options as any).cacheManager) || new LruCacheManager()
+      self.cacheManager =
+        (options && (options as any).cacheManager) || new LruCacheManager()
     }
 
     const cache = new Cache({
@@ -28,7 +29,7 @@ export default ({
       clearCache: () => cache.clear()
     })
 
-    const cleanCache = async options => {
+    const cleanCache = async (options) => {
       let transaction = options.transaction
       if (transaction === undefined && (<any>Sequelize)._cls) {
         // TODO Check if Sequelize update
@@ -62,19 +63,26 @@ export default ({
     })
     model.addHook('afterSave', 'cleanCache', async (instance, options) => {
       return cleanCache(options)
-    });
-    (<any>model).addHook('afterUpsert', 'cleanCache', async (instance, options) => {
+    })
+    ;(<any>model).addHook(
+      'afterUpsert',
+      'cleanCache',
+      async (instance, options) => {
+        return cleanCache(options)
+      }
+    )
+    model.addHook(
+      'afterBulkCreate',
+      'cleanCache',
+      async (instances, options) => {
+        return cleanCache(options)
+      }
+    )
+    model.addHook('afterBulkDestroy', 'cleanCache', async (options) => {
       return cleanCache(options)
     })
-    model.addHook('afterBulkCreate', 'cleanCache', async (instances, options) => {
-      return cleanCache(options)
-    })
-    model.addHook('afterBulkDestroy', 'cleanCache', async options => {
-      return cleanCache(options)
-    })
-    model.addHook('afterBulkUpdate', 'cleanCache', async options => {
+    model.addHook('afterBulkUpdate', 'cleanCache', async (options) => {
       return cleanCache(options)
     })
   }
-
-} as PluginOptions)
+} as PluginOptions

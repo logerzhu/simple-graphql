@@ -1,15 +1,21 @@
 import { ModelDefine, PluginOptions } from '../Definition'
 
-export default (models: Array<ModelDefine>, plugins: Array<PluginOptions>, defaultOptions: {
-    [id: string]: boolean | Object;
-}) => {
+export default (
+  models: Array<ModelDefine>,
+  plugins: Array<PluginOptions>,
+  defaultOptions: {
+    [id: string]: boolean | Object
+  }
+) => {
   const result: {
-        [key: string]: ModelDefine;
-    } = {}
+    [key: string]: ModelDefine
+  } = {}
 
-  plugins.forEach(plugin => {
+  plugins.forEach((plugin) => {
     for (const model of models) {
-      let options = ((model.sgSchema.config.options || {}).plugin || {})[plugin.name]
+      let options = ((model.sgSchema.config.options || {}).plugin || {})[
+        plugin.name
+      ]
       if (options === undefined) {
         options = defaultOptions[plugin.name]
       }
@@ -21,7 +27,7 @@ export default (models: Array<ModelDefine>, plugins: Array<PluginOptions>, defau
       }
     }
   })
-  models.forEach(model => {
+  models.forEach((model) => {
     result[model.name] = model
   })
   return result

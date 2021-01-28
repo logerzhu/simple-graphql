@@ -1,11 +1,11 @@
 import express from 'express'
-import graphqlHTTP from 'express-graphql'
+import {graphqlHTTP} from 'express-graphql'
 
 import schema from './schema'
 import sequelize from './sequelize'
 import initData from './data'
 
-async function startServer () {
+async function startServer() {
   await sequelize.sync({
     force: true,
     logging: console.log
@@ -15,7 +15,11 @@ async function startServer () {
   const app = express()
   app.use('/graphql', graphqlHTTP({
     schema: schema,
-    graphiql: true
+    graphiql: true,
+    customFormatErrorFn: (error) => {
+      console.error(error)
+      return error
+    }
   }))
 
   console.log('GraphQL Server is now running on http://localhost:4000/graphql')

@@ -1,22 +1,29 @@
 import _ from 'lodash'
-import { ColumnFieldOptions, ColumnFieldOptionsType, PluginOptions } from '../Definition'
+import {
+  ColumnFieldOptions,
+  ColumnFieldOptionsType,
+  PluginOptions
+} from '../Definition'
 import StringHelper from '../utils/StringHelper'
 
-export default ({
+export default {
   name: 'bulkAddMutation',
   defaultOptions: false,
   priority: 0,
   description: 'Gen `bulk add mutation` for Schema',
   applyToSchema: function (schema, options, schemas) {
     const name = 'bulkAdd' + StringHelper.toInitialUpperCase(schema.name)
-    const addedName = 'added' + StringHelper.toInitialUpperCase(schema.name) + 'Edges'
+    const addedName =
+      'added' + StringHelper.toInitialUpperCase(schema.name) + 'Edges'
 
     const inputFields = {}
     const isModelType = (fieldOptions: ColumnFieldOptions) => {
       if (typeof fieldOptions === 'string') {
-        return schemas.find(s => s.name === fieldOptions) != null
+        return schemas.find((s) => s.name === fieldOptions) != null
       } else if (typeof fieldOptions === 'object') {
-        return schemas.find(s => s.name === (fieldOptions as any).$type) != null
+        return (
+          schemas.find((s) => s.name === (fieldOptions as any).$type) != null
+        )
       }
       return false
     }
@@ -28,7 +35,11 @@ export default ({
       }
 
       if (value && (<ColumnFieldOptionsType>value).$type) {
-        if (!(<ColumnFieldOptionsType>value).hidden && (!(<ColumnFieldOptionsType>value).config || (<ColumnFieldOptionsType>value).config.initializable !== false)) {
+        if (
+          !(<ColumnFieldOptionsType>value).hidden &&
+          (!(<ColumnFieldOptionsType>value).config ||
+            (<ColumnFieldOptionsType>value).config.initializable !== false)
+        ) {
           inputFields[key] = value
         }
       } else {
@@ -51,9 +62,12 @@ export default ({
         outputFields: {
           [addedName]: [schema.name + 'Edge']
         },
-        mutateAndGetPayload: async function ({
-          values
-        }, context, info, sgContext) {
+        mutateAndGetPayload: async function (
+          { values },
+          context,
+          info,
+          sgContext
+        ) {
           const dbModel = sgContext.models[schema.name]
           const bulkDatas = []
 
@@ -80,7 +94,7 @@ export default ({
 
           const instances = await dbModel.bulkCreate(bulkDatas)
           return {
-            [addedName]: instances.map(instance => {
+            [addedName]: instances.map((instance) => {
               return {
                 node: instance,
                 cursor: (<any>instance).id
@@ -91,4 +105,4 @@ export default ({
       }
     })
   }
-} as PluginOptions)
+} as PluginOptions

@@ -1,6 +1,10 @@
 import Schema from '../definition/Schema'
 import Service from '../definition/Service'
-import { FieldTypeContext, MutationOptions, ResolverContext } from '../Definition'
+import {
+  FieldTypeContext,
+  MutationOptions,
+  ResolverContext
+} from '../Definition'
 import * as graphql from 'graphql'
 import _ from 'lodash'
 import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
@@ -8,22 +12,36 @@ import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConf
 import StringHelper from '../utils/StringHelper'
 import mutationWithClientMutationId from '../transformer/mutationWithClientMutationId'
 
-export default (schemas: Array<Schema>, services: Array<Service>, payloadFields: {
-    [key: string]: graphql.GraphQLFieldConfig<any, any>;
-}, context: ResolverContext & FieldTypeContext): {
-    [key: string]: graphql.GraphQLFieldConfig<any, any>;
+export default (
+  schemas: Array<Schema>,
+  services: Array<Service>,
+  payloadFields: {
+    [key: string]: graphql.GraphQLFieldConfig<any, any>
+  },
+  context: ResolverContext & FieldTypeContext
+): {
+  [key: string]: graphql.GraphQLFieldConfig<any, any>
 } => {
   const mutations: {
-        [key: string]: graphql.GraphQLFieldConfig<any, any>;
-    } = {}
+    [key: string]: graphql.GraphQLFieldConfig<any, any>
+  } = {}
 
   const addMutation = (name: string, options: MutationOptions) => {
     if (mutations[name]) {
       throw new Error(`Mutation ${name} already defined.`)
     }
 
-    const inputFields = toGraphQLInputFieldConfigMap(StringHelper.toInitialUpperCase(name), options.inputFields || {}, context)
-    const outputFields = toGraphQLFieldConfigMap(name, 'Payload', options.outputFields || {}, context)
+    const inputFields = toGraphQLInputFieldConfigMap(
+      StringHelper.toInitialUpperCase(name),
+      options.inputFields || {},
+      context
+    )
+    const outputFields = toGraphQLFieldConfigMap(
+      name,
+      'Payload',
+      options.outputFields || {},
+      context
+    )
     const payloadFields = _.get(options, 'mutation.payloadFields', [])
 
     mutations[name] = mutationWithClientMutationId({

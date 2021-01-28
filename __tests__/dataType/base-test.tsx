@@ -4,28 +4,38 @@ import SG from '../../src'
 import SGExecutor from '../SGExecutor'
 
 test('数据类型生成', async () => {
-  const executor = await SGExecutor.new({
-    dataTypes: [{
-      name: 'DummyData1',
-      $type: {
-        name: 'String',
-        data: 'DummyData2'
-      }
-    }, {
-      name: 'DummyData2',
-      $type: [{
-        length: 'Number'
-      }]
-    }],
-    schemas: [SG.schema('Dummy', {
-      plugin: {
-        addMutation: true
-      }
-    }).fields({
-      name: 'String',
-      data: 'DummyData1'
-    })]
-  }, {})
+  const executor = await SGExecutor.new(
+    {
+      dataTypes: [
+        {
+          name: 'DummyData1',
+          $type: {
+            name: 'String',
+            data: 'DummyData2'
+          }
+        },
+        {
+          name: 'DummyData2',
+          $type: [
+            {
+              length: 'Number'
+            }
+          ]
+        }
+      ],
+      schemas: [
+        SG.schema('Dummy', {
+          plugin: {
+            addMutation: true
+          }
+        }).fields({
+          name: 'String',
+          data: 'DummyData1'
+        })
+      ]
+    },
+    {}
+  )
 
   const values = {
     name: 'Hello',
@@ -35,7 +45,8 @@ test('数据类型生成', async () => {
     }
   }
 
-  const addResult = await executor.exec(`
+  const addResult = await executor.exec(
+    `
   mutation($input:AddDummyInput!){
     addDummy(input:$input){
       clientMutationId
@@ -47,12 +58,14 @@ test('数据类型生成', async () => {
       }
     }
   }
-  `, {
-    input: {
-      clientMutationId: 'XX',
-      ...values
+  `,
+    {
+      input: {
+        clientMutationId: 'XX',
+        ...values
+      }
     }
-  })
+  )
   expect(addResult.errors).toBeUndefined()
   expect(addResult.data.addDummy.addedDummyEdge.node).toEqual(values)
 })

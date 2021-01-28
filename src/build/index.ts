@@ -1,7 +1,13 @@
 import { Sequelize } from 'sequelize'
 import _ from 'lodash'
 
-import { GraphQLFieldConfig, GraphQLNonNull, GraphQLObjectType, GraphQLSchema, GraphQLSchemaConfig } from 'graphql'
+import {
+  GraphQLFieldConfig,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLSchema,
+  GraphQLSchemaConfig
+} from 'graphql'
 
 import Schema from '../definition/Schema'
 import Service from '../definition/Service'
@@ -29,53 +35,77 @@ import buildServices from './buildServices'
 import buildRootQueries from './buildRootQueries'
 import buildRootMutations from './buildRootMutations'
 
-export default function (sequelize: Sequelize, config: {
-    dataTypes?: Array<DataTypeOptions>;
-    fieldTypes?: Array<FieldType>;
-    schemas?: Array<Schema>;
-    services?: Array<Service>;
-    hooks?: Array<HookOptions>;
-    plugins?: Array<PluginOptions>;
-}, buildOptions: BuildOptions): { graphQLSchema: GraphQLSchema; sgContext: SGContext; } {
+export default function (
+  sequelize: Sequelize,
+  config: {
+    dataTypes?: Array<DataTypeOptions>
+    fieldTypes?: Array<FieldType>
+    schemas?: Array<Schema>
+    services?: Array<Service>
+    hooks?: Array<HookOptions>
+    plugins?: Array<PluginOptions>
+  },
+  buildOptions: BuildOptions
+): { graphQLSchema: GraphQLSchema; sgContext: SGContext } {
   const plugins = buildPlugins(config.plugins || [])
   const sgContext: SGContext = {
     sequelize: sequelize,
-    schemas: applyPluginsToSchemas(config.schemas || [], plugins, buildOptions.plugin || {}),
+    schemas: applyPluginsToSchemas(
+      config.schemas || [],
+      plugins,
+      buildOptions.plugin || {}
+    ),
     models: {},
     services: {},
-    fieldType: typeName => null
+    fieldType: (typeName) => null
   }
 
   const resolveContext = buildResolverContext(config.hooks || [], sgContext)
   const interfaceContext = buildInterfaceContext(sgContext)
 
   const context: ResolverContext & InterfaceContext & FieldTypeContext = {
-    hookFieldResolve: (name, options) => resolveContext.hookFieldResolve(name, options),
-    hookQueryResolve: (name, options) => resolveContext.hookQueryResolve(name, options),
-    hookMutationResolve: (name, options) => resolveContext.hookMutationResolve(name, options),
+    hookFieldResolve: (name, options) =>
+      resolveContext.hookFieldResolve(name, options),
+    hookQueryResolve: (name, options) =>
+      resolveContext.hookQueryResolve(name, options),
+    hookMutationResolve: (name, options) =>
+      resolveContext.hookMutationResolve(name, options),
 
-    interface: str => {
+    interface: (str) => {
       return interfaceContext.interface(str)
     },
     registerInterface: (name, gInterface) => {
       return interfaceContext.registerInterface(name, gInterface)
     },
 
-    fieldType: typeName => null
+    fieldType: (typeName) => null
   }
 
-  const fieldTypeContext = buildFieldTypeContext(config.fieldTypes || [], config.dataTypes || [], config.schemas || [], context)
-  context.fieldType = typeName => fieldTypeContext.fieldType(typeName)
+  const fieldTypeContext = buildFieldTypeContext(
+    config.fieldTypes || [],
+    config.dataTypes || [],
+    config.schemas || [],
+    context
+  )
+  context.fieldType = (typeName) => fieldTypeContext.fieldType(typeName)
 
-  sgContext.fieldType = typeName => fieldTypeContext.fieldType(typeName)
-  sgContext.models = applyPluginsToModels(buildSequelizeModels(sequelize, config.schemas || [], sgContext), plugins, buildOptions.plugin || {})
+  sgContext.fieldType = (typeName) => fieldTypeContext.fieldType(typeName)
+  sgContext.models = applyPluginsToModels(
+    buildSequelizeModels(sequelize, config.schemas || [], sgContext),
+    plugins,
+    buildOptions.plugin || {}
+  )
 
   sgContext.services = buildServices(config.services || [], sgContext)
 
-  const rootQueries = buildRootQueries(config.schemas || [], config.services || [], context)
+  const rootQueries = buildRootQueries(
+    config.schemas || [],
+    config.services || [],
+    context
+  )
   const payloadFields: {
-        [key: string]: GraphQLFieldConfig<any, any>;
-    } = {}
+    [key: string]: GraphQLFieldConfig<any, any>
+  } = {}
   const rootQueryObject = new GraphQLObjectType({
     name: 'RootQuery',
     fields: () => rootQueries
@@ -83,7 +113,8 @@ export default function (sequelize: Sequelize, config: {
   const schemaConfig: GraphQLSchemaConfig = { query: rootQueryObject }
   if (_.keys(rootQueries).length > 0) {
     payloadFields.relay = {
-      description: 'Hack to workaround https://github.com/facebook/relay/issues/112 re-exposing the root query object',
+      description:
+        'Hack to workaround https://github.com/facebook/relay/issues/112 re-exposing the root query object',
       type: new GraphQLNonNull(rootQueryObject),
       resolve: () => {
         return {}
@@ -91,7 +122,12 @@ export default function (sequelize: Sequelize, config: {
     }
   }
 
-  const rootMutations = buildRootMutations(config.schemas || [], config.services || [], payloadFields, context)
+  const rootMutations = buildRootMutations(
+    config.schemas || [],
+    config.services || [],
+    payloadFields,
+    context
+  )
   if (_.keys(rootMutations).length > 0) {
     schemaConfig.mutation = new GraphQLObjectType({
       name: 'RootMutation',

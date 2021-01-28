@@ -3,30 +3,49 @@ import _ from 'lodash'
 import * as relay from 'graphql-relay'
 import Schema from '../definition/Schema'
 import Service from '../definition/Service'
-import { FieldTypeContext, InterfaceContext, QueryOptions, ResolverContext } from '../Definition'
+import {
+  FieldTypeContext,
+  InterfaceContext,
+  QueryOptions,
+  ResolverContext
+} from '../Definition'
 import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
 import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConfigMap'
 import StringHelper from '../utils/StringHelper'
 
-export default (schemas: Array<Schema>, services: Array<Service>, context: ResolverContext & FieldTypeContext & InterfaceContext): {
-    [key: string]: graphql.GraphQLFieldConfig<any, any>;
+export default (
+  schemas: Array<Schema>,
+  services: Array<Service>,
+  context: ResolverContext & FieldTypeContext & InterfaceContext
+): {
+  [key: string]: graphql.GraphQLFieldConfig<any, any>
 } => {
   const queries: {
-        [key: string]: graphql.GraphQLFieldConfig<any, any>;
-    } = {}
+    [key: string]: graphql.GraphQLFieldConfig<any, any>
+  } = {}
   const addQuery = (name: string, options: QueryOptions) => {
     if (queries[name]) {
       throw new Error(`Query ${name} already defined.`)
     }
-    const fieldConfig = toGraphQLFieldConfigMap(name, 'Payload', { '': options.$type }, context)['']
+    const fieldConfig = toGraphQLFieldConfigMap(
+      name,
+      'Payload',
+      { '': options.$type },
+      context
+    )['']
     const finalOptions = { ...options }
     const fieldResolve = fieldConfig.resolve
     if (fieldResolve) {
       const resolve = finalOptions.resolve
       finalOptions.resolve = async function (args, context, info, sgContext) {
-        return fieldResolve({
-          [info.fieldName]: await resolve(args, context, info, sgContext)
-        }, args, context, info)
+        return fieldResolve(
+          {
+            [info.fieldName]: await resolve(args, context, info, sgContext)
+          },
+          args,
+          context,
+          info
+        )
       }
     }
     queries[name] = {
@@ -37,9 +56,13 @@ export default (schemas: Array<Schema>, services: Array<Service>, context: Resol
     if (options.args || fieldConfig.args) {
       queries[name].args = {
         ...fieldConfig.args,
-        ...toGraphQLInputFieldConfigMap(StringHelper.toInitialUpperCase(name), {
-          ...options.args
-        }, context)
+        ...toGraphQLInputFieldConfigMap(
+          StringHelper.toInitialUpperCase(name),
+          {
+            ...options.args
+          },
+          context
+        )
       }
     }
   }
@@ -57,13 +80,15 @@ export default (schemas: Array<Schema>, services: Array<Service>, context: Resol
 
   queries.viewer = {
     description: 'Default Viewer implement to include all queries.',
-    type: new graphql.GraphQLNonNull(new graphql.GraphQLObjectType({
-      name: 'Viewer',
-      fields: {
-        id: { type: new graphql.GraphQLNonNull(graphql.GraphQLID) },
-        ...queries
-      }
-    })),
+    type: new graphql.GraphQLNonNull(
+      new graphql.GraphQLObjectType({
+        name: 'Viewer',
+        fields: {
+          id: { type: new graphql.GraphQLNonNull(graphql.GraphQLID) },
+          ...queries
+        }
+      })
+    ),
     resolve: () => {
       return {
         _fieldType: 'Viewer',
@@ -88,7 +113,12 @@ export default (schemas: Array<Schema>, services: Array<Service>, context: Resol
         if (!sgContext.models[id.type]) return null
 
         const dbModel = sgContext.models[id.type]
-        const record = await dbModel.findByPkForGraphQL(id.id, {}, context, info)
+        const record = await dbModel.findByPkForGraphQL(
+          id.id,
+          {},
+          context,
+          info
+        )
         return record
       }
     })

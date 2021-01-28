@@ -1,21 +1,27 @@
 import * as _ from 'lodash'
 
 import StringHelper from '../utils/StringHelper'
-import { ColumnFieldOptions, ColumnFieldOptionsType, PluginOptions } from '../Definition'
+import {
+  ColumnFieldOptions,
+  ColumnFieldOptionsType,
+  PluginOptions
+} from '../Definition'
 
-export default ({
+export default {
   name: 'singularQuery',
   defaultOptions: false,
   priority: 0,
   description: 'Gen `singular query` for Schema',
-  applyToSchema: function singularQuery (schema, options, schemas): void {
+  applyToSchema: function singularQuery(schema, options, schemas): void {
     const name = StringHelper.toInitialLowerCase(schema.name)
 
     const isModelType = (fieldOptions: ColumnFieldOptions) => {
       if (typeof fieldOptions === 'string') {
-        return schemas.find(s => s.name === fieldOptions) != null
+        return schemas.find((s) => s.name === fieldOptions) != null
       } else if (typeof fieldOptions === 'object') {
-        return schemas.find(s => s.name === (fieldOptions as any).$type) != null
+        return (
+          schemas.find((s) => s.name === (fieldOptions as any).$type) != null
+        )
       }
       return false
     }
@@ -27,13 +33,22 @@ export default ({
       }
     }
     _.forOwn(schema.config.fields, (value, key) => {
-      if ((<ColumnFieldOptionsType>value).$type && ((<ColumnFieldOptionsType>value).columnOptions && (<ColumnFieldOptionsType>value).columnOptions.unique) && (<ColumnFieldOptionsType>value).hidden !== true) {
+      if (
+        (<ColumnFieldOptionsType>value).$type &&
+        (<ColumnFieldOptionsType>value).columnOptions &&
+        (<ColumnFieldOptionsType>value).columnOptions.unique &&
+        (<ColumnFieldOptionsType>value).hidden !== true
+      ) {
         if (isModelType(value)) {
           if (!key.endsWith('Id')) {
             key = key + 'Id'
           }
         }
-        searchFields[key] = { ...(<ColumnFieldOptionsType>value), required: false, default: null }
+        searchFields[key] = {
+          ...(<ColumnFieldOptionsType>value),
+          required: false,
+          default: null
+        }
       }
     })
 
@@ -51,13 +66,17 @@ export default ({
           if (args === null || Object.keys(args).length === 0) {
             return null
           }
-          return sgContext.models[schema.name].findOneForGraphQL({
-            where: {
-              ...args
-            }
-          }, context, info)
+          return sgContext.models[schema.name].findOneForGraphQL(
+            {
+              where: {
+                ...args
+              }
+            },
+            context,
+            info
+          )
         }
       }
     })
   }
-} as PluginOptions)
+} as PluginOptions

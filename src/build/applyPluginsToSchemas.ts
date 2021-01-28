@@ -1,14 +1,18 @@
 import Schema from '../definition/Schema'
 import { PluginOptions } from '../Definition'
 
-export default (schemas: Array<Schema>, plugins: Array<PluginOptions>, defaultOptions: {
-    [id: string]: boolean | Object;
-}) => {
+export default (
+  schemas: Array<Schema>,
+  plugins: Array<PluginOptions>,
+  defaultOptions: {
+    [id: string]: boolean | Object
+  }
+) => {
   const result: {
-        [key: string]: Schema;
-    } = {}
+    [key: string]: Schema
+  } = {}
 
-  plugins.forEach(plugin => {
+  plugins.forEach((plugin) => {
     for (const schema of schemas) {
       let options = ((schema.config.options || {}).plugin || {})[plugin.name]
       if (options === undefined) {
@@ -22,7 +26,7 @@ export default (schemas: Array<Schema>, plugins: Array<PluginOptions>, defaultOp
       }
     }
   })
-  schemas.forEach(schema => {
+  schemas.forEach((schema) => {
     result[schema.name] = schema
   })
   return result

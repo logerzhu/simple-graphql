@@ -18,14 +18,28 @@ import {
   InputFieldOptionsType
 } from '../Definition'
 
-const toGraphQLInputFieldConfigMap = function (name: string, fields: {
-  [id: string]: InputFieldOptions;
-}, context: FieldTypeContext): GraphQLInputFieldConfigMap {
+const toGraphQLInputFieldConfigMap = function (
+  name: string,
+  fields: {
+    [id: string]: InputFieldOptions
+  },
+  context: FieldTypeContext
+): GraphQLInputFieldConfigMap {
   const toTypeName = (name: string, path: string) => {
-    return name + path.replace(/\.\$type/g, '').replace(/\[\d*\]/g, '').split('.').map(v => StringHelper.toInitialUpperCase(v)).join('')
+    return (
+      name +
+      path
+        .replace(/\.\$type/g, '')
+        .replace(/\[\d*\]/g, '')
+        .split('.')
+        .map((v) => StringHelper.toInitialUpperCase(v))
+        .join('')
+    )
   }
 
-  const inputFieldConfig = (typeName): GraphQLInputFieldConfig | null | undefined => {
+  const inputFieldConfig = (
+    typeName
+  ): GraphQLInputFieldConfig | null | undefined => {
     const fieldType = context.fieldType(typeName)
     if (!fieldType) {
       throw new Error(`Type "${typeName}" has not register.`)
@@ -37,15 +51,22 @@ const toGraphQLInputFieldConfigMap = function (name: string, fields: {
     }
   }
 
-  const convert = (name: string, path: string, field: any): GraphQLInputFieldConfig | null | undefined => {
+  const convert = (
+    name: string,
+    path: string,
+    field: any
+  ): GraphQLInputFieldConfig | null | undefined => {
     if (typeof field === 'string' || typeof field === 'function') {
       return inputFieldConfig(field)
     }
     if (field instanceof Set) {
       return {
         type: new GraphQLEnumType({
-          name: StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
-          values: _.fromPairs([...field].map(f => [f, { value: f, description: f }]))
+          name:
+            StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
+          values: _.fromPairs(
+            [...field].map((f) => [f, { value: f, description: f }])
+          )
         })
       }
     } else if (_.isArray(field)) {
@@ -68,7 +89,10 @@ const toGraphQLInputFieldConfigMap = function (name: string, fields: {
           result.description = field.description
           if (field.default != null && !_.isFunction(field.default)) {
             result.defaultValue = field.default
-            result.description = (result.description ? result.description : '') + ' 默认值:' + result.defaultValue
+            result.description =
+              (result.description ? result.description : '') +
+              ' 默认值:' +
+              result.defaultValue
           }
           if (field.required) {
             if (!(result.type instanceof GraphQLNonNull)) {
@@ -81,8 +105,15 @@ const toGraphQLInputFieldConfigMap = function (name: string, fields: {
         if (_.keys(field).length > 0) {
           return {
             type: new GraphQLInputObjectType({
-              name: StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
-              fields: () => toGraphQLInputFieldConfigMap(toTypeName(name, path), field, context)
+              name:
+                StringHelper.toInitialUpperCase(toTypeName(name, path)) +
+                'Input',
+              fields: () =>
+                toGraphQLInputFieldConfigMap(
+                  toTypeName(name, path),
+                  field,
+                  context
+                )
             })
           }
         }
@@ -94,7 +125,12 @@ const toGraphQLInputFieldConfigMap = function (name: string, fields: {
   const fieldMap: GraphQLInputFieldConfigMap = {}
 
   _.forOwn(fields, (value, key) => {
-    if ((<InputFieldOptionsType>value).$type && ((<ColumnFieldOptionsType>value).hidden || (<FieldOptionsType>value).resolve)) { // Hidden field, ignore
+    if (
+      (<InputFieldOptionsType>value).$type &&
+      ((<ColumnFieldOptionsType>value).hidden ||
+        (<FieldOptionsType>value).resolve)
+    ) {
+      // Hidden field, ignore
       // Have resolve method, ignore
     } else {
       const inputFieldConfig = convert(name, key, value)

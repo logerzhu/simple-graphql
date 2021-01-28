@@ -1,10 +1,23 @@
-import Sequelize, { Model, ModelAttributeColumnOptions, ModelCtor } from 'sequelize'
+import Sequelize, {
+  Model,
+  ModelAttributeColumnOptions,
+  ModelCtor
+} from 'sequelize'
 import Schema from '../definition/Schema'
-import { ColumnFieldOptionsType, FieldTypeContext, ModelDefine, SGContext } from '../Definition'
+import {
+  ColumnFieldOptionsType,
+  FieldTypeContext,
+  ModelDefine,
+  SGContext
+} from '../Definition'
 import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
 
-function toSequelizeModel (sequelize: Sequelize.Sequelize, schema: Schema, context: FieldTypeContext): ModelCtor<Model> {
+function toSequelizeModel(
+  sequelize: Sequelize.Sequelize,
+  schema: Schema,
+  context: FieldTypeContext
+): ModelCtor<Model> {
   const dbDefinition = {}
 
   const versionConfig = (schema.config.options.tableOptions || {}).version
@@ -37,7 +50,10 @@ function toSequelizeModel (sequelize: Sequelize.Sequelize, schema: Schema, conte
       if (!fieldType.columnOptions) {
         throw new Error(`Column type of "${typeName}" is not supported.`)
       }
-      columnOptions = typeof fieldType.columnOptions === 'function' ? fieldType.columnOptions(schema, key, value) : fieldType.columnOptions
+      columnOptions =
+        typeof fieldType.columnOptions === 'function'
+          ? fieldType.columnOptions(schema, key, value)
+          : fieldType.columnOptions
     } else {
       columnOptions = {
         type: Sequelize.JSON
@@ -47,12 +63,18 @@ function toSequelizeModel (sequelize: Sequelize.Sequelize, schema: Schema, conte
       dbDefinition[key] = { ...columnOptions }
       if (value && (<ColumnFieldOptionsType>value).$type) {
         if ((<ColumnFieldOptionsType>value).required != null) {
-          dbDefinition[key].allowNull = !(<ColumnFieldOptionsType>value).required
+          dbDefinition[key].allowNull = !(<ColumnFieldOptionsType>value)
+            .required
         }
         if ((<ColumnFieldOptionsType>value).default != null) {
-          dbDefinition[key].defaultValue = (<ColumnFieldOptionsType>value).default
+          dbDefinition[key].defaultValue = (<ColumnFieldOptionsType>(
+            value
+          )).default
         }
-        dbDefinition[key] = { ...dbDefinition[key], ...((<ColumnFieldOptionsType>value).columnOptions || {}) }
+        dbDefinition[key] = {
+          ...dbDefinition[key],
+          ...((<ColumnFieldOptionsType>value).columnOptions || {})
+        }
       }
       // TODO underscored support
       // if ((sequelize.options.define || {}).underscored && dbDefinition[key].field == null) {
@@ -60,13 +82,20 @@ function toSequelizeModel (sequelize: Sequelize.Sequelize, schema: Schema, conte
       // }
     }
   })
-  sequelize.define(schema.name, dbDefinition, schema.config.options.tableOptions)
+  sequelize.define(
+    schema.name,
+    dbDefinition,
+    schema.config.options.tableOptions
+  )
   return sequelize.model(schema.name)
 }
 
-function buildModelAssociations (schemas: Array<Schema>, models: {
-    [id: string]: ModelDefine;
-}) {
+function buildModelAssociations(
+  schemas: Array<Schema>,
+  models: {
+    [id: string]: ModelDefine
+  }
+) {
   for (const schema of schemas) {
     _.forOwn(schema.config.associations.hasMany, (config, key) => {
       models[schema.name].hasMany(models[config.target], {
@@ -105,15 +134,23 @@ function buildModelAssociations (schemas: Array<Schema>, models: {
   }
 }
 
-export default (sequelize: Sequelize.Sequelize, schemas: Array<Schema>, context: SGContext): Array<ModelDefine> => {
+export default (
+  sequelize: Sequelize.Sequelize,
+  schemas: Array<Schema>,
+  context: SGContext
+): Array<ModelDefine> => {
   const result: {
-        [id: string]: ModelDefine;
-    } = {}
+    [id: string]: ModelDefine
+  } = {}
   for (const schema of schemas) {
     if (result[schema.name]) {
       throw new Error(`Schema ${schema.name} already define.`)
     }
-    const model: any = toSequelizeModel(schema.sequelize || sequelize, schema, context)
+    const model: any = toSequelizeModel(
+      schema.sequelize || sequelize,
+      schema,
+      context
+    )
     Object.assign(model, {
       sgSchema: schema,
       ...staticsMethods,

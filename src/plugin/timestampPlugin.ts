@@ -1,6 +1,6 @@
 import { PluginOptions } from '../Definition'
 
-export default ({
+export default {
   name: 'timestamp',
   defaultOptions: true,
   priority: 100,
@@ -25,7 +25,11 @@ export default ({
       }
     })
 
-    if (schema.config.options && schema.config.options.tableOptions && schema.config.options.tableOptions.paranoid) {
+    if (
+      schema.config.options &&
+      schema.config.options.tableOptions &&
+      schema.config.options.tableOptions.paranoid
+    ) {
       schema.fields({
         deletedAt: {
           $type: 'Date',
@@ -37,4 +41,4 @@ export default ({
       })
     }
   }
-} as PluginOptions)
+} as PluginOptions

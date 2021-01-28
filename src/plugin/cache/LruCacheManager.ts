@@ -1,5 +1,5 @@
-import {CacheManager} from "../../Definition";
-import {LRUMap} from "lru_map";
+import { CacheManager } from '../../Definition'
+import { LRUMap } from 'lru_map'
 
 export default class LruCacheManager implements CacheManager {
   cacheMap: LRUMap<string, any>
@@ -10,14 +10,16 @@ export default class LruCacheManager implements CacheManager {
 
   async get(key) {
     return this.cacheMap.get(key)
-  };
+  }
 
   async set(key, value, expire) {
     this.cacheMap.set(key, value)
   }
 
   async del(pattern) {
-    const regExp = new RegExp(pattern.replace(/\./g, "\.").replace(/\*/g, ".*").replace(/\?/g, "."))
+    const regExp = new RegExp(
+      pattern.replace(/\./g, '.').replace(/\*/g, '.*').replace(/\?/g, '.')
+    )
     let count = 0
     for (let [key, value] of this.cacheMap) {
       if (regExp.test(key)) {

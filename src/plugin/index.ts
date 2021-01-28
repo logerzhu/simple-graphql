@@ -12,4 +12,18 @@ import timestampPlugin from './timestampPlugin'
 import updateMutationPlugin from './updateMutationPlugin'
 import versionPlugin from './versionPlugin'
 
-export default [addMutationPlugin, bulkAddMutationPlugin, bulkUpdateMutationPlugin, cachePlugin, deleteMutationPlugin, genHasManyLinkPlugin, genHasOneLinkPlugin, pluralQueryPlugin, saveMutationPlugin, singularQueryPlugin, timestampPlugin, updateMutationPlugin, versionPlugin]
+export default [
+  addMutationPlugin,
+  bulkAddMutationPlugin,
+  bulkUpdateMutationPlugin,
+  cachePlugin,
+  deleteMutationPlugin,
+  genHasManyLinkPlugin,
+  genHasOneLinkPlugin,
+  pluralQueryPlugin,
+  saveMutationPlugin,
+  singularQueryPlugin,
+  timestampPlugin,
+  updateMutationPlugin,
+  versionPlugin
+]

@@ -1,8 +1,12 @@
 import _ from 'lodash'
-import { ColumnFieldOptions, ColumnFieldOptionsType, PluginOptions } from '../Definition'
+import {
+  ColumnFieldOptions,
+  ColumnFieldOptionsType,
+  PluginOptions
+} from '../Definition'
 import StringHelper from '../utils/StringHelper'
 
-export default ({
+export default {
   name: 'saveMutation',
   defaultOptions: false,
   priority: 0,
@@ -14,9 +18,11 @@ export default ({
     const inputFields = {}
     const isModelType = (fieldOptions: ColumnFieldOptions) => {
       if (typeof fieldOptions === 'string') {
-        return schemas.find(s => s.name === fieldOptions) != null
+        return schemas.find((s) => s.name === fieldOptions) != null
       } else if (typeof fieldOptions === 'object') {
-        return schemas.find(s => s.name === (fieldOptions as any).$type) != null
+        return (
+          schemas.find((s) => s.name === (fieldOptions as any).$type) != null
+        )
       }
       return false
     }
@@ -29,7 +35,10 @@ export default ({
 
       if (value && (<ColumnFieldOptionsType>value).$type) {
         if (!(<ColumnFieldOptionsType>value).hidden) {
-          inputFields[key] = { ...(<ColumnFieldOptionsType>value), resolve: null }
+          inputFields[key] = {
+            ...(<ColumnFieldOptionsType>value),
+            resolve: null
+          }
         }
       } else {
         inputFields[key] = value
@@ -75,4 +84,4 @@ export default ({
       }
     })
   }
-} as PluginOptions)
+} as PluginOptions

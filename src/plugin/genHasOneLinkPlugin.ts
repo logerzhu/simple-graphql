@@ -1,12 +1,12 @@
 import _ from 'lodash'
 import { PluginOptions } from '../Definition'
 
-export default ({
+export default {
   name: 'genHasOneLink',
   defaultOptions: true,
   priority: 99,
   description: 'Gen `HasOneLink` for Schema',
-  applyToSchema: function hasOneFieldsConfig (schema, options, schemas): void {
+  applyToSchema: function hasOneFieldsConfig(schema, options, schemas): void {
     _.forOwn(schema.config.associations.hasOne, (config, key) => {
       if (config.hidden) {
         return
@@ -22,16 +22,21 @@ export default ({
               return root[key]
             } else {
               const dbModel = sgContext.models[config.target]
-              return dbModel.findOneForGraphQL({
-                where: {
-                  ...{ ...(config.scope || {}) },
-                  [(<string>config.foreignKey) || config.foreignField + 'Id']: root.id
-                }
-              }, context, info)
+              return dbModel.findOneForGraphQL(
+                {
+                  where: {
+                    ...{ ...(config.scope || {}) },
+                    [<string>config.foreignKey ||
+                    config.foreignField + 'Id']: root.id
+                  }
+                },
+                context,
+                info
+              )
             }
           }
         }
       })
     })
   }
-} as PluginOptions)
+} as PluginOptions

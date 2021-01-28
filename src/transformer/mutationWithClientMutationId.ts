@@ -1,11 +1,17 @@
-import { GraphQLFieldConfig, GraphQLInputObjectType, GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql'
+import {
+  GraphQLFieldConfig,
+  GraphQLInputObjectType,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLString
+} from 'graphql'
 
-export default function mutationWithClientMutationId (config: {
-    name: string;
-    description: string | null | undefined;
-    inputFields: any;
-    outputFields: any;
-    mutateAndGetPayload: any;
+export default function mutationWithClientMutationId(config: {
+  name: string
+  description: string | null | undefined
+  inputFields: any
+  outputFields: any
+  mutateAndGetPayload: any
 }): GraphQLFieldConfig<any, any> {
   const {
     name,
@@ -42,12 +48,14 @@ export default function mutationWithClientMutationId (config: {
     args: {
       input: { type: new GraphQLNonNull(inputType) }
     },
-    resolve: function resolve (_: any, _ref: any, context: any, info: any) {
+    resolve: function resolve(_: any, _ref: any, context: any, info: any) {
       const input = _ref.input
-      return Promise.resolve(mutateAndGetPayload(_, input, context, info)).then(function (payload) {
-        payload.clientMutationId = input.clientMutationId
-        return payload
-      })
+      return Promise.resolve(mutateAndGetPayload(_, input, context, info)).then(
+        function (payload) {
+          payload.clientMutationId = input.clientMutationId
+          return payload
+        }
+      )
     }
   }
 }

@@ -1,5 +1,5 @@
 import { Dialect, Sequelize } from 'sequelize'
-import cls from 'continuation-local-storage'
+import cls from 'cls-hooked'
 
 const dbCfg = {
   schema: 'test',

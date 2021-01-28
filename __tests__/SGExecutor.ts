@@ -1,12 +1,19 @@
 import { graphql, GraphQLSchema } from 'graphql'
-import { BuildOptions, DataTypeOptions, FieldType, HookOptions, PluginOptions, SGContext } from '../src/Definition'
+import {
+  BuildOptions,
+  DataTypeOptions,
+  FieldType,
+  HookOptions,
+  PluginOptions,
+  SGContext
+} from '../src/Definition'
 import SG, { Schema, Service } from '../src'
-import cls from 'continuation-local-storage'
+import cls from 'cls-hooked'
 import Sequelize from 'sequelize'
 
-const namespace = cls.createNamespace('db-transaction-nsp');
+const namespace = cls.createNamespace('db-transaction-nsp')
 
-(Sequelize as any).useCLS(namespace)
+;(Sequelize as any).useCLS(namespace)
 
 const getDbConfig = () => {
   return {
@@ -23,40 +30,44 @@ const getDbConfig = () => {
       },
       // SQLite only
       storage: ':memory:',
-      logging: (s: string) => {
-      }
+      logging: (s: string) => {}
     }
   }
 }
 
 const sequelizeInstance = function (dbConfig) {
-  return new Sequelize.Sequelize(dbConfig.schema, dbConfig.user, dbConfig.password, dbConfig.options)
+  return new Sequelize.Sequelize(
+    dbConfig.schema,
+    dbConfig.user,
+    dbConfig.password,
+    dbConfig.options
+  )
 }
 
 class SGExecutor {
-    static new: (config: {
-        dataTypes?: Array<DataTypeOptions>;
-        fieldTypes?: Array<FieldType>;
-        schemas?: Array<Schema>;
-        services?: Array<Service>;
-        hooks?: Array<HookOptions>;
-        plugins?: Array<PluginOptions>;
-    }, buildOptions: BuildOptions) => Promise<SGExecutor>;
+  static new: (
+    config: {
+      dataTypes?: Array<DataTypeOptions>
+      fieldTypes?: Array<FieldType>
+      schemas?: Array<Schema>
+      services?: Array<Service>
+      hooks?: Array<HookOptions>
+      plugins?: Array<PluginOptions>
+    },
+    buildOptions: BuildOptions
+  ) => Promise<SGExecutor>
 
-    graphQLSchema: GraphQLSchema;
-    sgContext: SGContext;
+  graphQLSchema: GraphQLSchema
+  sgContext: SGContext
 
-    constructor (options: {
-        graphQLSchema: GraphQLSchema;
-        sgContext: SGContext;
-    }) {
-      this.graphQLSchema = options.graphQLSchema
-      this.sgContext = options.sgContext
-    }
+  constructor(options: { graphQLSchema: GraphQLSchema; sgContext: SGContext }) {
+    this.graphQLSchema = options.graphQLSchema
+    this.sgContext = options.sgContext
+  }
 
-    async exec (query: string, variables: any = {}) {
-      return graphql(this.graphQLSchema, query, {}, {}, variables)
-    }
+  async exec(query: string, variables: any = {}) {
+    return graphql(this.graphQLSchema, query, {}, {}, variables)
+  }
 }
 
 SGExecutor.new = async function (config, buildOptions) {

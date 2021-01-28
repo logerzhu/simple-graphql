@@ -1,9 +1,9 @@
-import {CacheManager, ModelDefine, SGModel} from "../../Definition";
-import Sequelize, {CountOptions, FindOptions} from "sequelize";
-import getFindOptionsKey from "./getFindOptionsKey";
-import getIncludeModeNames from './getIncludeModeNames';
-import dataToInstance from "./dataToInstance";
-import instanceToData from "./instanceToData";
+import { CacheManager, ModelDefine, SGModel } from '../../Definition'
+import Sequelize, { CountOptions, FindOptions } from 'sequelize'
+import getFindOptionsKey from './getFindOptionsKey'
+import getIncludeModeNames from './getIncludeModeNames'
+import dataToInstance from './dataToInstance'
+import instanceToData from './instanceToData'
 
 export default class Cache<M extends SGModel> {
   prefix: string
@@ -14,7 +14,7 @@ export default class Cache<M extends SGModel> {
   constructor(options: {
     prefix: string
     cacheManger: CacheManager
-    model: ModelDefine,
+    model: ModelDefine
     expire?: number
   }) {
     this.prefix = options.prefix
@@ -24,14 +24,16 @@ export default class Cache<M extends SGModel> {
   }
 
   buildCacheKey(method: string, options?: FindOptions | CountOptions) {
-    options = options || {};
+    options = options || {}
     const self = this
     const relateModelNames = [self.model.name, ...getIncludeModeNames(options)]
-    return `${self.prefix}|${method}|${relateModelNames.join("|")}|${getFindOptionsKey(self.model, options)}`
+    return `${self.prefix}|${method}|${relateModelNames.join(
+      '|'
+    )}|${getFindOptionsKey(self.model, options)}`
   }
 
   async isCacheValid(options?: FindOptions | CountOptions) {
-    options = options || {};
+    options = options || {}
     // 如果当前Transaction中, 关联实体的数据有改动, disable cache
     const self = this
     let transaction = options.transaction
@@ -39,8 +41,15 @@ export default class Cache<M extends SGModel> {
       transaction = (<any>Sequelize)._cls.get('transaction')
     }
     if (transaction && (transaction as any).clearCaches) {
-      const relateModelNames = [self.model.name, ...getIncludeModeNames(options)]
-      return (transaction as any).clearCaches.find(cache => relateModelNames.indexOf(cache.model.name) !== -1) == null
+      const relateModelNames = [
+        self.model.name,
+        ...getIncludeModeNames(options)
+      ]
+      return (
+        (transaction as any).clearCaches.find(
+          (cache) => relateModelNames.indexOf(cache.model.name) !== -1
+        ) == null
+      )
     }
     return true
   }
@@ -55,14 +64,20 @@ export default class Cache<M extends SGModel> {
 
     const cacheValue = await self.cacheManger.get(cacheKey)
     if (cacheValue !== undefined) {
-      return cacheValue.map(value => dataToInstance(value, self.model, options ? options.include : []))
+      return cacheValue.map((value) =>
+        dataToInstance(value, self.model, options?.include || [])
+      )
     } else {
-      const lockKey = cacheKey + "$LOCK"
+      const lockKey = cacheKey + '$LOCK'
       const lockValue = Date.now()
       await self.cacheManger.set(lockKey, lockValue, 300)
       const result = await self.model.findAll(options)
-      if ((await self.cacheManger.get(lockKey) === lockValue)) {
-        await self.cacheManger.set(cacheKey, result.map(r => instanceToData(r)), self.expire)
+      if ((await self.cacheManger.get(lockKey)) === lockValue) {
+        await self.cacheManger.set(
+          cacheKey,
+          result.map((r) => instanceToData(r)),
+          self.expire
+        )
       }
       return result as M[]
     }
@@ -78,23 +93,30 @@ export default class Cache<M extends SGModel> {
 
     const cacheValue = await self.cacheManger.get(cacheKey)
     if (cacheValue !== undefined) {
-      return dataToInstance(cacheValue, self.model, options ? options.include : [])
+      return dataToInstance(
+        cacheValue,
+        self.model,
+        options ? options.include : []
+      )
     } else {
-      const lockKey = cacheKey + "$LOCK"
+      const lockKey = cacheKey + '$LOCK'
       const lockValue = Date.now()
       await self.cacheManger.set(lockKey, lockValue, 300)
       const result = await self.model.findOne(options)
-      if ((await self.cacheManger.get(lockKey) === lockValue)) {
-        await self.cacheManger.set(cacheKey, instanceToData(result), self.expire)
+      if ((await self.cacheManger.get(lockKey)) === lockValue) {
+        await self.cacheManger.set(
+          cacheKey,
+          instanceToData(result),
+          self.expire
+        )
       }
       return result as M
     }
   }
 
-
   async count(options?: CountOptions): Promise<number> {
     const self = this
-    const cacheKey = self.buildCacheKey("count", options)
+    const cacheKey = self.buildCacheKey('count', options)
 
     if ((await self.isCacheValid(options)) === false) {
       return self.model.count(options)
@@ -104,11 +126,11 @@ export default class Cache<M extends SGModel> {
     if (cacheValue !== undefined) {
       return cacheValue
     } else {
-      const lockKey = cacheKey + "$LOCK"
+      const lockKey = cacheKey + '$LOCK'
       const lockValue = Date.now()
       await self.cacheManger.set(lockKey, lockValue, 300)
       const result = await self.model.count(options)
-      if ((await self.cacheManger.get(lockKey) === lockValue)) {
+      if ((await self.cacheManger.get(lockKey)) === lockValue) {
         await self.cacheManger.set(cacheKey, result, self.expire)
       }
       return result

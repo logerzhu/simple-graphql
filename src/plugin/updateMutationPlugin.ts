@@ -1,21 +1,27 @@
 import _ from 'lodash'
 import StringHelper from '../utils/StringHelper'
-import { ColumnFieldOptions, ColumnFieldOptionsType, PluginOptions } from '../Definition'
+import {
+  ColumnFieldOptions,
+  ColumnFieldOptionsType,
+  PluginOptions
+} from '../Definition'
 
-export default ({
+export default {
   name: 'updateMutation',
   defaultOptions: false,
   priority: 0,
   description: 'Gen `update mutation` for Schema',
-  applyToSchema: function updateMutation (schema, options, schemas): void {
+  applyToSchema: function updateMutation(schema, options, schemas): void {
     const name = 'update' + StringHelper.toInitialUpperCase(schema.name)
     const changedName = 'changed' + StringHelper.toInitialUpperCase(schema.name)
 
     const isModelType = (fieldOptions: ColumnFieldOptions) => {
       if (typeof fieldOptions === 'string') {
-        return schemas.find(s => s.name === fieldOptions) != null
+        return schemas.find((s) => s.name === fieldOptions) != null
       } else if (typeof fieldOptions === 'object') {
-        return schemas.find(s => s.name === (fieldOptions as any).$type) != null
+        return (
+          schemas.find((s) => s.name === (fieldOptions as any).$type) != null
+        )
       }
       return false
     }
@@ -29,7 +35,9 @@ export default ({
     }
     const versionConfig = (schema.config.options.tableOptions || {}).version
     if (versionConfig === true || typeof versionConfig === 'string') {
-      inputFields[typeof versionConfig === 'string' ? versionConfig : 'version'] = {
+      inputFields[
+        typeof versionConfig === 'string' ? versionConfig : 'version'
+      ] = {
         $type: 'Integer',
         required: false
       }
@@ -41,7 +49,11 @@ export default ({
         }
       }
       if (value && (<ColumnFieldOptionsType>value).$type) {
-        if (!(<ColumnFieldOptionsType>value).hidden && (!(<ColumnFieldOptionsType>value).config || (<ColumnFieldOptionsType>value).config.mutable !== false)) {
+        if (
+          !(<ColumnFieldOptionsType>value).hidden &&
+          (!(<ColumnFieldOptionsType>value).config ||
+            (<ColumnFieldOptionsType>value).config.mutable !== false)
+        ) {
           inputFields.values[key] = {
             ...(<ColumnFieldOptionsType>value),
             required: false,
@@ -93,14 +105,23 @@ export default ({
             }
           })
 
-          const instance = await dbModel.findOne({ where: { id: args.id }, lock: true })
+          const instance = await dbModel.findOne({
+            where: { id: args.id },
+            lock: true
+          })
           if (!instance) {
             throw new Error(schema.name + '[' + args.id + '] not exist.')
           } else {
             if (versionConfig === true || typeof versionConfig === 'string') {
-              const versionField = typeof versionConfig === 'string' ? versionConfig : 'version'
-              if (args[versionField] != null && instance[versionField] !== args[versionField]) {
-                throw new Error('OptimisticLockingError: Invalid version number.')
+              const versionField =
+                typeof versionConfig === 'string' ? versionConfig : 'version'
+              if (
+                args[versionField] != null &&
+                instance[versionField] !== args[versionField]
+              ) {
+                throw new Error(
+                  'OptimisticLockingError: Invalid version number.'
+                )
               }
             }
             await instance.update(values)
@@ -112,4 +133,4 @@ export default ({
       }
     })
   }
-} as PluginOptions)
+} as PluginOptions

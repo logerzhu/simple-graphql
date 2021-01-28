@@ -8,15 +8,19 @@ const getSearchFields = (schema, schemas) => {
 
   const isModelType = (fieldOptions: ColumnFieldOptions) => {
     if (typeof fieldOptions === 'string') {
-      return schemas.find(s => s.name === fieldOptions) != null
+      return schemas.find((s) => s.name === fieldOptions) != null
     } else if (typeof fieldOptions === 'object') {
-      return schemas.find(s => s.name === (fieldOptions as any).$type) != null
+      return schemas.find((s) => s.name === (fieldOptions as any).$type) != null
     }
     return false
   }
 
-  const advanceType = type => {
-    if (typeof type === 'string' && type.startsWith('[') && type.endsWith(']')) {
+  const advanceType = (type) => {
+    if (
+      typeof type === 'string' &&
+      type.startsWith('[') &&
+      type.endsWith(']')
+    ) {
       return { contains: [type.substring(1, type.length - 2)] }
     }
     if (_.isArray(type)) {
@@ -51,51 +55,72 @@ const getSearchFields = (schema, schemas) => {
     return aType
   }
 
-  _.forOwn({ id: schema.name + 'Id', ...schema.config.fields }, (value, key: string) => {
-    if (isModelType(value)) {
-      if (!key.endsWith('Id')) {
-        key = key + 'Id'
+  _.forOwn(
+    { id: schema.name + 'Id', ...schema.config.fields },
+    (value, key: string) => {
+      if (isModelType(value)) {
+        if (!key.endsWith('Id')) {
+          key = key + 'Id'
+        }
       }
-    }
-    if (value && value.$type) {
-      if (!value.hidden && !value.resolve) {
-        searchFields[key] = { ...value, $type: advanceType(value.$type), required: false, default: null }
-      } else {
-        return
-      }
-    } else {
-      searchFields[key] = { $type: advanceType(value) }
-    }
-
-    searchFields[key].mapper = function (option: { where: Object; attributes: Array<string>; }, argValue, sgContext) {
-      if (argValue !== undefined) {
-        option.where[Sequelize.Op.and] = option.where[Sequelize.Op.and] || []
-        if (argValue == null || typeof argValue === 'boolean') {
-          option.where[Sequelize.Op.and].push({ [key]: argValue })
-        } else {
-          const keyCondition = {}
-          for (const opKey of _.keys(argValue)) {
-            if (opKey !== 'contains') {
-              keyCondition[Sequelize.Op[opKey]] = argValue[opKey]
-            } else {
-              option.where[Sequelize.Op.and].push(Sequelize.literal(`json_contains(\`${key}\`, '${JSON.stringify(argValue[opKey])}' )`))
-            }
+      if (value && value.$type) {
+        if (!value.hidden && !value.resolve) {
+          searchFields[key] = {
+            ...value,
+            $type: advanceType(value.$type),
+            required: false,
+            default: null
           }
-          option.where[Sequelize.Op.and].push({ [key]: keyCondition })
+        } else {
+          return
+        }
+      } else {
+        searchFields[key] = { $type: advanceType(value) }
+      }
+
+      searchFields[key].mapper = function (
+        option: { where: Object; attributes: Array<string> },
+        argValue,
+        sgContext
+      ) {
+        if (argValue !== undefined) {
+          option.where[Sequelize.Op.and] = option.where[Sequelize.Op.and] || []
+          if (argValue == null || typeof argValue === 'boolean') {
+            option.where[Sequelize.Op.and].push({ [key]: argValue })
+          } else {
+            const keyCondition = {}
+            for (const opKey of _.keys(argValue)) {
+              if (opKey !== 'contains') {
+                keyCondition[Sequelize.Op[opKey]] = argValue[opKey]
+              } else {
+                option.where[Sequelize.Op.and].push(
+                  Sequelize.literal(
+                    `json_contains(\`${key}\`, '${JSON.stringify(
+                      argValue[opKey]
+                    )}' )`
+                  )
+                )
+              }
+            }
+            option.where[Sequelize.Op.and].push({ [key]: keyCondition })
+          }
         }
       }
     }
-  })
+  )
   return searchFields
 }
 
-export default ({
+export default {
   name: 'pluralQuery',
   defaultOptions: false,
   priority: 0,
   description: 'Gen `plural query` for Schema',
-  applyToSchema: function pluralQuery (schema, options, schemas): void {
-    const searchFields = { ...getSearchFields(schema, schemas), ...((options && (<{ [key: string]: any }>options).conditionFields) || {}) }
+  applyToSchema: function pluralQuery(schema, options, schemas): void {
+    const searchFields = {
+      ...getSearchFields(schema, schemas),
+      ...((options && (<{ [key: string]: any }>options).conditionFields) || {})
+    }
 
     let config: { [key: string]: any } = {}
     if (typeof options === 'object') {
@@ -103,34 +128,40 @@ export default ({
     }
 
     schema.queries({
-      [`${StringHelper.toInitialLowerCase(config.name || schema.name + 's')}`]: {
+      [`${StringHelper.toInitialLowerCase(
+        config.name || schema.name + 's'
+      )}`]: {
         config: config,
         $type: schema.name + 'Connection',
         args: {
-          ...(_.keys(searchFields).length > 0 ? {
-            condition: {
-              $type: [_.mapValues(searchFields, fieldConfig => {
-                const {
-                  mapper,
-                  ...value
-                } = fieldConfig
-                return value
-              })],
-              description: 'Query Condition'
-            }
-          } : {}),
+          ...(_.keys(searchFields).length > 0
+            ? {
+                condition: {
+                  $type: [
+                    _.mapValues(searchFields, (fieldConfig) => {
+                      const { mapper, ...value } = fieldConfig
+                      return value
+                    })
+                  ],
+                  description: 'Query Condition'
+                }
+              }
+            : {}),
           sort: {
-            $type: [{ field: new Set(_.keys(searchFields)), order: new Set(['ASC', 'DESC']) }],
+            $type: [
+              {
+                field: new Set(_.keys(searchFields)),
+                order: new Set(['ASC', 'DESC'])
+              }
+            ],
             description: 'Define the sort field'
           }
         },
         resolve: async function (args, context, info, sgContext) {
           const dbModel = sgContext.models[schema.name]
 
-          const {
-            sort = [{ field: 'id', order: 'ASC' }],
-            condition = []
-          } = (args || {})
+          const { sort = [{ field: 'id', order: 'ASC' }], condition = [] } =
+            args || {}
 
           const queryOption = { where: {}, bind: [], attributes: [] }
 
@@ -143,7 +174,9 @@ export default ({
               }
               if (queryOption.where[Sequelize.Op.and]) {
                 where[Sequelize.Op.or] = where[Sequelize.Op.or] || []
-                where[Sequelize.Op.or].push({ [Sequelize.Op.and]: queryOption.where[Sequelize.Op.and] })
+                where[Sequelize.Op.or].push({
+                  [Sequelize.Op.and]: queryOption.where[Sequelize.Op.and]
+                })
               }
             }
             queryOption.where = where
@@ -155,10 +188,10 @@ export default ({
             where: queryOption.where,
             bind: queryOption.bind,
             attributes: queryOption.attributes,
-            order: sort.map(s => [s.field, s.order])
+            order: sort.map((s) => [s.field, s.order])
           })
         }
       }
     })
   }
-} as PluginOptions)
+} as PluginOptions

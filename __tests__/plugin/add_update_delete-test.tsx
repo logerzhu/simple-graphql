@@ -4,57 +4,63 @@ import SG from '../../src'
 import SGExecutor from '../SGExecutor'
 
 test('Add/Update/Delete Test', async () => {
-  const executor = await SGExecutor.new({
-    schemas: [SG.schema('Dummy', {
-      plugin: {
-        addMutation: true,
-        updateMutation: true,
-        deleteMutation: true
-      }
-    }).fields({
-      number: 'Number',
-      numbers: ['Number'],
-      boolean: {
-        $type: 'Boolean',
-        required: false,
-        resolve: async function ({ boolean }) {
-          return boolean
-        }
-      },
-      booleans: {
-        $type: ['Boolean'],
-        required: false
-      },
-      date: 'Date',
-      integer: 'Integer',
-      string: 'String',
-      enum: new Set(['A', 'B', 'C']),
-      enums: [new Set(['A', 'B', 'C'])],
-      dummyA: 'Dummy',
-      dummyB: ['Dummy'],
-      dummyC: {
-        at: 'Date',
-        enum: new Set(['A', 'B', 'C']),
-        enums: [new Set(['A', 'B', 'C'])],
-        dummyE: 'Dummy',
-        dummyF: ['Dummy']
-      }
-    })]
-  }, {})
+  const executor = await SGExecutor.new(
+    {
+      schemas: [
+        SG.schema('Dummy', {
+          plugin: {
+            addMutation: true,
+            updateMutation: true,
+            deleteMutation: true
+          }
+        }).fields({
+          number: 'Number',
+          numbers: ['Number'],
+          boolean: {
+            $type: 'Boolean',
+            required: false,
+            resolve: async function ({ boolean }) {
+              return boolean
+            }
+          },
+          booleans: {
+            $type: ['Boolean'],
+            required: false
+          },
+          date: 'Date',
+          integer: 'Integer',
+          string: 'String',
+          enum: new Set(['A', 'B', 'C']),
+          enums: [new Set(['A', 'B', 'C'])],
+          dummyA: 'Dummy',
+          dummyB: ['Dummy'],
+          dummyC: {
+            at: 'Date',
+            enum: new Set(['A', 'B', 'C']),
+            enums: [new Set(['A', 'B', 'C'])],
+            dummyE: 'Dummy',
+            dummyF: ['Dummy']
+          }
+        })
+      ]
+    },
+    {}
+  )
 
   const values = {
     number: 123.2,
     numbers: [1.1, 9.1],
     boolean: true,
     booleans: [false, true],
-    date: (new Date()).toJSON(),
+    date: new Date().toJSON(),
     integer: 999,
     string: 'Hello',
     enum: 'A',
     enums: ['A', 'B']
   }
 
-  const addResult = await executor.exec(`
+  const addResult = await executor.exec(
+    `
   mutation($input:AddDummyInput!){
     addDummy(input:$input){
       clientMutationId
@@ -74,12 +80,14 @@ test('Add/Update/Delete Test', async () => {
       }
     }
   }
-  `, {
-    input: {
-      clientMutationId: 'XX',
-      ...values
+  `,
+    {
+      input: {
+        clientMutationId: 'XX',
+        ...values
+      }
     }
-  })
+  )
   expect(addResult.errors).toBeUndefined()
   const dummy1 = addResult.data.addDummy.addedDummyEdge.node
 
@@ -88,7 +96,7 @@ test('Add/Update/Delete Test', async () => {
     numbers: [9.0],
     boolean: false,
     booleans: [true, true, false],
-    date: (new Date()).toJSON(),
+    date: new Date().toJSON(),
     integer: 0,
     string: 'Hello2',
     enum: 'B',
@@ -96,7 +104,7 @@ test('Add/Update/Delete Test', async () => {
     dummyAId: dummy1.id,
     dummyB: [dummy1.id],
     dummyC: {
-      at: (new Date()).toJSON(),
+      at: new Date().toJSON(),
       enum: 'C',
       enums: ['C', 'B'],
       dummyE: dummy1.id,
@@ -104,7 +112,8 @@ test('Add/Update/Delete Test', async () => {
     }
   }
 
-  const updateResult = await executor.exec(`
+  const updateResult = await executor.exec(
+    `
   mutation($input:UpdateDummyInput!){
     updateDummy(input:$input){
       clientMutationId
@@ -130,13 +139,15 @@ test('Add/Update/Delete Test', async () => {
       }
     }
   }
-  `, {
-    input: {
-      clientMutationId: 'XX',
-      id: dummy1.id,
-      values: updateValues
+  `,
+    {
+      input: {
+        clientMutationId: 'XX',
+        id: dummy1.id,
+        values: updateValues
+      }
     }
-  })
+  )
 
   expect(updateResult.errors).toBeUndefined()
   const changedDummy1 = updateResult.data.updateDummy.changedDummy
@@ -149,8 +160,13 @@ test('Add/Update/Delete Test', async () => {
   expect(changedDummy1.string).toEqual(updateValues.string)
   expect(changedDummy1.enum).toEqual(updateValues.enum)
   expect(changedDummy1.enums).toEqual(updateValues.enums)
-  expect(changedDummy1.dummyA).toEqual({ id: dummy1.id, number: updateValues.number })
-  expect(changedDummy1.dummyB).toEqual([{ id: dummy1.id, numbers: updateValues.numbers }])
+  expect(changedDummy1.dummyA).toEqual({
+    id: dummy1.id,
+    number: updateValues.number
+  })
+  expect(changedDummy1.dummyB).toEqual([
+    { id: dummy1.id, numbers: updateValues.numbers }
+  ])
   expect(changedDummy1.dummyC).toEqual({
     at: updateValues.dummyC.at,
     enum: updateValues.dummyC.enum,
@@ -159,7 +175,8 @@ test('Add/Update/Delete Test', async () => {
     dummyF: [{ id: dummy1.id, date: updateValues.date }]
   })
 
-  const deleteResult = await executor.exec(`
+  const deleteResult = await executor.exec(
+    `
   mutation{
     deleteDummy(input:{
       clientMutationId: "XX",
@@ -172,7 +189,11 @@ test('Add/Update/Delete Test', async () => {
       }
     }
   }
-  `, {})
+  `,
+    {}
+  )
   expect(deleteResult.errors).toBeUndefined()
-  expect(deleteResult.data.deleteDummy.deletedDummy.number).toEqual(updateValues.number)
+  expect(deleteResult.data.deleteDummy.deletedDummy.number).toEqual(
+    updateValues.number
+  )
 })

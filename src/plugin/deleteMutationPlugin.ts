@@ -1,7 +1,7 @@
 import StringHelper from '../utils/StringHelper'
 import { PluginOptions } from '../Definition'
 
-export default ({
+export default {
   name: 'deleteMutation',
   defaultOptions: false,
   priority: 0,
@@ -24,10 +24,10 @@ export default ({
         outputFields: {
           ['deleted' + schema.name]: schema.name
         },
-        mutateAndGetPayload: async function ({
-          id
-        }, context, info, sgContext) {
-          const entity = await sgContext.models[schema.name].findOne({ where: { id: id } })
+        mutateAndGetPayload: async function ({ id }, context, info, sgContext) {
+          const entity = await sgContext.models[schema.name].findOne({
+            where: { id: id }
+          })
           if (entity) {
             await entity.destroy()
             return {
@@ -39,4 +39,4 @@ export default ({
       }
     })
   }
-} as PluginOptions)
+} as PluginOptions

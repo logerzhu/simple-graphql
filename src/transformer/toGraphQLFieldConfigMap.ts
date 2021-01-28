@@ -10,19 +10,42 @@ import {
   isOutputType
 } from 'graphql'
 import StringHelper from '../utils/StringHelper'
-import { ColumnFieldOptionsType, FieldOptions, FieldOptionsType, FieldTypeContext, ResolverContext } from '../Definition'
+import {
+  ColumnFieldOptionsType,
+  FieldOptions,
+  FieldOptionsType,
+  FieldTypeContext,
+  ResolverContext
+} from '../Definition'
 import toGraphQLInputFieldConfigMap from './toGraphQLInputFieldConfigMap'
 
-type Context = ResolverContext & FieldTypeContext;
+type Context = ResolverContext & FieldTypeContext
 
-const toGraphQLFieldConfigMap = function (name: string, postfix: string, fields: {
-  [id: string]: FieldOptions;
-}, context: Context): GraphQLFieldConfigMap<any, any> {
+const toGraphQLFieldConfigMap = function (
+  name: string,
+  postfix: string,
+  fields: {
+    [id: string]: FieldOptions
+  },
+  context: Context
+): GraphQLFieldConfigMap<any, any> {
   const toTypeName = (name: string, path: string) => {
-    return name + path.replace(/\.\$type/g, '').replace(/\[\d*\]/g, '').split('.').map(v => StringHelper.toInitialUpperCase(v)).join('')
+    return (
+      name +
+      path
+        .replace(/\.\$type/g, '')
+        .replace(/\[\d*\]/g, '')
+        .split('.')
+        .map((v) => StringHelper.toInitialUpperCase(v))
+        .join('')
+    )
   }
 
-  const fieldConfig = (fieldName: string, fieldPath: string, typeName: string): GraphQLFieldConfig<any, any> | null | undefined => {
+  const fieldConfig = (
+    fieldName: string,
+    fieldPath: string,
+    typeName: string
+  ): GraphQLFieldConfig<any, any> | null | undefined => {
     const fieldType = context.fieldType(typeName)
     if (!fieldType) {
       throw new Error(`Type "${typeName}" has not register for ${fieldName}.`)
@@ -30,7 +53,11 @@ const toGraphQLFieldConfigMap = function (name: string, postfix: string, fields:
     if (fieldType.outputType) {
       const config: GraphQLFieldConfig<any, any> = {
         type: fieldType.outputType,
-        args: toGraphQLInputFieldConfigMap(toTypeName(fieldName, fieldPath), fieldType.argFieldMap || {}, context)
+        args: toGraphQLInputFieldConfigMap(
+          toTypeName(fieldName, fieldPath),
+          fieldType.argFieldMap || {},
+          context
+        )
       }
       const outputResolve = fieldType.outputResolve
       if (outputResolve) {
@@ -45,15 +72,22 @@ const toGraphQLFieldConfigMap = function (name: string, postfix: string, fields:
     }
   }
 
-  const convert = (name: string, path: string, field: any): GraphQLFieldConfig<any, any> | null | undefined => {
+  const convert = (
+    name: string,
+    path: string,
+    field: any
+  ): GraphQLFieldConfig<any, any> | null | undefined => {
     if (typeof field === 'string' || typeof field === 'function') {
       return fieldConfig(name, path, field)
     }
     if (field instanceof Set) {
       return {
         type: new GraphQLEnumType({
-          name: StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
-          values: _.fromPairs([...field].map(f => [f, { value: f, description: f }]))
+          name:
+            StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
+          values: _.fromPairs(
+            [...field].map((f) => [f, { value: f, description: f }])
+          )
         })
       }
     } else if (_.isArray(field)) {
@@ -84,24 +118,50 @@ const toGraphQLFieldConfigMap = function (name: string, postfix: string, fields:
             const finalField = { ...field }
             if (result.resolve) {
               const resolve = result.resolve
-              finalField.resolve = async function (source, args, context, info, sgContext) {
-                return resolve({
-                  [info.fieldName]: await field.resolve(source, args, context, info, sgContext)
-                }, args, context, info)
+              finalField.resolve = async function (
+                source,
+                args,
+                context,
+                info,
+                sgContext
+              ) {
+                return resolve(
+                  {
+                    [info.fieldName]: await field.resolve(
+                      source,
+                      args,
+                      context,
+                      info,
+                      sgContext
+                    )
+                  },
+                  args,
+                  context,
+                  info
+                )
               }
             }
             result.resolve = context.hookFieldResolve(path, finalField)
           } else if (field.config != null) {
             // 性能优化:默认情况下不加hook
-            result.resolve = result.resolve || context.hookFieldResolve(path, {
-              ...field,
-              resolve: async function (root, args, context, info) {
-                return root[info.fieldName]
-              }
-            })
+            result.resolve =
+              result.resolve ||
+              context.hookFieldResolve(path, {
+                ...field,
+                resolve: async function (root, args, context, info) {
+                  return root[info.fieldName]
+                }
+              })
           }
           if (field.args) {
-            result.args = { ...result.args, ...toGraphQLInputFieldConfigMap(toTypeName(name, path), field.args, context) }
+            result.args = {
+              ...result.args,
+              ...toGraphQLInputFieldConfigMap(
+                toTypeName(name, path),
+                field.args,
+                context
+              )
+            }
           }
         }
         return result
@@ -109,8 +169,16 @@ const toGraphQLFieldConfigMap = function (name: string, postfix: string, fields:
         if (_.keys(field).length > 0) {
           return {
             type: new GraphQLObjectType({
-              name: StringHelper.toInitialUpperCase(toTypeName(name, path)) + postfix,
-              fields: () => toGraphQLFieldConfigMap(toTypeName(name, path), postfix, field, context)
+              name:
+                StringHelper.toInitialUpperCase(toTypeName(name, path)) +
+                postfix,
+              fields: () =>
+                toGraphQLFieldConfigMap(
+                  toTypeName(name, path),
+                  postfix,
+                  field,
+                  context
+                )
             }),
             resolve: context.hookFieldResolve(path, {
               $type: field,
@@ -128,7 +196,11 @@ const toGraphQLFieldConfigMap = function (name: string, postfix: string, fields:
   const fieldMap: GraphQLFieldConfigMap<any, any> = {}
 
   _.forOwn(fields, (value, key) => {
-    if ((<FieldOptionsType>value).$type && (<ColumnFieldOptionsType>value).hidden) { // Hidden field, ignore
+    if (
+      (<FieldOptionsType>value).$type &&
+      (<ColumnFieldOptionsType>value).hidden
+    ) {
+      // Hidden field, ignore
       // Have resolve method, ignore
     } else {
       const fieldConfig = convert(name, key, value)
