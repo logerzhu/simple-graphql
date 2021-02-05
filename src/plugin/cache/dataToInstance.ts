@@ -56,6 +56,8 @@ export default function (
     restoreTimestamps(data, instance, include)
   } else if (include != null) {
     restoreTimestamps(data, instance, [include])
+  } else {
+    restoreTimestamps(data, instance, [])
   }
 
   return instance
