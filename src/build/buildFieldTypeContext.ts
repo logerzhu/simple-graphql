@@ -97,7 +97,7 @@ function buildModelType(
             info
           )
         } else if (typeof root[fieldName].id === 'string') {
-          const { type, id } = relay.fromGlobalId(root[fieldName])
+          const { type, id } = relay.fromGlobalId(root[fieldName].id)
           if (type === typeName) {
             return sgContext.models[typeName].findByPkForGraphQL(
               id,
