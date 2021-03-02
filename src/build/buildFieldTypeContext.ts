@@ -124,6 +124,7 @@ function buildModelType(
     columnOptions: (schema, fieldName, options) => {
       const foreignField = fieldName
       let onDelete = 'RESTRICT'
+      let constraints = true
       if (
         options &&
         (<ColumnFieldOptionsType>options).$type &&
@@ -132,7 +133,16 @@ function buildModelType(
         if ((<ColumnFieldOptionsType>options).columnOptions.onDelete) {
           onDelete = (<ColumnFieldOptionsType>options).columnOptions.onDelete
         }
+        if (
+          (<ColumnFieldOptionsType>options).columnOptions.constraints !==
+          undefined
+        ) {
+          constraints = (<ColumnFieldOptionsType>options).columnOptions
+            .constraints
+          onDelete = undefined
+        }
       }
+
       if (
         options &&
         (<ColumnFieldOptionsType>options).$type &&
@@ -145,7 +155,7 @@ function buildModelType(
             foreignField: foreignField,
             foreignKey: { name: foreignField + 'Id', allowNull: false },
             onDelete: onDelete,
-            constraints: _.get(options, 'columnOptions.constraints', true)
+            constraints: constraints
           }
         })
       } else {
@@ -155,7 +165,7 @@ function buildModelType(
             hidden: true,
             foreignField: foreignField,
             onDelete: onDelete,
-            constraints: _.get(options, 'columnOptions.constraints', true)
+            constraints: constraints
           }
         })
       }
