@@ -145,7 +145,7 @@ function buildModelType(
             foreignField: foreignField,
             foreignKey: { name: foreignField + 'Id', allowNull: false },
             onDelete: onDelete,
-            constraints: true
+            constraints: _.get(options, 'columnOptions.constraints', true)
           }
         })
       } else {
@@ -155,7 +155,7 @@ function buildModelType(
             hidden: true,
             foreignField: foreignField,
             onDelete: onDelete,
-            constraints: true
+            constraints: _.get(options, 'columnOptions.constraints', true)
           }
         })
       }

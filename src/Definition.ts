@@ -184,7 +184,7 @@ export type ColumnFieldOptionsType = {
   required: boolean
   default?: any
   hidden?: boolean
-  columnOptions?: ModelAttributeColumnOptions
+  columnOptions?: ModelAttributeColumnOptions & { constraints?: boolean }
   resolve?: FieldResolve
 }
 
