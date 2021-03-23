@@ -1,10 +1,6 @@
 import _ from 'lodash'
 import StringHelper from '../utils/StringHelper'
-import {
-  ColumnFieldOptions,
-  ColumnFieldOptionsType,
-  PluginOptions
-} from '../Definition'
+import { InputFieldOptions, PluginOptions } from '../Definition'
 
 export default {
   name: 'updateMutation',
@@ -15,31 +11,29 @@ export default {
     const name = 'update' + StringHelper.toInitialUpperCase(schema.name)
     const changedName = 'changed' + StringHelper.toInitialUpperCase(schema.name)
 
-    const isModelType = (fieldOptions: ColumnFieldOptions) => {
-      if (typeof fieldOptions === 'string') {
-        return schemas.find((s) => s.name === fieldOptions) != null
-      } else if (typeof fieldOptions === 'object') {
-        return (
-          schemas.find((s) => s.name === (fieldOptions as any).$type) != null
-        )
-      }
-      return false
+    const isModelType = (fieldOptions: InputFieldOptions) => {
+      return (
+        fieldOptions.type &&
+        schemas.find((s) => s.name === fieldOptions.type) != null
+      )
     }
 
-    const inputFields: any = {
+    const inputFields: { [key: string]: InputFieldOptions } = {
       id: {
-        $type: schema.name + 'Id',
-        required: true
+        type: schema.name + 'Id',
+        nullable: false
       },
-      values: {}
+      values: {
+        properties: {}
+      }
     }
     const versionConfig = (schema.config.options.tableOptions || {}).version
     if (versionConfig === true || typeof versionConfig === 'string') {
       inputFields[
         typeof versionConfig === 'string' ? versionConfig : 'version'
       ] = {
-        $type: 'Integer',
-        required: false
+        type: 'Integer',
+        nullable: true
       }
     }
     _.forOwn(schema.config.fields, (value, key) => {
@@ -48,24 +42,18 @@ export default {
           key = key + 'Id'
         }
       }
-      if (value && (<ColumnFieldOptionsType>value).$type) {
-        if (
-          !(<ColumnFieldOptionsType>value).hidden &&
-          (!(<ColumnFieldOptionsType>value).config ||
-            (<ColumnFieldOptionsType>value).config.mutable !== false)
-        ) {
-          inputFields.values[key] = {
-            ...(<ColumnFieldOptionsType>value),
-            required: false,
-            default: null,
-            resolve: null
-          }
+      if (
+        value.metadata?.graphql?.hidden !== true &&
+        value?.metadata?.graphql?.updatable !== false
+      ) {
+        inputFields.values.properties[key] = {
+          ...value,
+          nullable: true,
+          metadata: { description: value.metadata?.description }
         }
-      } else {
-        inputFields.values[key] = value
       }
     })
-    if (_.keys(inputFields.values).length === 0) {
+    if (_.keys(inputFields.values.properties).length === 0) {
       return
     }
 
@@ -77,9 +65,9 @@ export default {
     schema.mutations({
       [config.name || name]: {
         config: config,
-        inputFields: inputFields,
-        outputFields: {
-          [changedName]: schema.name
+        input: inputFields,
+        output: {
+          [changedName]: { type: schema.name }
         },
         mutateAndGetPayload: async function (args, context, info, sgContext) {
           if (args == null || args.values == null) {

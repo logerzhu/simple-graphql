@@ -9,7 +9,7 @@ test('Hook生成', async () => {
       services: [
         SG.service('Test').queries({
           test: {
-            $type: 'JSON',
+            output: { type: 'JSON' },
             resolve: async function () {
               return 'OK1'
             }

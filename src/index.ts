@@ -16,7 +16,7 @@ export {
   RootResolve,
   FieldType,
   InputFieldOptions,
-  FieldOptions,
+  OutputFieldOptions,
   LinkedFieldOptions,
   ColumnFieldOptions,
   QueryOptions,

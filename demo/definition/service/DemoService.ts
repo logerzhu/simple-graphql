@@ -4,28 +4,28 @@ let gWeather = '晴天'
 
 export default SG.service('DemoService').queries({
   weather: {
-    $type: 'String',
+    output: {type: 'String'},
     resolve: async function (args, context, info) {
       return gWeather
     }
   }
 }).mutations({
   setWeather: {
-    inputFields: {
+    input: {
       weather: {
-        $type: 'String',
-        required: true
+        type: 'String',
+        nullable: false
       }
     },
-    outputFields: {
+    output: {
       weather: {
-        $type: 'String',
-        required: true
+        type: 'String',
+        nullable: false
       }
     },
     mutateAndGetPayload: async function ({
-      weather
-    }, context, info) {
+                                           weather
+                                         }, context, info) {
       gWeather = weather
       return {
         weather: gWeather

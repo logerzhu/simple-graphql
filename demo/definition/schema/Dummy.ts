@@ -8,29 +8,53 @@ export default SG.schema('Dummy', {
     deleteMutation: true
   }
 }).fields({
-  message: 'Message',
-  number: 'Number',
-  numbers: ['Number'],
+  message: {type: 'Message'},
+  number: {type: 'Number'},
+  numbers: {
+    elements: {type: 'Number'}
+  },
   boolean: {
-    $type: 'Boolean',
-    required: false
+    type: 'Boolean',
+    nullable: true
   },
   booleans: {
-    $type: ['Boolean'],
-    required: false
+    elements: {
+      type: 'Boolean'
+    },
+    nullable: true
   },
-  date: 'Date',
-  integer: 'Integer',
-  string: 'String',
-  enum: new Set(['A', 'B', 'C']),
-  enums: [new Set(['A', 'B', 'C'])],
-  dummyA: 'Dummy',
-  dummyB: ['Dummy'],
+  date: {type: 'Date'},
+  integer: {type: 'Integer'},
+  string: {type: 'String'},
+  enum: {
+    enum: ['A', 'B', 'C']
+  },
+  enums: {
+    elements: {
+      enum: ['A', 'B', 'C']
+    }
+  },
+  dummyA: {
+    type: 'Dummy'
+  },
+  dummyB: {
+    elements: {type: 'Dummy'}
+  },
   dummyC: {
-    at: 'Date',
-    enum: new Set(['A', 'B', 'C']),
-    enums: [new Set(['A', 'B', 'C'])],
-    dummyE: 'Dummy',
-    dummyF: ['Dummy']
+    properties: {
+      at: {type: 'Date'},
+      enum: {enum: ['A', 'B', 'C']},
+      enums: {
+        elements: {
+          enum: ['A', 'B', 'C']
+        }
+      },
+      dummyE: {
+        type: 'Dummy'
+      },
+      dummyF: {
+        elements: {type: 'Dummy'}
+      }
+    }
   }
 })

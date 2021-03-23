@@ -1,9 +1,5 @@
 import _ from 'lodash'
-import {
-  ColumnFieldOptions,
-  ColumnFieldOptionsType,
-  PluginOptions
-} from '../Definition'
+import { InputFieldOptions, PluginOptions } from '../Definition'
 import StringHelper from '../utils/StringHelper'
 
 export default {
@@ -15,33 +11,30 @@ export default {
     const name = 'save' + StringHelper.toInitialUpperCase(schema.name)
     const savedName = 'saved' + StringHelper.toInitialUpperCase(schema.name)
 
-    const inputFields = {}
-    const isModelType = (fieldOptions: ColumnFieldOptions) => {
-      if (typeof fieldOptions === 'string') {
-        return schemas.find((s) => s.name === fieldOptions) != null
-      } else if (typeof fieldOptions === 'object') {
-        return (
-          schemas.find((s) => s.name === (fieldOptions as any).$type) != null
-        )
-      }
-      return false
+    const inputFields: { [key: string]: InputFieldOptions } = {}
+    const isModelType = (fieldOptions: InputFieldOptions) => {
+      return (
+        fieldOptions.type &&
+        schemas.find((s) => s.name === fieldOptions.type) != null
+      )
     }
+
     _.forOwn(schema.config.fields, (value, key) => {
       if (isModelType(value)) {
         if (!key.endsWith('Id')) {
           key = key + 'Id'
         }
       }
-
-      if (value && (<ColumnFieldOptionsType>value).$type) {
-        if (!(<ColumnFieldOptionsType>value).hidden) {
-          inputFields[key] = {
-            ...(<ColumnFieldOptionsType>value),
-            resolve: null
-          }
+      if (
+        value.metadata?.graphql?.hidden !== true &&
+        value.metadata?.graphql?.initializable !== false &&
+        value.metadata?.graphql?.updatable !== false
+      ) {
+        inputFields[key] = {
+          ...value,
+          nullable: false,
+          metadata: { description: value.metadata?.description }
         }
-      } else {
-        inputFields[key] = value
       }
     })
     let config: { [key: string]: any } = {}
@@ -51,9 +44,9 @@ export default {
     schema.mutations({
       [config.name || name]: {
         config: config,
-        inputFields: inputFields,
-        outputFields: {
-          [savedName]: schema.name
+        input: inputFields,
+        output: {
+          [savedName]: { type: schema.name }
         },
         mutateAndGetPayload: async function (args, context, info, sgContext) {
           const dbModel = sgContext.models[schema.name]

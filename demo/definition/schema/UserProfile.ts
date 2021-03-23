@@ -6,12 +6,12 @@ export default SG.schema('UserProfile', {
   }
 }).fields({
   owner: {
-    $type: 'User',
-    required: true
+    type: 'User',
+    nullable: false
   },
-  realName: 'String',
-  age: 'Integer',
+  realName: {type: 'String'},
+  age: {type: 'Integer'},
   gender: {
-    $type: new Set(['Male', 'Female'])
+    enum: ['Male', 'Female']
   }
 })

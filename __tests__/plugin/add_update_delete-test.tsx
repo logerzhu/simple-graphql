@@ -14,32 +14,60 @@ test('Add/Update/Delete Test', async () => {
             deleteMutation: true
           }
         }).fields({
-          number: 'Number',
-          numbers: ['Number'],
+          number: { type: 'Number' },
+          numbers: {
+            elements: { type: 'Number' }
+          },
           boolean: {
-            $type: 'Boolean',
-            required: false,
-            resolve: async function ({ boolean }) {
-              return boolean
+            type: 'Boolean',
+            nullable: true,
+            metadata: {
+              graphql: {
+                resolve: async function ({ boolean }) {
+                  return boolean
+                }
+              }
             }
           },
           booleans: {
-            $type: ['Boolean'],
-            required: false
+            elements: { type: 'Boolean' },
+            nullable: true
           },
-          date: 'Date',
-          integer: 'Integer',
-          string: 'String',
-          enum: new Set(['A', 'B', 'C']),
-          enums: [new Set(['A', 'B', 'C'])],
-          dummyA: 'Dummy',
-          dummyB: ['Dummy'],
+          date: { type: 'Date' },
+          integer: { type: 'Integer' },
+          string: { type: 'String' },
+          enum: {
+            enum: ['A', 'B', 'C']
+          },
+          enums: {
+            elements: {
+              enum: ['A', 'B', 'C']
+            }
+          },
+          dummyA: {
+            type: 'Dummy'
+          },
+          dummyB: {
+            elements: { type: 'Dummy' }
+          },
           dummyC: {
-            at: 'Date',
-            enum: new Set(['A', 'B', 'C']),
-            enums: [new Set(['A', 'B', 'C'])],
-            dummyE: 'Dummy',
-            dummyF: ['Dummy']
+            properties: {
+              at: { type: 'Date' },
+              enum: {
+                enum: ['A', 'B', 'C']
+              },
+              enums: {
+                elements: {
+                  enum: ['A', 'B', 'C']
+                }
+              },
+              dummyE: {
+                type: 'Dummy'
+              },
+              dummyF: {
+                elements: { type: 'Dummy' }
+              }
+            }
           }
         })
       ]

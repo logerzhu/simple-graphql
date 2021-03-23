@@ -1,11 +1,10 @@
 import {
-  coerceValue,
+  coerceInputValue,
   GraphQLError,
   GraphQLInputObjectType,
   GraphQLInputType,
   GraphQLScalarType,
   GraphQLString,
-  isValidLiteralValue,
   ObjectValueNode,
   valueFromAST
 } from 'graphql'
@@ -39,19 +38,18 @@ export default function unionInputType(options: {
             `${options.name}(UnionInputType): Invalid inputType ${type}'`
           )
         }
-        const { value, errors } = coerceValue(inputValue[valueKey], valueType)
-        if (!errors) {
+
+        if (inputValue[valueKey] == null) {
           return {
             [typeKey]: inputValue[typeKey],
-            [valueKey]: value
+            [valueKey]: inputValue[valueKey]
           }
-        } else {
-          const errorString = errors
-            .map((error) => {
-              return '\n' + error.message
-            })
-            .join('')
-          throw new GraphQLError(errorString)
+        }
+
+        const value = coerceInputValue(inputValue[valueKey], valueType)
+        return {
+          [typeKey]: inputValue[typeKey],
+          [valueKey]: value
         }
       }
     },
@@ -92,16 +90,16 @@ export default function unionInputType(options: {
           }
         }
       })
-      if (isValidLiteralValue(inputType, ast).length === 0) {
-        return valueFromAST(ast, inputType)
-      } else {
-        throw new GraphQLError(
-          `expected ${valueKey} type ${type}, found ${_.get(
-            ast,
-            'loc.source.body'
-          ).substring(_.get(ast, 'loc.start'), _.get(ast, 'loc.end'))}`
-        )
-      }
+      //if (isValidLiteralValue(inputType, ast).length === 0) {
+      return valueFromAST(ast, inputType)
+      // } else {
+      //   throw new GraphQLError(
+      //     `expected ${valueKey} type ${type}, found ${_.get(
+      //       ast,
+      //       'loc.source.body'
+      //     ).substring(_.get(ast, 'loc.start'), _.get(ast, 'loc.end'))}`
+      //   )
+      // }
     }
   })
 }

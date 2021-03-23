@@ -1,9 +1,5 @@
 import _ from 'lodash'
-import {
-  InputFieldOptions,
-  InputFieldOptionsType,
-  PluginOptions
-} from '../Definition'
+import { InputFieldOptions, PluginOptions, SGContext } from '../Definition'
 import Sequelize from 'sequelize'
 
 export default {
@@ -20,42 +16,49 @@ export default {
         [key: string]: InputFieldOptions
       } = {}
 
-      const conditionFields: any = {}
+      const conditionFields: {
+        [key: string]: {
+          definition: InputFieldOptions
+          mapper: (
+            option: { where: any; attributes: Array<string> },
+            argValue: any,
+            context: SGContext
+          ) => void
+        }
+      } = {}
       _.forOwn(config.conditionFields || {}, async function (value, key) {
-        if (!(<InputFieldOptionsType>value).$type) {
-          value = { $type: value, mapper: null as any }
-        }
-        if (!(<InputFieldOptionsType>value).mapper) {
-          ;(<InputFieldOptionsType>value).mapper = function (
-            option: { where: Object; attributes: Array<string> },
-            argValue
-          ) {
-            if (argValue !== undefined) {
-              option.where[Sequelize.Op.and] =
-                option.where[Sequelize.Op.and] || []
-              option.where[Sequelize.Op.and].push({ [key]: argValue })
+        conditionFields[key] = {
+          definition: value,
+          mapper:
+            value.metadata?.graphql?.mapper ||
+            function (option, argValue) {
+              if (argValue !== undefined) {
+                option.where[Sequelize.Op.and] =
+                  option.where[Sequelize.Op.and] || []
+                option.where[Sequelize.Op.and].push({ [key]: argValue })
+              }
             }
-          }
         }
-        conditionFields[key] = value
       })
 
       if (conditionFields && _.keys(conditionFields).length > 0) {
-        args.condition = _.mapValues(conditionFields, (field) => {
-          const { mapper, ...config } = field
-          return config
-        })
+        args.condition = {
+          properties: _.mapValues(conditionFields, (field) => {
+            const { mapper, definition } = field
+            return definition
+          })
+        }
       }
 
       schema.links({
         [key]: {
           config: config.config,
           description: config.description,
-          args: args,
-          $type:
+          input: args,
+          output:
             config.outputStructure === 'Array'
-              ? [config.target]
-              : config.target + 'Connection',
+              ? { elements: { type: config.target } }
+              : { type: config.target + 'Connection' },
           dependentFields: [config.sourceKey || 'id'],
           resolve: async function (root, args, context, info, sgContext) {
             if (

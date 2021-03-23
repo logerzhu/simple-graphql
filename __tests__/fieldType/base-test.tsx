@@ -12,21 +12,29 @@ test('基本类型生成', async () => {
             addMutation: true
           }
         }).fields({
-          number: 'Number',
-          numbers: ['Number'],
+          number: { type: 'Number' },
+          numbers: {
+            elements: { type: 'Number' }
+          },
           boolean: {
-            $type: 'Boolean',
-            required: false
+            type: 'Boolean',
+            nullable: true
           },
           booleans: {
-            $type: ['Boolean'],
-            required: false
+            elements: { type: 'Boolean' },
+            nullable: true
           },
-          date: 'Date',
-          integer: 'Integer',
-          string: 'String',
-          enum: new Set(['A', 'B', 'C']),
-          enums: [new Set(['A', 'B', 'C'])]
+          date: { type: 'Date' },
+          integer: { type: 'Integer' },
+          string: { type: 'String' },
+          enum: {
+            enum: ['A', 'B', 'C']
+          },
+          enums: {
+            elements: {
+              enum: ['A', 'B', 'C']
+            }
+          }
         })
       ]
     },

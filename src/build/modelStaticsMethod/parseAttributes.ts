@@ -1,26 +1,23 @@
 import _ from 'lodash'
+import { ColumnFieldOptions, ModelDefine, SGModel } from '../../Definition'
 
 type Selection = { name: string; selections?: Array<Selection> }
 
-export default function (args: {
-  attributes: Array<string>
-  selections: Array<any>
-}): {
+export default function (
+  this: ModelDefine,
+  args: {
+    attributes: Array<string>
+    selections: Array<any>
+  }
+): {
   attributes: Array<string>
   additionSelections: Array<Selection>
 } {
   const dbModel = this
   const schema = dbModel.getSGContext().schemas[this.name]
 
-  const getFieldName = (key, config) => {
-    let fType = config
-    if (config && config.$type) {
-      fType = config.$type
-    }
-    if (
-      typeof fType === 'string' &&
-      dbModel.getSGContext().schemas[fType] != null
-    ) {
+  const getFieldName = (key: string, config: ColumnFieldOptions) => {
+    if (config.type && dbModel.getSGContext().schemas[config.type] != null) {
       return key + 'Id'
     } else {
       return key
@@ -57,7 +54,7 @@ export default function (args: {
       hasManyConfig &&
       hasManyConfig.outputStructure === 'Array' &&
       (hasManyConfig.conditionFields == null ||
-        hasManyConfig.conditionFields.length === 0)
+        _.keys(hasManyConfig.conditionFields).length === 0)
     ) {
       ;(hasManyConfig.order || [['id', 'ASC']]).forEach((p) => {
         if (typeof p[0] === 'string') {

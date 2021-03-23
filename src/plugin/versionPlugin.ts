@@ -12,11 +12,13 @@ export default {
         typeof versionConfig === 'string' ? versionConfig : 'version'
       schema.fields({
         [versionField]: {
-          $type: 'Integer',
-          required: true,
-          config: {
-            initializable: false,
-            mutable: false
+          type: 'Integer',
+          nullable: false,
+          metadata: {
+            graphql: {
+              initializable: false,
+              updatable: false
+            }
           }
         }
       })

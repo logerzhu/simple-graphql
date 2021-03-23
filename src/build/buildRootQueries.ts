@@ -30,7 +30,7 @@ export default (
     const fieldConfig = toGraphQLFieldConfigMap(
       name,
       'Payload',
-      { '': options.$type },
+      { '': options.output },
       context
     )['']
     const finalOptions = { ...options }
@@ -53,13 +53,13 @@ export default (
       resolve: context.hookQueryResolve(name, finalOptions),
       description: options.description
     }
-    if (options.args || fieldConfig.args) {
+    if (options.input || fieldConfig.args) {
       queries[name].args = {
         ...fieldConfig.args,
         ...toGraphQLInputFieldConfigMap(
           StringHelper.toInitialUpperCase(name),
           {
-            ...options.args
+            ...options.input
           },
           context
         )
@@ -107,7 +107,11 @@ export default (
       }
     },
     resolve: context.hookQueryResolve('node', {
-      $type: { id: 'Id' },
+      output: {
+        properties: {
+          id: { type: 'Id' }
+        }
+      },
       resolve: async function (args, context, info, sgContext) {
         const id = relay.fromGlobalId(args.id)
         if (!sgContext.models[id.type]) return null

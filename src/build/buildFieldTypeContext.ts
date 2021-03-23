@@ -1,31 +1,28 @@
 import {
-  BaseDataTypeOptions,
   ColumnFieldOptions,
-  ColumnFieldOptionsType,
   DataTypeOptions,
   FieldType,
   FieldTypeContext,
+  InputFieldOptions,
   InterfaceContext,
-  ResolverContext,
-  UnionDataTypeOptions
+  OutputFieldOptions,
+  ResolverContext
 } from '../Definition'
 import Schema from '../definition/Schema'
 import {
   GraphQLFloat,
   GraphQLList,
   GraphQLObjectType,
-  GraphQLString,
-  GraphQLUnionType
+  GraphQLString
 } from 'graphql'
 import * as relay from 'graphql-relay'
 import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
 import globalIdType from './fieldType/globalIdType'
-import unionInputType from './fieldType/unionInputType'
 import Sequelize, { ModelAttributeColumnOptions } from 'sequelize'
-import _ from 'lodash'
 import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConfigMap'
 import innerFieldTypes from './fieldType'
 import innerDataTypes from './dataType'
+import _ from 'lodash'
 
 type Context = ResolverContext & InterfaceContext
 
@@ -49,14 +46,32 @@ function buildModelType(
           '',
           {
             id: {
-              $type: 'Id',
-              required: true,
-              resolve: async function (root) {
-                return relay.toGlobalId(schema.name, root.id)
+              type: 'Id',
+              nullable: false,
+              metadata: {
+                graphql: {
+                  resolve: async function (root) {
+                    return relay.toGlobalId(schema.name, root.id)
+                  }
+                }
               }
             },
             ...schema.config.fields,
-            ...schema.config.links
+            ..._.mapValues(schema.config.links, (value, key) => {
+              return {
+                ...value.output,
+                metadata: {
+                  description:
+                    value.description || value.output.metadata?.description,
+                  config: value.config,
+                  graphql: {
+                    input: value.input,
+                    dependentFields: value.dependentFields,
+                    resolve: value.resolve
+                  }
+                }
+              } as OutputFieldOptions
+            })
           },
           {
             hookFieldResolve: (name, options) =>
@@ -123,31 +138,14 @@ function buildModelType(
     },
     columnOptions: (schema, fieldName, options) => {
       const foreignField = fieldName
-      let onDelete = 'RESTRICT'
+      let onDelete = options.metadata?.column?.onDelete || 'RESTRICT'
       let constraints = true
-      if (
-        options &&
-        (<ColumnFieldOptionsType>options).$type &&
-        (<ColumnFieldOptionsType>options).columnOptions
-      ) {
-        if ((<ColumnFieldOptionsType>options).columnOptions.onDelete) {
-          onDelete = (<ColumnFieldOptionsType>options).columnOptions.onDelete
-        }
-        if (
-          (<ColumnFieldOptionsType>options).columnOptions.constraints !==
-          undefined
-        ) {
-          constraints = (<ColumnFieldOptionsType>options).columnOptions
-            .constraints
-          onDelete = undefined
-        }
+      if (options.metadata?.column?.constraints !== undefined) {
+        constraints = options.metadata.column.constraints
+        onDelete = undefined
       }
 
-      if (
-        options &&
-        (<ColumnFieldOptionsType>options).$type &&
-        (<ColumnFieldOptionsType>options).required
-      ) {
+      if (options.nullable === false) {
         schema.belongsTo({
           [fieldName]: {
             target: typeName,
@@ -193,11 +191,11 @@ function buildDataType(
   fieldTypeContext: FieldTypeContext,
   context: Context
 ): FieldType {
-  const toOutputType = (name, $type) => {
+  const toOutputType = (name: string, options: OutputFieldOptions) => {
     const outputConfigMap = toGraphQLFieldConfigMap(
       name,
       '',
-      { '': $type },
+      { '': options },
       {
         hookFieldResolve: (name, options) =>
           context.hookFieldResolve(name, options),
@@ -211,50 +209,18 @@ function buildDataType(
     return outputConfigMap && outputConfigMap.type
   }
 
-  const toInputType = (name, $type) => {
+  const toInputType = (name, options: InputFieldOptions) => {
     const inputConfigMap = toGraphQLInputFieldConfigMap(
       name,
-      { '': $type } as any,
+      { '': options },
       fieldTypeContext
     )['']
     return inputConfigMap && inputConfigMap.type
   }
 
   let outputType, inputType
-  if ((<BaseDataTypeOptions>dataTypeOptions).$type) {
-    outputType = toOutputType(
-      dataTypeOptions.name,
-      (<BaseDataTypeOptions>dataTypeOptions).$type
-    )
-    inputType = toInputType(
-      dataTypeOptions.name,
-      (<BaseDataTypeOptions>dataTypeOptions).$type
-    )
-  } else if ((<UnionDataTypeOptions>dataTypeOptions).$unionTypes) {
-    const $unionTypes = (<UnionDataTypeOptions>dataTypeOptions).$unionTypes
-    const unionTypes = _.mapValues(
-      $unionTypes,
-      (type, key) =>
-        (fieldTypeContext.fieldType(`_Union_${type}`) as any).outputType
-    )
-    outputType = new GraphQLUnionType({
-      name: dataTypeOptions.name,
-      types: _.uniq(_.values(unionTypes)),
-      resolveType(value) {
-        if (value && value.variant) {
-          return (fieldTypeContext.fieldType(
-            `_Union_${$unionTypes[value.variant]}`
-          ) as any).outputType
-        }
-      }
-    })
-    inputType = unionInputType({
-      name: `${dataTypeOptions.name}Input`,
-      inputValueTypes: _.mapValues($unionTypes, ($type, key) =>
-        toInputType(`${dataTypeOptions.name}${key}`, $type)
-      )
-    })
-  }
+  outputType = toOutputType(dataTypeOptions.name, dataTypeOptions.definition)
+  inputType = toInputType(dataTypeOptions.name, dataTypeOptions.definition)
   return {
     name: dataTypeOptions.name,
     description: dataTypeOptions.description || dataTypeOptions.name,
@@ -265,51 +231,45 @@ function buildDataType(
       fieldName: string,
       options: ColumnFieldOptions
     ) => {
-      let columnOptions: ModelAttributeColumnOptions | null | undefined = null
-      if ((<BaseDataTypeOptions>dataTypeOptions).$type) {
-        const typeName = (<BaseDataTypeOptions>dataTypeOptions).$type
-        if (typeName instanceof Set) {
-          columnOptions = {
-            type: Sequelize.STRING(191)
-          }
-        } else if (_.isArray(typeName)) {
-          columnOptions = {
-            type: Sequelize.JSON
-          }
-        } else if (typeof typeName === 'string') {
-          const fieldType = fieldTypeContext.fieldType(typeName)
-          if (!fieldType) {
-            throw new Error(`Type "${typeName}" has not register.`)
-          }
-          if (!fieldType.columnOptions) {
-            throw new Error(`Column type of "${typeName}" is not supported.`)
-          }
-          columnOptions =
-            typeof fieldType.columnOptions === 'function'
-              ? fieldType.columnOptions(schema, fieldName, options)
-              : fieldType.columnOptions
-        } else {
-          columnOptions = {
-            type: Sequelize.JSON
-          }
+      let columnOptions: ModelAttributeColumnOptions | null = null
+      const definition = dataTypeOptions.definition
+      if (definition.type) {
+        const fieldType = fieldTypeContext.fieldType(definition.type)
+        if (!fieldType) {
+          throw new Error(`Type "${definition.type}" has not register.`)
+        }
+        if (!fieldType.columnOptions) {
+          throw new Error(
+            `Column type of "${definition.type}" is not supported.`
+          )
+        }
+        columnOptions =
+          typeof fieldType.columnOptions === 'function'
+            ? fieldType.columnOptions(schema, fieldName, options)
+            : fieldType.columnOptions
+      } else if (definition.enum) {
+        columnOptions = {
+          type: Sequelize.STRING(191)
+        }
+      } else if (definition.elements) {
+        columnOptions = {
+          type: Sequelize.JSON
         }
       } else {
         columnOptions = {
           type: Sequelize.JSON
         }
       }
+
       if (columnOptions) {
         columnOptions = {
           ...columnOptions,
           ...(dataTypeOptions.columnOptions || {})
         }
-        if (
-          (<ColumnFieldOptionsType>options).$type != null &&
-          (<ColumnFieldOptionsType>options).columnOptions != null
-        ) {
+        if (options?.metadata?.column) {
           columnOptions = {
             ...columnOptions,
-            ...((<ColumnFieldOptionsType>options).columnOptions || {})
+            ...options?.metadata?.column
           }
         }
         return columnOptions
@@ -337,7 +297,7 @@ function buildUnionWrapType(
           type: typeConfig.outputType,
           resolve: typeConfig.outputResolve
             ? context.hookFieldResolve('value', {
-                $type: wrapType,
+                output: { type: wrapType },
                 resolve: typeConfig.outputResolve
               })
             : undefined
@@ -504,11 +464,11 @@ export default function (
         typeMap[schema.name + 'Connection'] = {
           name: schema.name + 'Connection',
           description: schema.name + 'Connection',
-          argFieldMap: {
-            after: 'String',
-            first: 'Number',
-            before: 'String',
-            last: 'Number'
+          additionalInput: {
+            after: { type: 'String' },
+            first: { type: 'Number' },
+            before: { type: 'String' },
+            last: { type: 'Number' }
           },
           inputType: undefined,
           outputType: connectionInfo.connectionType

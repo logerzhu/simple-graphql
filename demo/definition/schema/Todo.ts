@@ -13,44 +13,46 @@ export default SG.schema('Todo', {
   }
 }).fields({
   owner: {
-    $type: 'User',
-    required: true
+    type: 'User',
+    nullable: false
   },
   title: {
-    $type: 'String',
-    required: true
+    type: 'String',
+    nullable: false
   },
-  description: 'String',
+  description: {type: 'String'},
   completed: {
-    $type: 'Boolean',
-    required: true
+    type: 'Boolean',
+    nullable: false
   },
-  dueAt: 'Date'
+  dueAt: {type: 'Date'}
 }).queries({
   dueTodos: {
     description: 'Find all due todos',
-    $type: ['Todo'],
+    output: {
+      elements: {type: 'Todo'}
+    },
     config: {
       acl: 'User'
     },
-    args: {
+    input: {
       ownerId: {
-        $type: 'UserId',
-        required: true
+        type: 'UserId',
+        nullable: false
       },
       dueBefore: {
-        $type: 'Date',
-        required: true
+        type: 'Date',
+        nullable: false
       }
     },
     resolve: async function ({
-      ownerId,
-      dueBefore
-    }, context, info, {
-      models: {
-        Todo
-      }
-    }) {
+                               ownerId,
+                               dueBefore
+                             }, context, info, {
+                               models: {
+                                 Todo
+                               }
+                             }) {
       return Todo.findAll({
         where: {
           completed: false,
@@ -65,23 +67,23 @@ export default SG.schema('Todo', {
 }).mutations({
   completedTodo: {
     description: 'Mark the todo task completed.',
-    inputFields: {
+    input: {
       todoId: {
-        $type: 'Todo',
-        required: true
+        type: 'Todo',
+        nullable: false
       }
     },
-    outputFields: {
-      changedTodo: 'Todo'
+    output: {
+      changedTodo: {type: 'Todo'}
     },
     mutateAndGetPayload: async function ({
-      todoId
-    }, context, info, {
-      models: {
-        Todo
-      }
-    }) {
-      const todo:any = await Todo.findOne({ where: { id: todoId } })
+                                           todoId
+                                         }, context, info, {
+                                           models: {
+                                             Todo
+                                           }
+                                         }) {
+      const todo: any = await Todo.findOne({where: {id: todoId}})
       if (!todo) {
         throw new Error('Todo entity not found.')
       }
@@ -89,7 +91,7 @@ export default SG.schema('Todo', {
         todo.completed = true
         await todo.save()
       }
-      return { changedTodo: todo }
+      return {changedTodo: todo}
     }
   }
 })

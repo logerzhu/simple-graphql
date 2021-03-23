@@ -1,11 +1,11 @@
 import Sequelize from 'sequelize'
 import path from 'path'
 import fs from 'fs'
-import SG, { Schema } from '../src'
+import SG, {Schema} from '../src'
 import DemoService from './definition/service/DemoService'
 
 export default function (sequelize: Sequelize.Sequelize) {
-  function listSchemas (dir: string): Array<Schema> {
+  function listSchemas(dir: string): Array<Schema> {
     const schemas: Array<Schema> = []
     const handleFile = d => fs.readdirSync(path.resolve(__dirname, d)).map(function (file) {
       const stats = fs.statSync(path.resolve(__dirname, dir, file))
@@ -43,16 +43,22 @@ export default function (sequelize: Sequelize.Sequelize) {
     services: [DemoService],
     dataTypes: [{
       name: 'Message',
-      $unionTypes: { 文本: 'String', Dummy: 'Dummy' }
+      definition:{
+        discriminator: 'variant',
+        mapping: {
+          文本: {type: 'String'},
+          Dummy: {type: 'Dummy'}
+        }
+      }
     }],
     hooks: [{
       description: 'Enable transaction on mutations',
       priority: 100,
       filter: ({
-        type,
-        name,
-        options
-      }) => type === 'mutation',
+                 type,
+                 name,
+                 options
+               }) => type === 'mutation',
       hook: async function (action, invokeInfo, next) {
         return (sequelize as any).transaction(t => {
           return next()
@@ -62,10 +68,10 @@ export default function (sequelize: Sequelize.Sequelize) {
       description: '自定义hook',
       priority: 99,
       filter: ({
-        type,
-        name,
-        options
-      }) => type === 'mutation' && options.config != null && options.config.hook != null,
+                 type,
+                 name,
+                 options
+               }) => type === 'mutation' && options.config != null && options.config.hook != null,
       hook: async function (action, invokeInfo, next) {
         const config = action.options.config
         if (config && config.hook) {

@@ -7,14 +7,13 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
-  isOutputType
+  GraphQLUnionType
 } from 'graphql'
 import StringHelper from '../utils/StringHelper'
 import {
-  ColumnFieldOptionsType,
-  FieldOptions,
-  FieldOptionsType,
+  OutputFieldOptions,
   FieldTypeContext,
+  LinkedFieldOptions,
   ResolverContext
 } from '../Definition'
 import toGraphQLInputFieldConfigMap from './toGraphQLInputFieldConfigMap'
@@ -25,7 +24,7 @@ const toGraphQLFieldConfigMap = function (
   name: string,
   postfix: string,
   fields: {
-    [id: string]: FieldOptions
+    [id: string]: OutputFieldOptions
   },
   context: Context
 ): GraphQLFieldConfigMap<any, any> {
@@ -33,8 +32,6 @@ const toGraphQLFieldConfigMap = function (
     return (
       name +
       path
-        .replace(/\.\$type/g, '')
-        .replace(/\[\d*\]/g, '')
         .split('.')
         .map((v) => StringHelper.toInitialUpperCase(v))
         .join('')
@@ -55,14 +52,14 @@ const toGraphQLFieldConfigMap = function (
         type: fieldType.outputType,
         args: toGraphQLInputFieldConfigMap(
           toTypeName(fieldName, fieldPath),
-          fieldType.argFieldMap || {},
+          fieldType.additionalInput || {},
           context
         )
       }
       const outputResolve = fieldType.outputResolve
       if (outputResolve) {
         config.resolve = context.hookFieldResolve(fieldPath, {
-          $type: typeName,
+          output: { type: typeName },
           resolve: outputResolve
         })
       }
@@ -75,120 +72,152 @@ const toGraphQLFieldConfigMap = function (
   const convert = (
     name: string,
     path: string,
-    field: any
-  ): GraphQLFieldConfig<any, any> | null | undefined => {
-    if (typeof field === 'string' || typeof field === 'function') {
-      return fieldConfig(name, path, field)
-    }
-    if (field instanceof Set) {
-      return {
-        type: new GraphQLEnumType({
-          name:
-            StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
-          values: _.fromPairs(
-            [...field].map((f) => [f, { value: f, description: f }])
-          )
-        })
-      }
-    } else if (_.isArray(field)) {
-      if (typeof field[0] === 'string' && context.fieldType(`[${field[0]}]`)) {
-        return fieldConfig(name, path, `[${field[0]}]`)
+    field: OutputFieldOptions
+  ): GraphQLFieldConfig<any, any> | null => {
+    const makeNonNull = function (config: GraphQLFieldConfig<any, any> | null) {
+      if (config == null) {
+        return null
       }
 
-      const subField = convert(name, path, field[0])
-      if (subField) {
-        return {
-          type: new GraphQLList(subField.type)
+      if (
+        field.nullable === false &&
+        !(config.type instanceof GraphQLNonNull)
+      ) {
+        config.type = new GraphQLNonNull(config.type)
+      }
+
+      config.description = field.metadata?.description
+      const finalField: LinkedFieldOptions = {
+        description: config.description,
+        config: field.metadata?.config,
+        input: field.metadata?.graphql?.input,
+        dependentFields: field.metadata?.graphql?.dependentFields,
+        output: field,
+        resolve: async function (root, args, context, info) {
+          return root[info.fieldName]
         }
       }
-    }
-    if (isOutputType(field)) {
-      return { type: field }
-    } else if (field instanceof Object) {
-      if (field.$type) {
-        const result = convert(name, path, field.$type)
-        if (result) {
-          result.description = field.description
-          if (field.required) {
-            if (!(result.type instanceof GraphQLNonNull)) {
-              result.type = new GraphQLNonNull(result.type)
-            }
-          }
-          if (field.resolve) {
-            const finalField = { ...field }
-            if (result.resolve) {
-              const resolve = result.resolve
-              finalField.resolve = async function (
-                source,
-                args,
-                context,
-                info,
-                sgContext
-              ) {
-                return resolve(
-                  {
-                    [info.fieldName]: await field.resolve(
-                      source,
-                      args,
-                      context,
-                      info,
-                      sgContext
-                    )
-                  },
+
+      if (field.metadata?.graphql?.resolve) {
+        const cusResolve = field.metadata.graphql.resolve
+        if (config.resolve) {
+          const resolve = config.resolve
+          finalField.resolve = async function (
+            source,
+            args,
+            context,
+            info,
+            sgContext
+          ) {
+            return resolve(
+              {
+                [info.fieldName]: await cusResolve(
+                  source,
                   args,
                   context,
-                  info
+                  info,
+                  sgContext
                 )
-              }
-            }
-            result.resolve = context.hookFieldResolve(path, finalField)
-          } else if (field.config != null) {
-            // 性能优化:默认情况下不加hook
-            result.resolve =
-              result.resolve ||
-              context.hookFieldResolve(path, {
-                ...field,
-                resolve: async function (root, args, context, info) {
-                  return root[info.fieldName]
-                }
-              })
+              },
+              args,
+              context,
+              info
+            )
           }
-          if (field.args) {
-            result.args = {
-              ...result.args,
-              ...toGraphQLInputFieldConfigMap(
-                toTypeName(name, path),
-                field.args,
-                context
-              )
-            }
-          }
+        } else {
+          finalField.resolve = cusResolve
         }
-        return result
+        config.resolve = context.hookFieldResolve(path, finalField)
       } else {
-        if (_.keys(field).length > 0) {
-          return {
-            type: new GraphQLObjectType({
-              name:
-                StringHelper.toInitialUpperCase(toTypeName(name, path)) +
-                postfix,
-              fields: () =>
-                toGraphQLFieldConfigMap(
-                  toTypeName(name, path),
-                  postfix,
-                  field,
-                  context
-                )
-            }),
-            resolve: context.hookFieldResolve(path, {
-              $type: field,
-              resolve: async function (root, args, context, info) {
-                return root[info.fieldName]
-              }
-            })
-          }
+        // 性能优化:默认情况下不加hook
+        config.resolve =
+          config.resolve || context.hookFieldResolve(path, finalField)
+      }
+
+      if (field.metadata?.graphql?.input) {
+        config.args = {
+          ...config.args,
+          ...toGraphQLInputFieldConfigMap(
+            toTypeName(name, path),
+            field.metadata?.graphql?.input,
+            context
+          )
         }
       }
+      return config
+    }
+
+    if (field.type) {
+      return makeNonNull(fieldConfig(name, path, field.type))
+    } else if (field.enum) {
+      return makeNonNull({
+        type: new GraphQLEnumType({
+          name:
+            StringHelper.toInitialUpperCase(toTypeName(name, path)) + postfix,
+          values: _.fromPairs(
+            [...field.enum].map((f) => [f, { value: f, description: f }])
+          )
+        })
+      })
+    } else if (field.elements) {
+      if (
+        field.elements.type &&
+        context.fieldType(`[${field.elements.type}]`)
+      ) {
+        return makeNonNull(fieldConfig(name, path, `[${field.elements.type}]`))
+      } else {
+        const subField = convert(name, path, field.elements)
+        if (subField) {
+          return makeNonNull({
+            type: new GraphQLList(subField.type)
+          })
+        }
+      }
+    } else if (field.properties) {
+      if (_.keys(field.properties).length > 0) {
+        return makeNonNull({
+          type: new GraphQLObjectType({
+            name:
+              StringHelper.toInitialUpperCase(toTypeName(name, path)) + postfix,
+            fields: () =>
+              toGraphQLFieldConfigMap(
+                toTypeName(name, path),
+                postfix,
+                field.properties,
+                context
+              )
+          }),
+          resolve: context.hookFieldResolve(path, {
+            output: field,
+            resolve: async function (root, args, context, info) {
+              return root[info.fieldName]
+            }
+          })
+        })
+      }
+    } else if (field.values) {
+      //TODO
+    } else if (field.mapping) {
+      //TODO 支持嵌套定义
+      const unionTypes = _.mapValues(
+        field.mapping,
+        (value, key) => context.fieldType(`_Union_${value.type}`).outputType
+      )
+      return makeNonNull({
+        type: new GraphQLUnionType({
+          name:
+            StringHelper.toInitialUpperCase(toTypeName(name, path)) + postfix,
+          types: _.uniq(_.values(unionTypes)) as any, //TODO 需要 Object Type
+          resolveType(value) {
+            if (value && value[field.discriminator]) {
+              return (context.fieldType(
+                `_Union_${field.mapping[value[field.discriminator]].type}` // TODO 支持嵌套定义
+              ) as any).outputType
+            }
+          }
+        })
+      })
+      //TODO
     }
     return null
   }
@@ -196,10 +225,7 @@ const toGraphQLFieldConfigMap = function (
   const fieldMap: GraphQLFieldConfigMap<any, any> = {}
 
   _.forOwn(fields, (value, key) => {
-    if (
-      (<FieldOptionsType>value).$type &&
-      (<ColumnFieldOptionsType>value).hidden
-    ) {
+    if (value.metadata?.graphql?.hidden) {
       // Hidden field, ignore
       // Have resolve method, ignore
     } else {

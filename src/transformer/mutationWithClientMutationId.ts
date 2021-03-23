@@ -52,6 +52,7 @@ export default function mutationWithClientMutationId(config: {
       const input = _ref.input
       return Promise.resolve(mutateAndGetPayload(_, input, context, info)).then(
         function (payload) {
+          payload = payload || {}
           payload.clientMutationId = input.clientMutationId
           return payload
         }

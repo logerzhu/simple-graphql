@@ -4,12 +4,7 @@ import Sequelize, {
   ModelCtor
 } from 'sequelize'
 import Schema from '../definition/Schema'
-import {
-  ColumnFieldOptionsType,
-  FieldTypeContext,
-  ModelDefine,
-  SGContext
-} from '../Definition'
+import { FieldTypeContext, ModelDefine, SGContext } from '../Definition'
 import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
 
@@ -28,27 +23,24 @@ function toSequelizeModel(
 
   _.forOwn(schema.config.fields, (value, key) => {
     if (key === versionField) return
-    let typeName = value
-    if (value && (<ColumnFieldOptionsType>value).$type) {
-      typeName = (<ColumnFieldOptionsType>value).$type
-    }
 
     let columnOptions: ModelAttributeColumnOptions | null | undefined = null
-    if (typeName instanceof Set) {
+
+    if (value.enum) {
       columnOptions = {
         type: Sequelize.STRING(191)
       }
-    } else if (_.isArray(typeName)) {
+    } else if (value.elements) {
       columnOptions = {
         type: Sequelize.JSON
       }
-    } else if (typeof typeName === 'string') {
-      const fieldType = context.fieldType(typeName)
+    } else if (value.type) {
+      const fieldType = context.fieldType(value.type)
       if (!fieldType) {
-        throw new Error(`Type "${typeName}" has not register.`)
+        throw new Error(`Type "${value.type}" has not register.`)
       }
       if (!fieldType.columnOptions) {
-        throw new Error(`Column type of "${typeName}" is not supported.`)
+        throw new Error(`Column type of "${value.type}" is not supported.`)
       }
       columnOptions =
         typeof fieldType.columnOptions === 'function'
@@ -61,20 +53,10 @@ function toSequelizeModel(
     }
     if (columnOptions) {
       dbDefinition[key] = { ...columnOptions }
-      if (value && (<ColumnFieldOptionsType>value).$type) {
-        if ((<ColumnFieldOptionsType>value).required != null) {
-          dbDefinition[key].allowNull = !(<ColumnFieldOptionsType>value)
-            .required
-        }
-        if ((<ColumnFieldOptionsType>value).default != null) {
-          dbDefinition[key].defaultValue = (<ColumnFieldOptionsType>(
-            value
-          )).default
-        }
-        dbDefinition[key] = {
-          ...dbDefinition[key],
-          ...((<ColumnFieldOptionsType>value).columnOptions || {})
-        }
+      dbDefinition[key].allowNull = value.nullable !== false
+      dbDefinition[key] = {
+        ...dbDefinition[key],
+        ...(value.metadata?.column || {})
       }
       // TODO underscored support
       // if ((sequelize.options.define || {}).underscored && dbDefinition[key].field == null) {

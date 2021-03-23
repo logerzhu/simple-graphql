@@ -1,108 +1,140 @@
 import _ from 'lodash'
 import Sequelize from 'sequelize'
 import StringHelper from '../utils/StringHelper'
-import { ColumnFieldOptions, PluginOptions } from '../Definition'
+import {
+  ColumnFieldOptions,
+  InputFieldOptions,
+  PluginOptions,
+  SGContext
+} from '../Definition'
+import { Schema } from '../index'
 
-const getSearchFields = (schema, schemas) => {
-  const searchFields: any = {}
-
-  const isModelType = (fieldOptions: ColumnFieldOptions) => {
-    if (typeof fieldOptions === 'string') {
-      return schemas.find((s) => s.name === fieldOptions) != null
-    } else if (typeof fieldOptions === 'object') {
-      return schemas.find((s) => s.name === (fieldOptions as any).$type) != null
-    }
-    return false
+const getSearchFields = (schema: Schema, schemas: Array<Schema>) => {
+  const isModelType = (fieldOptions: InputFieldOptions) => {
+    return (
+      fieldOptions.type &&
+      schemas.find((s) => s.name === fieldOptions.type) != null
+    )
   }
 
-  const advanceType = (type) => {
+  const advanceType = (options: InputFieldOptions): InputFieldOptions => {
+    if (options.elements) {
+      return {
+        properties: {
+          contains: options.elements
+        }
+      }
+    } else if (options.type === 'Boolean') {
+      return options
+    }
+
+    const aType: { [key: string]: InputFieldOptions } = {
+      ne: options,
+      eq: options,
+      in: {
+        elements: options
+      },
+      notIn: {
+        elements: options
+      }
+    }
     if (
-      typeof type === 'string' &&
-      type.startsWith('[') &&
-      type.endsWith(']')
+      options.type === 'Number' ||
+      options.type === 'Integer' ||
+      options.type === 'Date'
     ) {
-      return { contains: [type.substring(1, type.length - 2)] }
+      aType.gt = options
+      aType.gte = options
+      aType.lt = options
+      aType.lte = options
+      aType.between = options
+      aType.notBetween = options
     }
-    if (_.isArray(type)) {
-      return { contains: type }
+    if (options.type === 'String') {
+      aType.like = options
+      aType.notLike = options
+      aType.startsWith = options
+      aType.endsWith = options
+      aType.substring = options
+      aType.regexp = options
+      aType.notRegexp = options
     }
-    if (type === 'Boolean') {
-      return type
+    return {
+      properties: aType
     }
-    const aType: any = {
-      ne: type,
-      eq: type,
-      in: [type],
-      notIn: [type]
-    }
-    if (type === 'Number' || type === 'Integer' || type === 'Date') {
-      aType.gt = type
-      aType.gte = type
-      aType.lt = type
-      aType.lte = type
-      aType.between = type
-      aType.notBetween = type
-    }
-    if (type === 'String') {
-      aType.like = type
-      aType.notLike = type
-      aType.startsWith = type
-      aType.endsWith = type
-      aType.substring = type
-      aType.regexp = type
-      aType.notRegexp = type
-    }
-    return aType
   }
 
+  const searchFields: {
+    [key: string]: {
+      definition: InputFieldOptions
+      mapper: (
+        option: { where: any; attributes: Array<string> },
+        argValue: any,
+        context: SGContext
+      ) => void
+    }
+  } = {}
   _.forOwn(
-    { id: schema.name + 'Id', ...schema.config.fields },
+    {
+      id: { type: schema.name + 'Id' } as ColumnFieldOptions,
+      ...schema.config.fields
+    },
     (value, key: string) => {
       if (isModelType(value)) {
         if (!key.endsWith('Id')) {
           key = key + 'Id'
         }
       }
-      if (value && value.$type) {
-        if (!value.hidden && !value.resolve) {
+      if (
+        value.metadata?.graphql?.hidden !== true &&
+        value.metadata?.graphql?.searchable !== false
+      ) {
+        if (value.metadata?.graphql?.mapper) {
+          //自定义mapper不需要扩展查询类型
           searchFields[key] = {
-            ...value,
-            $type: advanceType(value.$type),
-            required: false,
-            default: null
+            definition: {
+              ...value,
+              nullable: true,
+              metadata: { description: value.metadata?.description }
+            },
+            mapper: value.metadata?.graphql?.mapper
           }
         } else {
-          return
-        }
-      } else {
-        searchFields[key] = { $type: advanceType(value) }
-      }
-
-      searchFields[key].mapper = function (
-        option: { where: Object; attributes: Array<string> },
-        argValue,
-        sgContext
-      ) {
-        if (argValue !== undefined) {
-          option.where[Sequelize.Op.and] = option.where[Sequelize.Op.and] || []
-          if (argValue == null || typeof argValue === 'boolean') {
-            option.where[Sequelize.Op.and].push({ [key]: argValue })
-          } else {
-            const keyCondition = {}
-            for (const opKey of _.keys(argValue)) {
-              if (opKey !== 'contains') {
-                keyCondition[Sequelize.Op[opKey]] = argValue[opKey]
-              } else {
-                option.where[Sequelize.Op.and].push(
-                  Sequelize.literal(
-                    `json_contains(\`${key}\`, '${JSON.stringify(
-                      argValue[opKey]
-                    )}' )`
-                  )
-                )
+          searchFields[key] = {
+            definition: advanceType({
+              ...value,
+              nullable: true,
+              metadata: { description: value.metadata?.description }
+            }),
+            mapper: function (
+              option: { where: Object; attributes: Array<string> },
+              argValue,
+              sgContext
+            ) {
+              if (argValue !== undefined) {
+                option.where[Sequelize.Op.and] =
+                  option.where[Sequelize.Op.and] || []
+                if (argValue == null || typeof argValue === 'boolean') {
+                  option.where[Sequelize.Op.and].push({ [key]: argValue })
+                } else {
+                  const keyCondition = {}
+                  for (const opKey of _.keys(argValue)) {
+                    if (opKey !== 'contains') {
+                      keyCondition[Sequelize.Op[opKey]] = argValue[opKey]
+                    } else {
+                      option.where[Sequelize.Op.and].push(
+                        Sequelize.literal(
+                          `json_contains(\`${key}\`, '${JSON.stringify(
+                            argValue[opKey]
+                          )}' )`
+                        )
+                      )
+                    }
+                  }
+                  option.where[Sequelize.Op.and].push({ [key]: keyCondition })
+                }
               }
             }
-            option.where[Sequelize.Op.and].push({ [key]: keyCondition })
           }
         }
       }
@@ -117,9 +149,18 @@ export default {
   priority: 0,
   description: 'Gen `plural query` for Schema',
   applyToSchema: function pluralQuery(schema, options, schemas): void {
-    const searchFields = {
+    const searchFields: {
+      [key: string]: {
+        definition: InputFieldOptions
+        mapper: (
+          option: { where: any; attributes: Array<string> },
+          argValue: any,
+          context: SGContext
+        ) => void
+      }
+    } = {
       ...getSearchFields(schema, schemas),
-      ...((options && (<{ [key: string]: any }>options).conditionFields) || {})
+      ...((options as any)?.conditionFields || {})
     }
 
     let config: { [key: string]: any } = {}
@@ -132,29 +173,39 @@ export default {
         config.name || schema.name + 's'
       )}`]: {
         config: config,
-        $type: schema.name + 'Connection',
-        args: {
+        output: { type: schema.name + 'Connection' },
+        input: {
           ...(_.keys(searchFields).length > 0
             ? {
                 condition: {
-                  $type: [
-                    _.mapValues(searchFields, (fieldConfig) => {
-                      const { mapper, ...value } = fieldConfig
-                      return value
+                  elements: {
+                    properties: _.mapValues(searchFields, (fieldConfig) => {
+                      const { mapper, definition } = fieldConfig
+                      return definition
                     })
-                  ],
-                  description: 'Query Condition'
+                  },
+                  metadata: {
+                    description: 'Query Condition'
+                  }
                 }
               }
             : {}),
           sort: {
-            $type: [
-              {
-                field: new Set(_.keys(searchFields)),
-                order: new Set(['ASC', 'DESC'])
+            elements: {
+              properties: {
+                field: {
+                  enum: _.keys(searchFields)
+                },
+                order: {
+                  elements: {
+                    enum: ['ASC', 'DESC']
+                  }
+                }
               }
-            ],
-            description: 'Define the sort field'
+            },
+            metadata: {
+              description: 'Define the sort field'
+            }
           }
         },
         resolve: async function (args, context, info, sgContext) {

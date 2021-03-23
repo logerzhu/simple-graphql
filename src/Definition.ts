@@ -21,6 +21,7 @@ import parseAttributes from './build/modelStaticsMethod/parseAttributes'
 import hasSelection from './build/modelStaticsMethod/hasSelection'
 import findOneForGraphQL from './build/modelStaticsMethod/findOneForGraphQL'
 import findByPkForGraphQL from './build/modelStaticsMethod/findByPkForGraphQL'
+import { DataType } from 'sequelize/types/lib/data-types'
 
 export abstract class SGModel extends Model {
   static resolveRelayConnection: typeof resolveRelayConnection
@@ -41,6 +42,8 @@ export abstract class SGModel extends Model {
 
   static clearCache: () => Promise<void>
   static sgSchema: Schema
+
+  static getSGContext: () => SGContext
 }
 
 export type ModelDefine = { new (): SGModel } & typeof SGModel
@@ -109,7 +112,7 @@ export type FieldType = {
   name: string
   description?: string
   inputType?: GraphQLInputType | null | undefined
-  argFieldMap?: {
+  additionalInput?: {
     [key: string]: InputFieldOptions
   }
   outputType?: GraphQLOutputType | null | undefined
@@ -123,116 +126,159 @@ export type FieldType = {
       ) => ModelAttributeColumnOptions | null | undefined)
 }
 
-export type InputFieldOptionsType = {
-  $type: InputFieldOptions
+export type TypeMetadata = {
   description?: string
-  required: boolean
-  default?: any
-  mapper?: (
-    option: { where: { [key: string]: any }; attributes: Array<string> },
-    arg1: any
-  ) => void
 }
 
-export type InputFieldOptions =
-  | string
-  | Set<string>
-  | Array<InputFieldOptions>
-  | InputFieldOptionsType
-  | {
+export type OutputTypeMetadata = TypeMetadata & {
+  config?: { [key: string]: any }
+  graphql?: {
+    hidden?: boolean
+    resolve?: FieldResolve
+    dependentFields?: Array<string>
+    input?: {
       [key: string]: InputFieldOptions
     }
-
-export type FieldOptionsType = {
-  config?: { [key: string]: any }
-  $type: FieldOptions
-  description?: string
-  required: boolean
-  default?: any
-  args?: {
-    [key: string]: InputFieldOptions
   }
-  dependentFields?: Array<string>
-  resolve?: FieldResolve
 }
 
-export type FieldOptions =
-  | string
-  | Set<string>
-  | Array<FieldOptions>
-  | FieldOptionsType
+export type InputTypeMetadata = TypeMetadata & {
+  graphql?: {
+    hidden?: boolean
+    defaultValue?: any
+    mapper?: (
+      option: { where: any; attributes: Array<string> },
+      argValue: any,
+      context: SGContext
+    ) => void
+  }
+}
+
+// 基于 https://jsontypedef.com/ 扩展 sequelize / graphql 配置
+export type TypeDefinition<T extends TypeMetadata = TypeMetadata> = (
   | {
-      [key: string]: FieldOptions
+      type:
+        | 'String'
+        | 'Number'
+        | 'Integer'
+        | 'Date'
+        | 'JSON'
+        | 'Boolean'
+        | string
+      enum?: undefined
+      elements?: undefined
+      properties?: undefined
+      values?: undefined
+      discriminator?: undefined
+      mapping?: undefined
     }
+  | {
+      enum: string[]
+      type?: undefined
+      elements?: undefined
+      properties?: undefined
+      values?: undefined
+      discriminator?: undefined
+      mapping?: undefined
+    }
+  | {
+      elements: TypeDefinition<T>
+      type?: undefined
+      enum?: undefined
+      properties?: undefined
+      values?: undefined
+      discriminator?: undefined
+      mapping?: undefined
+    }
+  | {
+      properties: { [key: string]: TypeDefinition<T> }
+      type?: undefined
+      enum?: undefined
+      elements?: undefined
+      values?: undefined
+      discriminator?: undefined
+      mapping?: undefined
+    }
+  | {
+      values: TypeDefinition<T>
+      type?: undefined
+      enum?: undefined
+      elements?: undefined
+      properties?: undefined
+      discriminator?: undefined
+      mapping?: undefined
+    }
+  | {
+      discriminator: string
+      mapping: { [key: string]: TypeDefinition<T> }
+      type?: undefined
+      enum?: undefined
+      elements?: undefined
+      properties?: undefined
+      values?: undefined
+    }
+) & {
+  definitions?: { [key: string]: TypeDefinition<T> }
+  nullable?: boolean
+  metadata?: T
+}
+
+export type InputFieldOptions = TypeDefinition<InputTypeMetadata>
+
+export type OutputFieldOptions = TypeDefinition<OutputTypeMetadata>
 
 export type LinkedFieldOptions = {
-  config?: { [key: string]: any }
-  $type: FieldOptions
   description?: string
-  required?: boolean
-  dependentFields?: Array<string>
-  args?: {
+  config?: { [key: string]: any }
+  input?: {
     [key: string]: InputFieldOptions
   }
+  dependentFields?: Array<string>
+  output: OutputFieldOptions
   resolve: FieldResolve
 }
 
-export type ColumnFieldOptionsType = {
-  config?: any
-  $type: FieldOptions
-  description?: string
-  required: boolean
-  default?: any
-  hidden?: boolean
-  columnOptions?: ModelAttributeColumnOptions & { constraints?: boolean }
-  resolve?: FieldResolve
-}
-
-export type ColumnFieldOptions =
-  | string
-  | Set<string>
-  | Array<FieldOptions>
-  | ColumnFieldOptionsType
-  | {
-      [key: string]: FieldOptions
+export type ColumnFieldOptions = TypeDefinition<
+  OutputTypeMetadata & InputTypeMetadata
+> & {
+  metadata?: {
+    graphql?: {
+      initializable?: boolean
+      updatable?: boolean
+      searchable?: boolean
     }
-
-export type BaseDataTypeOptions = {
-  name: string
-  $type: FieldOptions
-  description?: string
-  columnOptions?: ModelAttributeColumnOptions
-}
-
-export type UnionDataTypeOptions = {
-  name: string
-  $unionTypes: {
-    [key: string]: string
+    column?: Omit<ModelAttributeColumnOptions, 'type'> & {
+      type?: DataType
+      constraints?: boolean
+    }
   }
-  description?: string
-  columnOptions?: ModelAttributeColumnOptions
 }
 
-export type DataTypeOptions = BaseDataTypeOptions | UnionDataTypeOptions
+export type DataTypeOptions = {
+  name: string
+  description?: string
+  definition: TypeDefinition<OutputTypeMetadata & InputTypeMetadata>
+  columnOptions?: ModelAttributeColumnOptions
+}
 
 export type QueryOptions = {
-  $type: FieldOptions
   description?: string
   config?: { [key: string]: any }
-  args?: {
+  input?: {
     [key: string]: InputFieldOptions
   }
+  output: OutputFieldOptions
   resolve: RootResolve
 }
 
 export type MutationOptions = {
   description?: string
   config?: { [key: string]: any }
-  inputFields: {
+  input: {
     [key: string]: InputFieldOptions
   }
-  outputFields: {
-    [key: string]: FieldOptions
+  output: {
+    [key: string]: OutputFieldOptions
   }
   mutateAndGetPayload: RootResolve
 }

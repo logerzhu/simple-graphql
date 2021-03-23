@@ -14,7 +14,7 @@ test('引用类型生成', async () => {
           }
         })
           .fields({
-            name: 'String'
+            name: { type: 'String' }
           })
           .hasOne({
             dummyA: {
@@ -38,14 +38,18 @@ test('引用类型生成', async () => {
             addMutation: true
           }
         }).fields({
-          name: 'String',
-          dummyA: 'Dummy1',
-          dummyB: 'Dummy1',
-          dummyC: ['Dummy1'],
+          name: { type: 'String' },
+          dummyA: { type: 'Dummy1' },
+          dummyB: { type: 'Dummy1' },
+          dummyC: {
+            elements: { type: 'Dummy1' }
+          },
           dummyD: {
-            at: 'Date',
-            dummyE: 'Dummy1',
-            dummyF: ['Dummy1']
+            properties: {
+              at: { type: 'Date' },
+              dummyE: { type: 'Dummy1' },
+              dummyF: { elements: { type: 'Dummy1' } }
+            }
           }
         })
       ]

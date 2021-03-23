@@ -6,17 +6,12 @@ import {
   GraphQLInputFieldConfigMap,
   GraphQLInputObjectType,
   GraphQLList,
-  GraphQLNonNull,
-  isInputType
+  GraphQLNonNull
 } from 'graphql'
 import StringHelper from '../utils/StringHelper'
-import {
-  ColumnFieldOptionsType,
-  FieldOptionsType,
-  FieldTypeContext,
-  InputFieldOptions,
-  InputFieldOptionsType
-} from '../Definition'
+import { FieldTypeContext, InputFieldOptions } from '../Definition'
+
+import unionInputType from '../build/fieldType/unionInputType'
 
 const toGraphQLInputFieldConfigMap = function (
   name: string,
@@ -29,17 +24,13 @@ const toGraphQLInputFieldConfigMap = function (
     return (
       name +
       path
-        .replace(/\.\$type/g, '')
-        .replace(/\[\d*\]/g, '')
         .split('.')
         .map((v) => StringHelper.toInitialUpperCase(v))
         .join('')
     )
   }
 
-  const inputFieldConfig = (
-    typeName
-  ): GraphQLInputFieldConfig | null | undefined => {
+  const inputFieldConfig = (typeName): GraphQLInputFieldConfig | null => {
     const fieldType = context.fieldType(typeName)
     if (!fieldType) {
       throw new Error(`Type "${typeName}" has not register.`)
@@ -54,70 +45,84 @@ const toGraphQLInputFieldConfigMap = function (
   const convert = (
     name: string,
     path: string,
-    field: any
-  ): GraphQLInputFieldConfig | null | undefined => {
-    if (typeof field === 'string' || typeof field === 'function') {
-      return inputFieldConfig(field)
+    field: InputFieldOptions
+  ): GraphQLInputFieldConfig | null => {
+    const makeNonNull = function (config: GraphQLInputFieldConfig | null) {
+      if (config == null) {
+        return null
+      }
+      config.description = field.metadata?.description
+      if (field.metadata?.graphql?.defaultValue) {
+        config.defaultValue = field.metadata?.graphql?.defaultValue
+        config.description = `${config.description || ''}  默认值: ${
+          config.defaultValue
+        }`
+      }
+      if (
+        field.nullable === false &&
+        !(config.type instanceof GraphQLNonNull)
+      ) {
+        config.type = new GraphQLNonNull(config.type)
+      }
+      return config
     }
-    if (field instanceof Set) {
-      return {
+
+    if (field.type) {
+      return makeNonNull(inputFieldConfig(field.type))
+    } else if (field.enum) {
+      return makeNonNull({
         type: new GraphQLEnumType({
           name:
             StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
           values: _.fromPairs(
-            [...field].map((f) => [f, { value: f, description: f }])
+            [...field.enum].map((f) => [f, { value: f, description: f }])
           )
         })
-      }
-    } else if (_.isArray(field)) {
-      if (typeof field[0] === 'string' && context.fieldType(`[${field[0]}]`)) {
-        return inputFieldConfig(`[${field[0]}]`)
+      })
+    } else if (field.elements) {
+      if (
+        field.elements.type &&
+        context.fieldType(`[${field.elements.type}]`)
+      ) {
+        return makeNonNull(inputFieldConfig(`[${field.elements.type}]`))
       }
 
-      const subField = convert(name, path, field[0])
+      const subField = convert(name, path, field.elements)
       if (subField) {
-        return {
+        return makeNonNull({
           type: new GraphQLList(subField.type)
-        }
+        })
       }
-    } else if (isInputType(field)) {
-      return { type: field }
-    } else if (field instanceof Object) {
-      if (field.$type) {
-        const result = convert(name, path, field.$type)
-        if (result) {
-          result.description = field.description
-          if (field.default != null && !_.isFunction(field.default)) {
-            result.defaultValue = field.default
-            result.description =
-              (result.description ? result.description : '') +
-              ' 默认值:' +
-              result.defaultValue
-          }
-          if (field.required) {
-            if (!(result.type instanceof GraphQLNonNull)) {
-              result.type = new GraphQLNonNull(result.type)
-            }
-          }
-        }
-        return result
-      } else {
-        if (_.keys(field).length > 0) {
-          return {
-            type: new GraphQLInputObjectType({
-              name:
-                StringHelper.toInitialUpperCase(toTypeName(name, path)) +
-                'Input',
-              fields: () =>
-                toGraphQLInputFieldConfigMap(
-                  toTypeName(name, path),
-                  field,
-                  context
-                )
-            })
-          }
-        }
+    }
+    if (field.properties) {
+      if (_.keys(field.properties).length > 0) {
+        return makeNonNull({
+          type: new GraphQLInputObjectType({
+            name:
+              StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
+            fields: () =>
+              toGraphQLInputFieldConfigMap(
+                toTypeName(name, path),
+                field.properties,
+                context
+              )
+          })
+        })
       }
+    } else if (field.values) {
+      //TODO
+    } else if (field.mapping) {
+      //TODO
+      return makeNonNull({
+        type: unionInputType({
+          name:
+            StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
+          inputValueTypes: _.mapValues(
+            field.mapping,
+            (options, key) => inputFieldConfig(options.type).type //TODO 支持嵌套类型
+          )
+        })
+      })
     }
     return null
   }
@@ -125,11 +130,7 @@ const toGraphQLInputFieldConfigMap = function (
   const fieldMap: GraphQLInputFieldConfigMap = {}
 
   _.forOwn(fields, (value, key) => {
-    if (
-      (<InputFieldOptionsType>value).$type &&
-      ((<ColumnFieldOptionsType>value).hidden ||
-        (<FieldOptionsType>value).resolve)
-    ) {
+    if (value.metadata?.graphql?.hidden) {
       // Hidden field, ignore
       // Have resolve method, ignore
     } else {

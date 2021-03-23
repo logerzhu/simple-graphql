@@ -9,18 +9,22 @@ test('数据类型生成', async () => {
       dataTypes: [
         {
           name: 'DummyData1',
-          $type: {
-            name: 'String',
-            data: 'DummyData2'
+          definition: {
+            properties: {
+              name: { type: 'String' },
+              data: { type: 'DummyData2' }
+            }
           }
         },
         {
           name: 'DummyData2',
-          $type: [
-            {
-              length: 'Number'
+          definition: {
+            elements: {
+              properties: {
+                length: { type: 'Number' }
+              }
             }
-          ]
+          }
         }
       ],
       schemas: [
@@ -29,8 +33,8 @@ test('数据类型生成', async () => {
             addMutation: true
           }
         }).fields({
-          name: 'String',
-          data: 'DummyData1'
+          name: { type: 'String' },
+          data: { type: 'DummyData1' }
         })
       ]
     },

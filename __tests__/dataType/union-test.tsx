@@ -10,11 +10,18 @@ test('Union数据类型生成', async () => {
       dataTypes: [
         {
           name: 'Text',
-          $type: 'String'
+          definition: { type: 'String' }
         },
         {
           name: 'Union',
-          $unionTypes: { 文本: 'Text', 实体: 'Dummy', 短文本: 'Text' }
+          definition: {
+            discriminator: 'variant',
+            mapping: {
+              文本: { type: 'Text' },
+              实体: { type: 'Dummy' },
+              短文本: { type: 'Text' }
+            }
+          }
         }
       ],
       schemas: [
@@ -23,9 +30,9 @@ test('Union数据类型生成', async () => {
             addMutation: true
           }
         }).fields({
-          name: 'Text',
-          data: 'Union',
-          datas: ['Union']
+          name: { type: 'Text' },
+          data: { type: 'Union' },
+          datas: { elements: { type: 'Union' } }
         })
       ]
     },
@@ -139,7 +146,7 @@ test('Union数据类型生成', async () => {
   expect(addResult2.errors).toBeUndefined()
   const node2 = _.get(addResult2, 'data.addDummy.addedDummyEdge.node')
   expect(node2.name).toEqual(values2.name)
-  console.log(node2.data)
+
   expect(node2.data.value.name).toEqual('Hello')
   expect(node2.datas[0].text).toEqual('测试')
   expect(node2.datas[1].value.name).toEqual('Hello')

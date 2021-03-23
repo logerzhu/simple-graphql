@@ -8,19 +8,23 @@ export default {
   applyToSchema: (schema, options, schemas) => {
     schema.fields({
       createdAt: {
-        $type: 'Date',
-        required: false,
-        config: {
-          initializable: false,
-          mutable: false
+        type: 'Date',
+        nullable: true,
+        metadata: {
+          graphql: {
+            initializable: false,
+            updatable: false
+          }
         }
       },
       updatedAt: {
-        $type: 'Date',
-        required: false,
-        config: {
-          initializable: false,
-          mutable: false
+        type: 'Date',
+        nullable: true,
+        metadata: {
+          graphql: {
+            initializable: false,
+            updatable: false
+          }
         }
       }
     })
@@ -32,10 +36,13 @@ export default {
     ) {
       schema.fields({
         deletedAt: {
-          $type: 'Date',
-          required: false,
-          config: {
-            initializable: false
+          type: 'Date',
+          nullable: true,
+          metadata: {
+            graphql: {
+              initializable: false,
+              updatable: false
+            }
           }
         }
       })

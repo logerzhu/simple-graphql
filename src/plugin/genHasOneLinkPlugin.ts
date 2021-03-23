@@ -14,7 +14,7 @@ export default {
       schema.links({
         [key]: {
           config: config.config,
-          $type: config.target,
+          output: { type: config.target },
           description: config.description,
           dependentFields: ['id'],
           resolve: async function (root, args, context, info, sgContext) {

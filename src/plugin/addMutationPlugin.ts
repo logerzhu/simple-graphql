@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import {
   ColumnFieldOptions,
-  ColumnFieldOptionsType,
+  InputFieldOptions,
   PluginOptions
 } from '../Definition'
 import StringHelper from '../utils/StringHelper'
@@ -16,17 +16,14 @@ export default {
     const addedName =
       'added' + StringHelper.toInitialUpperCase(schema.name) + 'Edge'
 
-    const inputFields = {}
-    const isModelType = (fieldOptions: ColumnFieldOptions) => {
-      if (typeof fieldOptions === 'string') {
-        return schemas.find((s) => s.name === fieldOptions) != null
-      } else if (typeof fieldOptions === 'object') {
-        return (
-          schemas.find((s) => s.name === (fieldOptions as any).$type) != null
-        )
-      }
-      return false
+    const inputFields: { [key: string]: InputFieldOptions } = {}
+    const isModelType = (fieldOptions: InputFieldOptions) => {
+      return (
+        fieldOptions.type &&
+        schemas.find((s) => s.name === fieldOptions.type) != null
+      )
     }
+
     _.forOwn(schema.config.fields, (value, key) => {
       if (isModelType(value)) {
         if (!key.endsWith('Id')) {
@@ -34,18 +31,10 @@ export default {
         }
       }
 
-      if (value && (<ColumnFieldOptionsType>value).$type) {
-        if (
-          !(<ColumnFieldOptionsType>value).hidden &&
-          (!(<ColumnFieldOptionsType>value).config ||
-            (<ColumnFieldOptionsType>value).config.initializable !== false)
-        ) {
-          inputFields[key] = {
-            ...(<ColumnFieldOptionsType>value),
-            resolve: null
-          }
-        }
-      } else {
+      if (
+        value.metadata?.graphql?.hidden !== true &&
+        value.metadata?.graphql?.initializable !== false
+      ) {
         inputFields[key] = value
       }
     })
@@ -56,9 +45,11 @@ export default {
     schema.mutations({
       [config.name || name]: {
         config: config,
-        inputFields: inputFields,
-        outputFields: {
-          [addedName]: schema.name + 'Edge'
+        input: inputFields,
+        output: {
+          [addedName]: {
+            type: schema.name + 'Edge'
+          }
         },
         mutateAndGetPayload: async function (args, context, info, sgContext) {
           const dbModel = sgContext.models[schema.name]

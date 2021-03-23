@@ -143,7 +143,7 @@ const buildQueryOption = function ({
           as: selection.name,
           include: option.include,
           attributes: option.attributes,
-          required: false
+          nullable: true
         })
         additionOrder = _.unionBy(
           additionOrder,

@@ -1,11 +1,7 @@
 import * as _ from 'lodash'
 
 import StringHelper from '../utils/StringHelper'
-import {
-  ColumnFieldOptions,
-  ColumnFieldOptionsType,
-  PluginOptions
-} from '../Definition'
+import { InputFieldOptions, PluginOptions } from '../Definition'
 
 export default {
   name: 'singularQuery',
@@ -15,29 +11,25 @@ export default {
   applyToSchema: function singularQuery(schema, options, schemas): void {
     const name = StringHelper.toInitialLowerCase(schema.name)
 
-    const isModelType = (fieldOptions: ColumnFieldOptions) => {
-      if (typeof fieldOptions === 'string') {
-        return schemas.find((s) => s.name === fieldOptions) != null
-      } else if (typeof fieldOptions === 'object') {
-        return (
-          schemas.find((s) => s.name === (fieldOptions as any).$type) != null
-        )
-      }
-      return false
+    const isModelType = (fieldOptions: InputFieldOptions) => {
+      return (
+        fieldOptions.type &&
+        schemas.find((s) => s.name === fieldOptions.type) != null
+      )
     }
 
-    const searchFields = {
+    const searchFields: { [key: string]: InputFieldOptions } = {
       id: {
-        $type: schema.name + 'Id',
-        description: 'Id of Schema ' + schema.name
+        type: schema.name + 'Id',
+        metadata: {
+          description: 'Id of Schema ' + schema.name
+        }
       }
     }
     _.forOwn(schema.config.fields, (value, key) => {
       if (
-        (<ColumnFieldOptionsType>value).$type &&
-        (<ColumnFieldOptionsType>value).columnOptions &&
-        (<ColumnFieldOptionsType>value).columnOptions.unique &&
-        (<ColumnFieldOptionsType>value).hidden !== true
+        value.metadata?.graphql?.hidden !== true &&
+        value.metadata?.column?.unique !== true
       ) {
         if (isModelType(value)) {
           if (!key.endsWith('Id')) {
@@ -45,9 +37,9 @@ export default {
           }
         }
         searchFields[key] = {
-          ...(<ColumnFieldOptionsType>value),
-          required: false,
-          default: null
+          ...value,
+          nullable: true,
+          metadata: { description: value.metadata?.description }
         }
       }
     })
@@ -60,8 +52,8 @@ export default {
     schema.queries({
       [name]: {
         config: config,
-        $type: schema.name,
-        args: searchFields,
+        output: { type: schema.name },
+        input: searchFields,
         resolve: async function (args, context, info, sgContext) {
           if (args === null || Object.keys(args).length === 0) {
             return null

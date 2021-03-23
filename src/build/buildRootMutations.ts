@@ -33,13 +33,13 @@ export default (
 
     const inputFields = toGraphQLInputFieldConfigMap(
       StringHelper.toInitialUpperCase(name),
-      options.inputFields || {},
+      options.input || {},
       context
     )
     const outputFields = toGraphQLFieldConfigMap(
       name,
       'Payload',
-      options.outputFields || {},
+      options.output || {},
       context
     )
     const payloadFields = _.get(options, 'mutation.payloadFields', [])

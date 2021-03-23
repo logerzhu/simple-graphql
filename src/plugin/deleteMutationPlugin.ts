@@ -15,14 +15,14 @@ export default {
     schema.mutations({
       [config.name || name]: {
         config: config,
-        inputFields: {
+        input: {
           id: {
-            $type: schema.name + 'Id',
-            required: true
+            type: schema.name + 'Id',
+            nullable: false
           }
         },
-        outputFields: {
-          ['deleted' + schema.name]: schema.name
+        output: {
+          ['deleted' + schema.name]: { type: schema.name }
         },
         mutateAndGetPayload: async function ({ id }, context, info, sgContext) {
           const entity = await sgContext.models[schema.name].findOne({

@@ -8,14 +8,16 @@ export default SG.schema('User', {
     pluralQuery: {
       conditionFields: {
         passwordLike: {
-          $type: new Set(['A', 'B']),
+          definition: {
+            enum: ['A', 'B']
+          },
           mapper: function ({
-            where,
-            attributes
-          }, argValue, sgContext) {
+                              where,
+                              attributes
+                            }, argValue, sgContext) {
             if (argValue) {
               where.$and = where.$and || []
-              where.password = { $like: `%${argValue}%` }
+              where.password = {$like: `%${argValue}%`}
             }
           }
         }
@@ -27,30 +29,34 @@ export default SG.schema('User', {
   }
 }).fields({
   userName: {
-    $type: 'String',
-    required: true
+    type: 'String',
+    nullable: false
   },
   password: {
-    $type: 'String',
-    required: true
+    type: 'String',
+    nullable: false
   },
   tags: {
-    $type: ['String'],
-    required: false
+    elements: {type: 'String'},
+    nullable: true
   },
   blocked: {
-    $type: 'Boolean',
-    required: false,
-    default: false
+    type: 'Boolean',
+    nullable: true,
+    metadata: {
+      column: {defaultValue: false}
+    }
   },
   registerAt: {
-    $type: 'Date',
-    required: false,
-    default: () => new Date()
+    type: 'Date',
+    nullable: true,
+    metadata: {
+      column: {defaultValue: () => new Date()}
+    }
   }
 }).links({
   node: {
-    $type: 'NodeInterface',
+    output: {type: 'NodeInterface'},
     dependentFields: ['id'],
     resolve: async function (root, args, context, info, {
       models: {
@@ -61,21 +67,21 @@ export default SG.schema('User', {
     }
   },
   p1: {
-    $type: 'String',
+    output: {type: 'String'},
     dependentFields: ['p2', 'blocked'],
     resolve: async function ({
-      password,
-      blocked
-    }) {
+                               password,
+                               blocked
+                             }) {
       return password + ',' + blocked
     }
   },
   p2: {
-    $type: 'JSON',
+    output: {type: 'JSON'},
     dependentFields: ['dueTodos.title'],
     resolve: async function ({
-      dueTodos
-    }) {
+                               dueTodos
+                             }) {
       return dueTodos.map(t => t.title)
     }
   }
