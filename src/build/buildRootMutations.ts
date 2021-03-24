@@ -3,6 +3,7 @@ import Service from '../definition/Service'
 import {
   FieldTypeContext,
   MutationConfig,
+  MutationConfigMap,
   ResolverContext
 } from '../Definition'
 import * as graphql from 'graphql'
@@ -13,8 +14,7 @@ import StringHelper from '../utils/StringHelper'
 import mutationWithClientMutationId from '../transformer/mutationWithClientMutationId'
 
 export default (
-  schemas: Array<Schema>,
-  services: Array<Service>,
+  mutationConfigMaps: Array<MutationConfigMap>,
   payloadFields: {
     [key: string]: graphql.GraphQLFieldConfig<any, any>
   },
@@ -52,14 +52,8 @@ export default (
       description: options.description
     })
   }
-  for (const schema of schemas) {
-    _.forOwn(schema.config.mutations, (value, key) => {
-      addMutation(key, value)
-    })
-  }
-
-  for (const service of services) {
-    _.forOwn(service.config.mutations, (value, key) => {
+  for (let mutationConfigMap of mutationConfigMaps) {
+    _.forOwn(mutationConfigMap, (value, key) => {
       addMutation(key, value)
     })
   }

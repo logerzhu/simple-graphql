@@ -7,6 +7,7 @@ import {
   FieldTypeContext,
   InterfaceContext,
   QueryConfig,
+  QueryConfigMap,
   ResolverContext
 } from '../Definition'
 import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
@@ -14,8 +15,7 @@ import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConf
 import StringHelper from '../utils/StringHelper'
 
 export default (
-  schemas: Array<Schema>,
-  services: Array<Service>,
+  queryConfigMaps: Array<QueryConfigMap>,
   context: ResolverContext & FieldTypeContext & InterfaceContext
 ): {
   [key: string]: graphql.GraphQLFieldConfig<any, any>
@@ -66,14 +66,8 @@ export default (
       }
     }
   }
-  for (const schema of schemas) {
-    _.forOwn(schema.config.queries, (value, key) => {
-      addQuery(key, value)
-    })
-  }
-
-  for (const service of services) {
-    _.forOwn(service.config.queries, (value, key) => {
+  for (let queryConfigMap of queryConfigMaps) {
+    _.forOwn(queryConfigMap, (value, key) => {
       addQuery(key, value)
     })
   }

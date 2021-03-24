@@ -3,6 +3,7 @@ import _ from 'lodash'
 
 import {
   GraphQLFieldConfig,
+  GraphQLFieldConfigMap,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLSchema,
@@ -19,7 +20,9 @@ import {
   FieldTypeContext,
   HookConfig,
   InterfaceContext,
+  MutationConfigMap,
   PluginConfig,
+  QueryConfigMap,
   ResolverContext,
   SGContext
 } from '../Definition'
@@ -44,6 +47,8 @@ export default function (
     services?: Array<Service>
     hooks?: Array<HookConfig>
     plugins?: Array<PluginConfig>
+    queries?: QueryConfigMap
+    mutations?: MutationConfigMap
   },
   buildOptions: BuildOptions
 ): { graphQLSchema: GraphQLSchema; sgContext: SGContext } {
@@ -99,13 +104,14 @@ export default function (
   sgContext.services = buildServices(config.services || [], sgContext)
 
   const rootQueries = buildRootQueries(
-    config.schemas || [],
-    config.services || [],
+    [
+      ...(config.schemas || []).map((schema) => schema.config.queries),
+      ...(config.services || []).map((service) => service.config.queries),
+      config.queries
+    ],
     context
   )
-  const payloadFields: {
-    [key: string]: GraphQLFieldConfig<any, any>
-  } = {}
+  const payloadFields: GraphQLFieldConfigMap<any, any> = {}
   const rootQueryObject = new GraphQLObjectType({
     name: 'RootQuery',
     fields: () => rootQueries
@@ -123,8 +129,11 @@ export default function (
   }
 
   const rootMutations = buildRootMutations(
-    config.schemas || [],
-    config.services || [],
+    [
+      ...(config.schemas || []).map((schema) => schema.config.mutations),
+      ...(config.services || []).map((service) => service.config.mutations),
+      config.mutations
+    ],
     payloadFields,
     context
   )
