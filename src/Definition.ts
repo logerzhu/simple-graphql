@@ -138,15 +138,17 @@ export type OutputTypeMetadata = TypeMetadata & {
   }
 }
 
+export type ConditionFieldMapper = (
+  option: { where: any; attributes: Array<string> },
+  argValue: any,
+  context: SGContext
+) => void
+
 export type InputTypeMetadata = TypeMetadata & {
   graphql?: {
     hidden?: boolean
     defaultValue?: any
-    mapper?: (
-      option: { where: any; attributes: Array<string> },
-      argValue: any,
-      context: SGContext
-    ) => void
+    mapper?: ConditionFieldMapper
   }
 }
 

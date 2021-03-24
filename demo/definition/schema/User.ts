@@ -13,16 +13,18 @@ export default SG.schema('User', {
       enable: true,
       conditionFields: {
         passwordLike: {
-          definition: {
-            enum: ['A', 'B']
-          },
-          mapper: function ({
-                              where,
-                              attributes
-                            }, argValue, sgContext) {
-            if (argValue) {
-              where.$and = where.$and || []
-              where.password = {$like: `%${argValue}%`}
+          enum: ['A', 'B'],
+          metadata: {
+            graphql: {
+              mapper: function ({
+                                  where,
+                                  attributes
+                                }, argValue, sgContext) {
+                if (argValue) {
+                  where.$and = where.$and || []
+                  where.password = {$like: `%${argValue}%`}
+                }
+              }
             }
           }
         }

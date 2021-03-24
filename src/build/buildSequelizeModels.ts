@@ -4,7 +4,7 @@ import Sequelize, {
   ModelCtor
 } from 'sequelize'
 import Schema from '../definition/Schema'
-import { FieldTypeContext, SGModelCtrl, SGContext } from '../Definition'
+import { FieldTypeContext, SGContext, SGModelCtrl } from '../Definition'
 import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
 

@@ -3,15 +3,19 @@ import Sequelize from 'sequelize'
 import StringHelper from '../utils/StringHelper'
 import {
   ColumnFieldConfig,
+  ConditionFieldMapper,
   InputFieldConfig,
   InputFieldConfigMap,
   PluginConfig,
-  PluginOptionsType,
-  SGContext
+  PluginOptionsType
 } from '../Definition'
 import { Schema } from '../index'
 
-const getSearchFields = (schema: Schema, schemas: Array<Schema>) => {
+const getSearchFields = (
+  additionFields: InputFieldConfigMap,
+  schema: Schema,
+  schemas: Array<Schema>
+) => {
   const isModelType = (fieldOptions: InputFieldConfig) => {
     return (
       fieldOptions.type &&
@@ -69,17 +73,14 @@ const getSearchFields = (schema: Schema, schemas: Array<Schema>) => {
   const searchFields: {
     [key: string]: {
       definition: InputFieldConfig
-      mapper: (
-        option: { where: any; attributes: Array<string> },
-        argValue: any,
-        context: SGContext
-      ) => void
+      mapper: ConditionFieldMapper
     }
   } = {}
   _.forOwn(
     {
       id: { type: schema.name + 'Id' } as ColumnFieldConfig,
-      ...schema.config.fields
+      ...schema.config.fields,
+      ...additionFields
     },
     (value, key: string) => {
       if (isModelType(value)) {
@@ -149,16 +150,7 @@ declare module '../Definition' {
   interface PluginsOptionsType {
     pluralQuery?: PluginOptionsType & {
       name?: string
-      conditionFields?: {
-        [key: string]: {
-          definition: InputFieldConfig
-          mapper: (
-            option: { where: any; attributes: Array<string> },
-            argValue: any,
-            context: SGContext
-          ) => void
-        }
-      }
+      conditionFields?: InputFieldConfigMap
     }
   }
 }
@@ -171,19 +163,11 @@ export default {
   priority: 0,
   description: 'Gen `plural query` for Schema',
   applyToSchema: function pluralQuery(schema, options, schemas): void {
-    const searchFields: {
-      [key: string]: {
-        definition: InputFieldConfig
-        mapper: (
-          option: { where: any; attributes: Array<string> },
-          argValue: any,
-          context: SGContext
-        ) => void
-      }
-    } = {
-      ...getSearchFields(schema, schemas),
-      ...(options.conditionFields || {})
-    }
+    const searchFields = getSearchFields(
+      options.conditionFields || {},
+      schema,
+      schemas
+    )
 
     const { enable, ...config } = options
 
@@ -267,15 +251,6 @@ export default {
 } as PluginConfig<
   PluginOptionsType & {
     name?: string
-    conditionFields?: {
-      [key: string]: {
-        definition: InputFieldConfig
-        mapper: (
-          option: { where: any; attributes: Array<string> },
-          argValue: any,
-          context: SGContext
-        ) => void
-      }
-    }
+    conditionFields?: InputFieldConfigMap
   }
 >

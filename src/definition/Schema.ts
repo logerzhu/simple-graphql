@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import {
   ColumnFieldConfig,
-  InputFieldConfig,
   InputFieldConfigMap,
   LinkedFieldConfig,
   MutationConfig,

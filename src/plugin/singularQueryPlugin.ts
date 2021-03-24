@@ -30,6 +30,7 @@ export default {
         schemas.find((s) => s.name === fieldOptions.type) != null
       )
     }
+    //TODO support mapper setting
 
     const searchFields: InputFieldConfigMap = {
       id: {

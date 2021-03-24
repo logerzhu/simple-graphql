@@ -1,9 +1,9 @@
 import _ from 'lodash'
 import {
+  ConditionFieldMapper,
   InputFieldConfig,
   InputFieldConfigMap,
-  PluginConfig,
-  SGContext
+  PluginConfig
 } from '../Definition'
 import Sequelize from 'sequelize'
 
@@ -24,11 +24,7 @@ export default {
       const conditionFields: {
         [key: string]: {
           definition: InputFieldConfig
-          mapper: (
-            option: { where: any; attributes: Array<string> },
-            argValue: any,
-            context: SGContext
-          ) => void
+          mapper: ConditionFieldMapper
         }
       } = {}
       _.forOwn(config.conditionFields || {}, async function (value, key) {

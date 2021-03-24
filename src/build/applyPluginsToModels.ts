@@ -1,4 +1,4 @@
-import { SGModelCtrl, PluginConfig, PluginsOptionsType } from '../Definition'
+import { PluginConfig, PluginsOptionsType, SGModelCtrl } from '../Definition'
 
 export default (
   models: Array<SGModelCtrl>,

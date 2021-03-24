@@ -1,4 +1,4 @@
-import { CacheManager, SGModelCtrl, SGModel } from '../../Definition'
+import { CacheManager, SGModel, SGModelCtrl } from '../../Definition'
 import Sequelize, { CountOptions, FindOptions } from 'sequelize'
 import getFindOptionsKey from './getFindOptionsKey'
 import getIncludeModeNames from './getIncludeModeNames'
