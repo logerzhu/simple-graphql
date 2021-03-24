@@ -61,16 +61,12 @@ export interface SGModelCtrlMap {
   [key: string]: SGModelCtrl
 }
 
-export type SGContext<
-  T extends SGModelCtrlMap = {
-    [key: string]: SGModelCtrl
-  }
-> = {
+export type SGContext = {
   sequelize: Sequelize
   schemas: {
     [key: string]: Schema
   }
-  models: T
+  models: SGModelCtrlMap
   services: SGServiceMap
   fieldType: (typeName: string) => FieldTypeConfig | null | undefined
 }
