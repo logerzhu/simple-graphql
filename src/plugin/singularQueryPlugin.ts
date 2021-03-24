@@ -5,12 +5,12 @@ import {
   InputFieldConfig,
   InputFieldConfigMap,
   PluginConfig,
-  PluginOptionsType
+  PluginOptions
 } from '../Definition'
 
 declare module '../Definition' {
-  interface PluginsOptionsType {
-    singularQuery?: PluginOptionsType & { name?: string }
+  interface PluginOptionsMap {
+    singularQuery?: PluginOptions & { name?: string }
   }
 }
 
@@ -82,4 +82,4 @@ export default {
       }
     })
   }
-} as PluginConfig<PluginOptionsType & { name?: string }>
+} as PluginConfig<PluginOptions & { name?: string }>

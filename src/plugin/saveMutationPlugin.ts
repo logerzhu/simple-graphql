@@ -3,13 +3,13 @@ import {
   InputFieldConfig,
   InputFieldConfigMap,
   PluginConfig,
-  PluginOptionsType
+  PluginOptions
 } from '../Definition'
 import StringHelper from '../utils/StringHelper'
 
 declare module '../Definition' {
-  interface PluginsOptionsType {
-    saveMutation?: PluginOptionsType & { name?: string }
+  interface PluginOptionsMap {
+    saveMutation?: PluginOptions & { name?: string }
   }
 }
 
@@ -89,4 +89,4 @@ export default {
       }
     })
   }
-} as PluginConfig<PluginOptionsType & { name?: string }>
+} as PluginConfig<PluginOptions & { name?: string }>

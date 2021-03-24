@@ -275,15 +275,15 @@ export type MutationConfig = {
   mutateAndGetPayload: RootResolve
 }
 
-export interface PluginOptionsType {
+export interface PluginOptions {
   enable: boolean
 }
 
-export interface PluginsOptionsType {}
+export interface PluginOptionsMap {}
 
 export type SchemaOptions = {
   description?: string
-  plugin?: PluginsOptionsType
+  plugin?: PluginOptionsMap
   tableOptions?: ModelOptions<any>
 }
 
@@ -315,7 +315,7 @@ export type HookConfig = {
   ) => any
 }
 
-export type PluginConfig<T = PluginOptionsType> = {
+export type PluginConfig<T = PluginOptions> = {
   name: string
   description?: string
   priority?: number
@@ -329,7 +329,7 @@ export type PluginConfig<T = PluginOptionsType> = {
 }
 
 export type BuildOptions = {
-  plugin?: PluginsOptionsType
+  plugin?: PluginOptionsMap
 }
 
 export interface CacheManager {

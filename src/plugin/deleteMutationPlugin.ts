@@ -1,9 +1,9 @@
 import StringHelper from '../utils/StringHelper'
-import { PluginConfig, PluginOptionsType } from '../Definition'
+import { PluginConfig, PluginOptions } from '../Definition'
 
 declare module '../Definition' {
-  interface PluginsOptionsType {
-    deleteMutation?: PluginOptionsType & { name?: string }
+  interface PluginOptionsMap {
+    deleteMutation?: PluginOptions & { name?: string }
   }
 }
 
@@ -44,4 +44,4 @@ export default {
       }
     })
   }
-} as PluginConfig<PluginOptionsType & { name?: string }>
+} as PluginConfig<PluginOptions & { name?: string }>

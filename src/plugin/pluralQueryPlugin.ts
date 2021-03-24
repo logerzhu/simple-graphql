@@ -7,7 +7,7 @@ import {
   InputFieldConfig,
   InputFieldConfigMap,
   PluginConfig,
-  PluginOptionsType
+  PluginOptions
 } from '../Definition'
 import { Schema } from '../index'
 
@@ -147,8 +147,8 @@ const getSearchFields = (
 }
 
 declare module '../Definition' {
-  interface PluginsOptionsType {
-    pluralQuery?: PluginOptionsType & {
+  interface PluginOptionsMap {
+    pluralQuery?: PluginOptions & {
       name?: string
       conditionFields?: InputFieldConfigMap
     }
@@ -249,7 +249,7 @@ export default {
     })
   }
 } as PluginConfig<
-  PluginOptionsType & {
+  PluginOptions & {
     name?: string
     conditionFields?: InputFieldConfigMap
   }

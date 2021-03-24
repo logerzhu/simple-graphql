@@ -1,9 +1,9 @@
-import { PluginConfig, PluginsOptionsType, SGModelCtrl } from '../Definition'
+import { PluginConfig, PluginOptionsMap, SGModelCtrl } from '../Definition'
 
 export default (
   models: Array<SGModelCtrl>,
   plugins: Array<PluginConfig>,
-  defaultOptions: PluginsOptionsType
+  defaultOptions: PluginOptionsMap
 ) => {
   const result: {
     [key: string]: SGModelCtrl

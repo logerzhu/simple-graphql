@@ -1,8 +1,8 @@
-import { PluginConfig, PluginOptionsType } from '../Definition'
+import { PluginConfig, PluginOptions } from '../Definition'
 
 declare module '../Definition' {
-  interface PluginsOptionsType {
-    version?: PluginOptionsType
+  interface PluginOptionsMap {
+    version?: PluginOptions
   }
 }
 

@@ -1,11 +1,11 @@
-import { CacheManager, PluginConfig, PluginOptionsType } from '../Definition'
+import { CacheManager, PluginConfig, PluginOptions } from '../Definition'
 import Sequelize from 'sequelize'
 import LruCacheManager from './cache/LruCacheManager'
 import Cache from './cache/Cache'
 
 declare module '../Definition' {
-  interface PluginsOptionsType {
-    cache?: PluginOptionsType & {
+  interface PluginOptionsMap {
+    cache?: PluginOptions & {
       prefix?: string
       cacheManager?: CacheManager
       expire?: number
@@ -96,7 +96,7 @@ export default {
     })
   }
 } as PluginConfig<
-  PluginOptionsType & {
+  PluginOptions & {
     prefix?: string
     cacheManager?: CacheManager
     expire?: number
