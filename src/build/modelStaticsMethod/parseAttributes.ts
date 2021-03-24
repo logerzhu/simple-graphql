@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { ColumnFieldOptions, ModelDefine, SGModel } from '../../Definition'
+import { ColumnFieldOptions, ModelDefine } from '../../Definition'
 
 type Selection = { name: string; selections?: Array<Selection> }
 

@@ -1,8 +1,16 @@
-import { PluginOptions } from '../Definition'
+import { PluginOptions, PluginOptionsType } from '../Definition'
+
+declare module '../Definition' {
+  interface PluginsOptionsType {
+    version?: PluginOptionsType
+  }
+}
 
 export default {
   name: 'version',
-  defaultOptions: true,
+  defaultOptions: {
+    enable: true
+  },
   priority: 100,
   description: 'Add version field to Schema',
   applyToSchema: (schema, options, schemas) => {

@@ -27,7 +27,9 @@ test('Union数据类型生成', async () => {
       schemas: [
         SG.schema('Dummy', {
           plugin: {
-            addMutation: true
+            addMutation: {
+              enable: true
+            }
           }
         }).fields({
           name: { type: 'Text' },

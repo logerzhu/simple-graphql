@@ -4,7 +4,9 @@ import Sequelize from 'sequelize'
 
 export default {
   name: 'genHasManyLink',
-  defaultOptions: true,
+  defaultOptions: {
+    enable: true
+  },
   priority: 99,
   description: 'Gen `HasManyLink` for Schema',
   applyToSchema: function hasManyLinkedField(schema, options, schemas): void {

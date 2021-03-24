@@ -9,9 +9,15 @@ test('Add/Update/Delete Test', async () => {
       schemas: [
         SG.schema('Dummy', {
           plugin: {
-            addMutation: true,
-            updateMutation: true,
-            deleteMutation: true
+            addMutation: {
+              enable: true
+            },
+            updateMutation: {
+              enable: true
+            },
+            deleteMutation: {
+              enable: true
+            }
           }
         }).fields({
           number: { type: 'Number' },

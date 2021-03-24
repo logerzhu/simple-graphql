@@ -5,6 +5,7 @@ import {
   ColumnFieldOptions,
   InputFieldOptions,
   PluginOptions,
+  PluginOptionsType,
   SGContext
 } from '../Definition'
 import { Schema } from '../index'
@@ -143,9 +144,29 @@ const getSearchFields = (schema: Schema, schemas: Array<Schema>) => {
   return searchFields
 }
 
+declare module '../Definition' {
+  interface PluginsOptionsType {
+    pluralQuery?: PluginOptionsType & {
+      name?: string
+      conditionFields?: {
+        [key: string]: {
+          definition: InputFieldOptions
+          mapper: (
+            option: { where: any; attributes: Array<string> },
+            argValue: any,
+            context: SGContext
+          ) => void
+        }
+      }
+    }
+  }
+}
+
 export default {
   name: 'pluralQuery',
-  defaultOptions: false,
+  defaultOptions: {
+    enable: false
+  },
   priority: 0,
   description: 'Gen `plural query` for Schema',
   applyToSchema: function pluralQuery(schema, options, schemas): void {
@@ -160,13 +181,10 @@ export default {
       }
     } = {
       ...getSearchFields(schema, schemas),
-      ...((options as any)?.conditionFields || {})
+      ...(options.conditionFields || {})
     }
 
-    let config: { [key: string]: any } = {}
-    if (typeof options === 'object') {
-      config = options
-    }
+    const { enable, ...config } = options
 
     schema.queries({
       [`${StringHelper.toInitialLowerCase(
@@ -245,4 +263,18 @@ export default {
       }
     })
   }
-} as PluginOptions
+} as PluginOptions<
+  PluginOptionsType & {
+    name?: string
+    conditionFields?: {
+      [key: string]: {
+        definition: InputFieldOptions
+        mapper: (
+          option: { where: any; attributes: Array<string> },
+          argValue: any,
+          context: SGContext
+        ) => void
+      }
+    }
+  }
+>

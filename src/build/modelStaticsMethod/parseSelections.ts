@@ -1,8 +1,4 @@
-import {
-  FragmentDefinitionNode,
-  SelectionNode,
-  SelectionSetNode
-} from 'graphql'
+import { FragmentDefinitionNode, SelectionNode } from 'graphql'
 
 export default function parseSelections(
   fragments: { [key: string]: FragmentDefinitionNode },

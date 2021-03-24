@@ -283,9 +283,15 @@ export type MutationOptions = {
   mutateAndGetPayload: RootResolve
 }
 
+export interface PluginOptionsType {
+  enable: boolean
+}
+
+export interface PluginsOptionsType {}
+
 export type SchemaOptionConfig = {
   description?: string
-  plugin?: { [key: string]: any }
+  plugin?: PluginsOptionsType
   tableOptions?: ModelOptions<any>
 }
 
@@ -317,27 +323,21 @@ export type HookOptions = {
   ) => any
 }
 
-export type PluginOptions = {
+export type PluginOptions<T = PluginOptionsType> = {
   name: string
   description?: string
   priority?: number
-  defaultOptions: (boolean | { [key: string]: any }) | null | undefined
-  applyToSchema?: (
-    schema: Schema,
-    options: boolean | { [key: string]: any },
-    schemas: Array<Schema>
-  ) => void
+  defaultOptions?: T
+  applyToSchema?: (schema: Schema, options: T, schemas: Array<Schema>) => void
   applyToModel?: (
     model: ModelDefine,
-    options: boolean | { [key: string]: any },
+    options: T,
     models: Array<ModelDefine>
   ) => void
 }
 
 export type BuildOptions = {
-  plugin?: {
-    [id: string]: boolean | { [key: string]: any }
-  }
+  plugin?: PluginsOptionsType
 }
 
 export interface CacheManager {

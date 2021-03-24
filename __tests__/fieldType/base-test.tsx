@@ -9,7 +9,9 @@ test('基本类型生成', async () => {
       schemas: [
         SG.schema('Dummy', {
           plugin: {
-            addMutation: true
+            addMutation: {
+              enable: true
+            }
           }
         }).fields({
           number: { type: 'Number' },

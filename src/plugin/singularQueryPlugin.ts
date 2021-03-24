@@ -1,11 +1,23 @@
 import * as _ from 'lodash'
 
 import StringHelper from '../utils/StringHelper'
-import { InputFieldOptions, PluginOptions } from '../Definition'
+import {
+  InputFieldOptions,
+  PluginOptions,
+  PluginOptionsType
+} from '../Definition'
+
+declare module '../Definition' {
+  interface PluginsOptionsType {
+    singularQuery?: PluginOptionsType & { name?: string }
+  }
+}
 
 export default {
   name: 'singularQuery',
-  defaultOptions: false,
+  defaultOptions: {
+    enable: false
+  },
   priority: 0,
   description: 'Gen `singular query` for Schema',
   applyToSchema: function singularQuery(schema, options, schemas): void {
@@ -44,13 +56,10 @@ export default {
       }
     })
 
-    let config: { [key: string]: any } = {}
-    if (typeof options === 'object') {
-      config = options
-    }
+    const { enable, ...config } = options
 
     schema.queries({
-      [name]: {
+      [config.name || name]: {
         config: config,
         output: { type: schema.name },
         input: searchFields,
@@ -71,4 +80,4 @@ export default {
       }
     })
   }
-} as PluginOptions
+} as PluginOptions<PluginOptionsType & { name?: string }>

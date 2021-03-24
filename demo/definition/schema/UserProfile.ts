@@ -2,7 +2,9 @@ import SG from '../../../src'
 
 export default SG.schema('UserProfile', {
   plugin: {
-    singularQuery: true
+    singularQuery: {
+      enable:true
+    }
   }
 }).fields({
   owner: {

@@ -2,10 +2,18 @@ import SG from '../../../src'
 
 export default SG.schema('Dummy', {
   plugin: {
-    pluralQuery: true,
-    addMutation: true,
-    updateMutation: true,
-    deleteMutation: true
+    pluralQuery: {
+      enable:true
+    },
+    addMutation: {
+      enable:true
+    },
+    updateMutation: {
+      enable:true
+    },
+    deleteMutation: {
+      enable:true
+    }
   }
 }).fields({
   message: {type: 'Message'},

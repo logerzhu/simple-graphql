@@ -9,8 +9,12 @@ test('引用类型生成', async () => {
       schemas: [
         SG.schema('Dummy1', {
           plugin: {
-            singularQuery: true,
-            addMutation: true
+            singularQuery: {
+              enable: true
+            },
+            addMutation: {
+              enable: true
+            }
           }
         })
           .fields({
@@ -35,7 +39,9 @@ test('引用类型生成', async () => {
           }),
         SG.schema('Dummy2', {
           plugin: {
-            addMutation: true
+            addMutation: {
+              enable: true
+            }
           }
         }).fields({
           name: { type: 'String' },

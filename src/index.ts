@@ -4,6 +4,8 @@ import _Service from './definition/Service'
 import { SchemaOptionConfig } from './Definition'
 import _build from './build'
 
+import './plugin'
+
 export {
   HookAction,
   HookOptions,

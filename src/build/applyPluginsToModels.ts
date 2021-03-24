@@ -1,11 +1,9 @@
-import { ModelDefine, PluginOptions } from '../Definition'
+import { ModelDefine, PluginOptions, PluginsOptionsType } from '../Definition'
 
 export default (
   models: Array<ModelDefine>,
   plugins: Array<PluginOptions>,
-  defaultOptions: {
-    [id: string]: boolean | Object
-  }
+  defaultOptions: PluginsOptionsType
 ) => {
   const result: {
     [key: string]: ModelDefine

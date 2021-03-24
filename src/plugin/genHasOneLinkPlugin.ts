@@ -3,7 +3,9 @@ import { PluginOptions } from '../Definition'
 
 export default {
   name: 'genHasOneLink',
-  defaultOptions: true,
+  defaultOptions: {
+    enable: true
+  },
   priority: 99,
   description: 'Gen `HasOneLink` for Schema',
   applyToSchema: function hasOneFieldsConfig(schema, options, schemas): void {

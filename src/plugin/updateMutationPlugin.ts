@@ -1,10 +1,22 @@
 import _ from 'lodash'
 import StringHelper from '../utils/StringHelper'
-import { InputFieldOptions, PluginOptions } from '../Definition'
+import {
+  InputFieldOptions,
+  PluginOptions,
+  PluginOptionsType
+} from '../Definition'
+
+declare module '../Definition' {
+  interface PluginsOptionsType {
+    updateMutation?: PluginOptionsType & { name?: string }
+  }
+}
 
 export default {
   name: 'updateMutation',
-  defaultOptions: false,
+  defaultOptions: {
+    enable: false
+  },
   priority: 0,
   description: 'Gen `update mutation` for Schema',
   applyToSchema: function updateMutation(schema, options, schemas): void {
@@ -57,10 +69,7 @@ export default {
       return
     }
 
-    let config: any = {}
-    if (typeof options === 'object') {
-      config = options
-    }
+    const { enable, ...config } = options
 
     schema.mutations({
       [config.name || name]: {
@@ -121,4 +130,4 @@ export default {
       }
     })
   }
-} as PluginOptions
+} as PluginOptions<PluginOptionsType & { name?: string }>

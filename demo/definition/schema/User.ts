@@ -3,9 +3,14 @@ import SG from '../../../src'
 export default SG.schema('User', {
   description: '用户',
   plugin: {
-    addMutation: true,
-    singularQuery: true,
+    addMutation: {
+      enable: true
+    },
+    singularQuery: {
+      enable: true
+    },
     pluralQuery: {
+      enable: true,
       conditionFields: {
         passwordLike: {
           definition: {

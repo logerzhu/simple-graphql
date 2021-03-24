@@ -1,27 +1,37 @@
-import { PluginOptions } from '../Definition'
+import { CacheManager, PluginOptions, PluginOptionsType } from '../Definition'
 import Sequelize from 'sequelize'
 import LruCacheManager from './cache/LruCacheManager'
 import Cache from './cache/Cache'
 
+declare module '../Definition' {
+  interface PluginsOptionsType {
+    cache?: PluginOptionsType & {
+      prefix?: string
+      cacheManager?: CacheManager
+      expire?: number
+    }
+  }
+}
+
 export default {
   name: 'cache',
   defaultOptions: {
-    prefix: 'SG'
+    prefix: 'SG',
+    enable: true
   },
   priority: 999,
   description: 'Support cache with dataLoader',
   applyToModel: function (model, options, models) {
     const self = this
     if (self.cacheManager == null) {
-      self.cacheManager =
-        (options && (options as any).cacheManager) || new LruCacheManager()
+      self.cacheManager = options?.cacheManager || new LruCacheManager()
     }
 
     const cache = new Cache({
-      prefix: (options && (options as any).prefix) || 'SG',
+      prefix: options.prefix || 'SG',
       cacheManger: self.cacheManager,
       model: model,
-      expire: options && (options as any).expire
+      expire: options.expire
     })
 
     Object.assign(model, {
@@ -85,4 +95,10 @@ export default {
       return cleanCache(options)
     })
   }
-} as PluginOptions
+} as PluginOptions<
+  PluginOptionsType & {
+    prefix?: string
+    cacheManager?: CacheManager
+    expire?: number
+  }
+>

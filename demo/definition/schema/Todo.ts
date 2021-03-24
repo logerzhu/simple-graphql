@@ -5,11 +5,18 @@ export default SG.schema('Todo', {
     underscored: true
   },
   plugin: {
-    addMutation: true,
-    bulkAddMutation: true,
-    bulkUpdateMutation: true,
-    singularQuery: true,
-    pluralQuery: true
+    addMutation: {
+      enable:true
+    },
+    bulkAddMutation: {
+      enable:true
+    },
+    singularQuery: {
+      enable:true
+    },
+    pluralQuery: {
+      enable:true
+    }
   }
 }).fields({
   owner: {

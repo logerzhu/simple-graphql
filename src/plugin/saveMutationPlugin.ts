@@ -1,10 +1,22 @@
 import _ from 'lodash'
-import { InputFieldOptions, PluginOptions } from '../Definition'
+import {
+  InputFieldOptions,
+  PluginOptions,
+  PluginOptionsType
+} from '../Definition'
 import StringHelper from '../utils/StringHelper'
+
+declare module '../Definition' {
+  interface PluginsOptionsType {
+    saveMutation?: PluginOptionsType & { name?: string }
+  }
+}
 
 export default {
   name: 'saveMutation',
-  defaultOptions: false,
+  defaultOptions: {
+    enable: false
+  },
   priority: 0,
   description: 'Gen `save mutation` for Schema',
   applyToSchema: function (schema, options, schemas) {
@@ -37,10 +49,9 @@ export default {
         }
       }
     })
-    let config: { [key: string]: any } = {}
-    if (typeof options === 'object') {
-      config = options
-    }
+
+    const { enable, ...config } = options
+
     schema.mutations({
       [config.name || name]: {
         config: config,
@@ -77,4 +88,4 @@ export default {
       }
     })
   }
-} as PluginOptions
+} as PluginOptions<PluginOptionsType & { name?: string }>

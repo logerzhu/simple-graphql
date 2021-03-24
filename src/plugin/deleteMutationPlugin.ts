@@ -1,17 +1,22 @@
 import StringHelper from '../utils/StringHelper'
-import { PluginOptions } from '../Definition'
+import { PluginOptions, PluginOptionsType } from '../Definition'
+
+declare module '../Definition' {
+  interface PluginsOptionsType {
+    deleteMutation?: PluginOptionsType & { name?: string }
+  }
+}
 
 export default {
   name: 'deleteMutation',
-  defaultOptions: false,
+  defaultOptions: {
+    enable: false
+  },
   priority: 0,
   description: 'Gen `delete mutation` for Schema',
   applyToSchema: function (schema, options, schemas): void {
     const name = 'delete' + StringHelper.toInitialUpperCase(schema.name)
-    let config: { [key: string]: any } = {}
-    if (typeof options === 'object') {
-      config = options
-    }
+    const { enable, ...config } = options
     schema.mutations({
       [config.name || name]: {
         config: config,
@@ -39,4 +44,4 @@ export default {
       }
     })
   }
-} as PluginOptions
+} as PluginOptions<PluginOptionsType & { name?: string }>

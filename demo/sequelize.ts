@@ -1,4 +1,4 @@
-import { Dialect, Sequelize } from 'sequelize'
+import {Dialect, Sequelize} from 'sequelize'
 import cls from 'cls-hooked'
 
 const dbCfg = {

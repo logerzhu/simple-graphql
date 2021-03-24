@@ -1,8 +1,16 @@
-import { PluginOptions } from '../Definition'
+import { PluginOptions, PluginOptionsType } from '../Definition'
+
+declare module '../Definition' {
+  interface PluginsOptionsType {
+    timestamp?: PluginOptionsType
+  }
+}
 
 export default {
   name: 'timestamp',
-  defaultOptions: true,
+  defaultOptions: {
+    enable: true
+  },
   priority: 100,
   description: 'Add createdAt/updatedAt field to Schema',
   applyToSchema: (schema, options, schemas) => {
@@ -29,11 +37,7 @@ export default {
       }
     })
 
-    if (
-      schema.config.options &&
-      schema.config.options.tableOptions &&
-      schema.config.options.tableOptions.paranoid
-    ) {
+    if (schema.config.options?.tableOptions?.paranoid) {
       schema.fields({
         deletedAt: {
           type: 'Date',
