@@ -1,5 +1,5 @@
 import StringHelper from '../utils/StringHelper'
-import { PluginOptions, PluginOptionsType } from '../Definition'
+import { PluginConfig, PluginOptionsType } from '../Definition'
 
 declare module '../Definition' {
   interface PluginsOptionsType {
@@ -44,4 +44,4 @@ export default {
       }
     })
   }
-} as PluginOptions<PluginOptionsType & { name?: string }>
+} as PluginConfig<PluginOptionsType & { name?: string }>

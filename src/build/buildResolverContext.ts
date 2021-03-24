@@ -1,7 +1,7 @@
-import { HookOptions, ResolverContext, SGContext } from '../Definition'
+import { HookConfig, ResolverContext, SGContext } from '../Definition'
 
 export default (
-  hooks: Array<HookOptions>,
+  hooks: Array<HookConfig>,
   sgContext: SGContext
 ): ResolverContext => {
   const finalHooks = [...hooks].sort((p1, p2) => {

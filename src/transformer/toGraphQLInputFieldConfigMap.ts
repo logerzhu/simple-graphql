@@ -9,14 +9,14 @@ import {
   GraphQLNonNull
 } from 'graphql'
 import StringHelper from '../utils/StringHelper'
-import { FieldTypeContext, InputFieldOptions } from '../Definition'
+import { FieldTypeContext, InputFieldConfig } from '../Definition'
 
 import unionInputType from '../build/fieldType/unionInputType'
 
 const toGraphQLInputFieldConfigMap = function (
   name: string,
   fields: {
-    [id: string]: InputFieldOptions
+    [id: string]: InputFieldConfig
   },
   context: FieldTypeContext
 ): GraphQLInputFieldConfigMap {
@@ -45,7 +45,7 @@ const toGraphQLInputFieldConfigMap = function (
   const convert = (
     name: string,
     path: string,
-    field: InputFieldOptions
+    field: InputFieldConfig
   ): GraphQLInputFieldConfig | null => {
     const makeNonNull = function (config: GraphQLInputFieldConfig | null) {
       if (config == null) {

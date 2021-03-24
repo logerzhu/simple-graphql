@@ -1,7 +1,8 @@
 import _ from 'lodash'
 import {
-  InputFieldOptions,
-  PluginOptions,
+  InputFieldConfig,
+  InputFieldConfigMap,
+  PluginConfig,
   PluginOptionsType
 } from '../Definition'
 import StringHelper from '../utils/StringHelper'
@@ -24,8 +25,8 @@ export default {
     const addedName =
       'added' + StringHelper.toInitialUpperCase(schema.name) + 'Edge'
 
-    const inputFields: { [key: string]: InputFieldOptions } = {}
-    const isModelType = (fieldOptions: InputFieldOptions) => {
+    const inputFields: InputFieldConfigMap = {}
+    const isModelType = (fieldOptions: InputFieldConfig) => {
       return (
         fieldOptions.type &&
         schemas.find((s) => s.name === fieldOptions.type) != null
@@ -88,4 +89,4 @@ export default {
       }
     })
   }
-} as PluginOptions<PluginOptionsType & { name?: string }>
+} as PluginConfig<PluginOptionsType & { name?: string }>

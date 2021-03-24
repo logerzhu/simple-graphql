@@ -1,4 +1,4 @@
-import { ModelDefine, SGModel } from '../../Definition'
+import { SGModelCtrl, SGModel } from '../../Definition'
 import { Includeable, IncludeOptions } from 'sequelize'
 
 function restoreTimestamps(
@@ -41,7 +41,7 @@ function restoreTimestamps(
 
 export default function (
   data,
-  model: ModelDefine,
+  model: SGModelCtrl,
   include?: Includeable | Includeable[]
 ) {
   if (!data) {

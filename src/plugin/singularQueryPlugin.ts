@@ -2,8 +2,9 @@ import * as _ from 'lodash'
 
 import StringHelper from '../utils/StringHelper'
 import {
-  InputFieldOptions,
-  PluginOptions,
+  InputFieldConfig,
+  InputFieldConfigMap,
+  PluginConfig,
   PluginOptionsType
 } from '../Definition'
 
@@ -23,14 +24,14 @@ export default {
   applyToSchema: function singularQuery(schema, options, schemas): void {
     const name = StringHelper.toInitialLowerCase(schema.name)
 
-    const isModelType = (fieldOptions: InputFieldOptions) => {
+    const isModelType = (fieldOptions: InputFieldConfig) => {
       return (
         fieldOptions.type &&
         schemas.find((s) => s.name === fieldOptions.type) != null
       )
     }
 
-    const searchFields: { [key: string]: InputFieldOptions } = {
+    const searchFields: InputFieldConfigMap = {
       id: {
         type: schema.name + 'Id',
         metadata: {
@@ -80,4 +81,4 @@ export default {
       }
     })
   }
-} as PluginOptions<PluginOptionsType & { name?: string }>
+} as PluginConfig<PluginOptionsType & { name?: string }>

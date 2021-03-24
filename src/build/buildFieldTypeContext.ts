@@ -1,11 +1,11 @@
 import {
-  ColumnFieldOptions,
-  DataTypeOptions,
-  FieldType,
+  ColumnFieldConfig,
+  DataTypeConfig,
+  FieldTypeConfig,
   FieldTypeContext,
-  InputFieldOptions,
+  InputFieldConfig,
   InterfaceContext,
-  OutputFieldOptions,
+  OutputFieldConfig,
   ResolverContext
 } from '../Definition'
 import Schema from '../definition/Schema'
@@ -30,7 +30,7 @@ function buildModelType(
   schema: Schema,
   fieldTypeContext: FieldTypeContext,
   context: Context
-): FieldType {
+): FieldTypeConfig {
   const typeName = schema.name
   return {
     name: typeName,
@@ -70,7 +70,7 @@ function buildModelType(
                     resolve: value.resolve
                   }
                 }
-              } as OutputFieldOptions
+              } as OutputFieldConfig
             })
           },
           {
@@ -175,7 +175,7 @@ function buildModelType(
 function buildModelTypeId(
   schema: Schema,
   fieldTypeContext: FieldTypeContext
-): FieldType {
+): FieldTypeConfig {
   const typeName = schema.name + 'Id'
   const idType = globalIdType(schema.name)
   return {
@@ -187,11 +187,11 @@ function buildModelTypeId(
 }
 
 function buildDataType(
-  dataTypeOptions: DataTypeOptions,
+  dataTypeOptions: DataTypeConfig,
   fieldTypeContext: FieldTypeContext,
   context: Context
-): FieldType {
-  const toOutputType = (name: string, options: OutputFieldOptions) => {
+): FieldTypeConfig {
+  const toOutputType = (name: string, options: OutputFieldConfig) => {
     const outputConfigMap = toGraphQLFieldConfigMap(
       name,
       '',
@@ -209,7 +209,7 @@ function buildDataType(
     return outputConfigMap && outputConfigMap.type
   }
 
-  const toInputType = (name, options: InputFieldOptions) => {
+  const toInputType = (name, options: InputFieldConfig) => {
     const inputConfigMap = toGraphQLInputFieldConfigMap(
       name,
       { '': options },
@@ -229,7 +229,7 @@ function buildDataType(
     columnOptions: (
       schema: Schema,
       fieldName: string,
-      options: ColumnFieldOptions
+      options: ColumnFieldConfig
     ) => {
       let columnOptions: ModelAttributeColumnOptions | null = null
       const definition = dataTypeOptions.definition
@@ -282,7 +282,7 @@ function buildUnionWrapType(
   wrapType: string,
   fieldTypeContext: FieldTypeContext,
   context: Context
-): FieldType {
+): FieldTypeConfig {
   const name = `_Union_${wrapType}`
   const typeConfig = fieldTypeContext.fieldType(wrapType) as any
   return {
@@ -309,12 +309,12 @@ function buildUnionWrapType(
 }
 
 export default function (
-  fieldTypes: Array<FieldType>,
-  dataTypes: Array<DataTypeOptions>,
+  fieldTypes: Array<FieldTypeConfig>,
+  dataTypes: Array<DataTypeConfig>,
   schemas: Array<Schema>,
   context: Context
 ) {
-  const typeMap: { [key: string]: FieldType } = {}
+  const typeMap: { [key: string]: FieldTypeConfig } = {}
 
   const resolves = [
     function resolveFunctionType(typeName) {

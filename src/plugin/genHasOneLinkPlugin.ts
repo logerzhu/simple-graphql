@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { PluginOptions } from '../Definition'
+import { PluginConfig } from '../Definition'
 
 export default {
   name: 'genHasOneLink',
@@ -41,4 +41,4 @@ export default {
       })
     })
   }
-} as PluginOptions
+} as PluginConfig

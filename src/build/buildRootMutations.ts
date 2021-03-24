@@ -2,7 +2,7 @@ import Schema from '../definition/Schema'
 import Service from '../definition/Service'
 import {
   FieldTypeContext,
-  MutationOptions,
+  MutationConfig,
   ResolverContext
 } from '../Definition'
 import * as graphql from 'graphql'
@@ -26,7 +26,7 @@ export default (
     [key: string]: graphql.GraphQLFieldConfig<any, any>
   } = {}
 
-  const addMutation = (name: string, options: MutationOptions) => {
+  const addMutation = (name: string, options: MutationConfig) => {
     if (mutations[name]) {
       throw new Error(`Mutation ${name} already defined.`)
     }

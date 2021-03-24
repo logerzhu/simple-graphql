@@ -2,23 +2,24 @@ import _ from 'lodash'
 import Sequelize from 'sequelize'
 import StringHelper from '../utils/StringHelper'
 import {
-  ColumnFieldOptions,
-  InputFieldOptions,
-  PluginOptions,
+  ColumnFieldConfig,
+  InputFieldConfig,
+  InputFieldConfigMap,
+  PluginConfig,
   PluginOptionsType,
   SGContext
 } from '../Definition'
 import { Schema } from '../index'
 
 const getSearchFields = (schema: Schema, schemas: Array<Schema>) => {
-  const isModelType = (fieldOptions: InputFieldOptions) => {
+  const isModelType = (fieldOptions: InputFieldConfig) => {
     return (
       fieldOptions.type &&
       schemas.find((s) => s.name === fieldOptions.type) != null
     )
   }
 
-  const advanceType = (options: InputFieldOptions): InputFieldOptions => {
+  const advanceType = (options: InputFieldConfig): InputFieldConfig => {
     if (options.elements) {
       return {
         properties: {
@@ -29,7 +30,7 @@ const getSearchFields = (schema: Schema, schemas: Array<Schema>) => {
       return options
     }
 
-    const aType: { [key: string]: InputFieldOptions } = {
+    const aType: InputFieldConfigMap = {
       ne: options,
       eq: options,
       in: {
@@ -67,7 +68,7 @@ const getSearchFields = (schema: Schema, schemas: Array<Schema>) => {
 
   const searchFields: {
     [key: string]: {
-      definition: InputFieldOptions
+      definition: InputFieldConfig
       mapper: (
         option: { where: any; attributes: Array<string> },
         argValue: any,
@@ -77,7 +78,7 @@ const getSearchFields = (schema: Schema, schemas: Array<Schema>) => {
   } = {}
   _.forOwn(
     {
-      id: { type: schema.name + 'Id' } as ColumnFieldOptions,
+      id: { type: schema.name + 'Id' } as ColumnFieldConfig,
       ...schema.config.fields
     },
     (value, key: string) => {
@@ -150,7 +151,7 @@ declare module '../Definition' {
       name?: string
       conditionFields?: {
         [key: string]: {
-          definition: InputFieldOptions
+          definition: InputFieldConfig
           mapper: (
             option: { where: any; attributes: Array<string> },
             argValue: any,
@@ -172,7 +173,7 @@ export default {
   applyToSchema: function pluralQuery(schema, options, schemas): void {
     const searchFields: {
       [key: string]: {
-        definition: InputFieldOptions
+        definition: InputFieldConfig
         mapper: (
           option: { where: any; attributes: Array<string> },
           argValue: any,
@@ -263,12 +264,12 @@ export default {
       }
     })
   }
-} as PluginOptions<
+} as PluginConfig<
   PluginOptionsType & {
     name?: string
     conditionFields?: {
       [key: string]: {
-        definition: InputFieldOptions
+        definition: InputFieldConfig
         mapper: (
           option: { where: any; attributes: Array<string> },
           argValue: any,

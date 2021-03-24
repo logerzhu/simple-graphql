@@ -1,4 +1,4 @@
-import { FieldType } from '../../Definition'
+import { FieldTypeConfig } from '../../Definition'
 
 import Id from './Id'
 import Integer from './Integer'
@@ -16,4 +16,4 @@ export default [
   JSON,
   Number,
   StringField
-] as Array<FieldType>
+] as Array<FieldTypeConfig>

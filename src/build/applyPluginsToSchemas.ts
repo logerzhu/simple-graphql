@@ -1,13 +1,13 @@
 import Schema from '../definition/Schema'
 import {
-  PluginOptions,
+  PluginConfig,
   PluginOptionsType,
   PluginsOptionsType
 } from '../Definition'
 
 export default (
   schemas: Array<Schema>,
-  plugins: Array<PluginOptions>,
+  plugins: Array<PluginConfig>,
   defaultOptions: PluginsOptionsType
 ) => {
   const result: {

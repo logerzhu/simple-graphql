@@ -6,7 +6,7 @@ import Service from '../definition/Service'
 import {
   FieldTypeContext,
   InterfaceContext,
-  QueryOptions,
+  QueryConfig,
   ResolverContext
 } from '../Definition'
 import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
@@ -23,7 +23,7 @@ export default (
   const queries: {
     [key: string]: graphql.GraphQLFieldConfig<any, any>
   } = {}
-  const addQuery = (name: string, options: QueryOptions) => {
+  const addQuery = (name: string, options: QueryConfig) => {
     if (queries[name]) {
       throw new Error(`Query ${name} already defined.`)
     }

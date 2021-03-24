@@ -1,10 +1,10 @@
 import _ from 'lodash'
-import { ColumnFieldOptions, ModelDefine } from '../../Definition'
+import { ColumnFieldConfig, SGModelCtrl } from '../../Definition'
 
 type Selection = { name: string; selections?: Array<Selection> }
 
 export default function (
-  this: ModelDefine,
+  this: SGModelCtrl,
   args: {
     attributes: Array<string>
     selections: Array<any>
@@ -16,7 +16,7 @@ export default function (
   const dbModel = this
   const schema = dbModel.getSGContext().schemas[this.name]
 
-  const getFieldName = (key: string, config: ColumnFieldOptions) => {
+  const getFieldName = (key: string, config: ColumnFieldConfig) => {
     if (config.type && dbModel.getSGContext().schemas[config.type] != null) {
       return key + 'Id'
     } else {

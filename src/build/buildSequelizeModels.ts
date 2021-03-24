@@ -4,7 +4,7 @@ import Sequelize, {
   ModelCtor
 } from 'sequelize'
 import Schema from '../definition/Schema'
-import { FieldTypeContext, ModelDefine, SGContext } from '../Definition'
+import { FieldTypeContext, SGModelCtrl, SGContext } from '../Definition'
 import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
 
@@ -75,7 +75,7 @@ function toSequelizeModel(
 function buildModelAssociations(
   schemas: Array<Schema>,
   models: {
-    [id: string]: ModelDefine
+    [id: string]: SGModelCtrl
   }
 ) {
   for (const schema of schemas) {
@@ -120,9 +120,9 @@ export default (
   sequelize: Sequelize.Sequelize,
   schemas: Array<Schema>,
   context: SGContext
-): Array<ModelDefine> => {
+): Array<SGModelCtrl> => {
   const result: {
-    [id: string]: ModelDefine
+    [id: string]: SGModelCtrl
   } = {}
   for (const schema of schemas) {
     if (result[schema.name]) {

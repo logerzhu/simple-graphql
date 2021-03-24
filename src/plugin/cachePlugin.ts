@@ -1,4 +1,4 @@
-import { CacheManager, PluginOptions, PluginOptionsType } from '../Definition'
+import { CacheManager, PluginConfig, PluginOptionsType } from '../Definition'
 import Sequelize from 'sequelize'
 import LruCacheManager from './cache/LruCacheManager'
 import Cache from './cache/Cache'
@@ -95,7 +95,7 @@ export default {
       return cleanCache(options)
     })
   }
-} as PluginOptions<
+} as PluginConfig<
   PluginOptionsType & {
     prefix?: string
     cacheManager?: CacheManager

@@ -1,12 +1,12 @@
-import { ModelDefine, PluginOptions, PluginsOptionsType } from '../Definition'
+import { SGModelCtrl, PluginConfig, PluginsOptionsType } from '../Definition'
 
 export default (
-  models: Array<ModelDefine>,
-  plugins: Array<PluginOptions>,
+  models: Array<SGModelCtrl>,
+  plugins: Array<PluginConfig>,
   defaultOptions: PluginsOptionsType
 ) => {
   const result: {
-    [key: string]: ModelDefine
+    [key: string]: SGModelCtrl
   } = {}
 
   plugins.forEach((plugin) => {

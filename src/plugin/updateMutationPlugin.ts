@@ -1,8 +1,9 @@
 import _ from 'lodash'
 import StringHelper from '../utils/StringHelper'
 import {
-  InputFieldOptions,
-  PluginOptions,
+  InputFieldConfig,
+  InputFieldConfigMap,
+  PluginConfig,
   PluginOptionsType
 } from '../Definition'
 
@@ -23,14 +24,14 @@ export default {
     const name = 'update' + StringHelper.toInitialUpperCase(schema.name)
     const changedName = 'changed' + StringHelper.toInitialUpperCase(schema.name)
 
-    const isModelType = (fieldOptions: InputFieldOptions) => {
+    const isModelType = (fieldOptions: InputFieldConfig) => {
       return (
         fieldOptions.type &&
         schemas.find((s) => s.name === fieldOptions.type) != null
       )
     }
 
-    const inputFields: { [key: string]: InputFieldOptions } = {
+    const inputFields: InputFieldConfigMap = {
       id: {
         type: schema.name + 'Id',
         nullable: false
@@ -130,4 +131,4 @@ export default {
       }
     })
   }
-} as PluginOptions<PluginOptionsType & { name?: string }>
+} as PluginConfig<PluginOptionsType & { name?: string }>

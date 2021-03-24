@@ -14,12 +14,12 @@ import Service from '../definition/Service'
 
 import {
   BuildOptions,
-  DataTypeOptions,
-  FieldType,
+  DataTypeConfig,
+  FieldTypeConfig,
   FieldTypeContext,
-  HookOptions,
+  HookConfig,
   InterfaceContext,
-  PluginOptions,
+  PluginConfig,
   ResolverContext,
   SGContext
 } from '../Definition'
@@ -38,12 +38,12 @@ import buildRootMutations from './buildRootMutations'
 export default function (
   sequelize: Sequelize,
   config: {
-    dataTypes?: Array<DataTypeOptions>
-    fieldTypes?: Array<FieldType>
+    dataTypes?: Array<DataTypeConfig>
+    fieldTypes?: Array<FieldTypeConfig>
     schemas?: Array<Schema>
     services?: Array<Service>
-    hooks?: Array<HookOptions>
-    plugins?: Array<PluginOptions>
+    hooks?: Array<HookConfig>
+    plugins?: Array<PluginConfig>
   },
   buildOptions: BuildOptions
 ): { graphQLSchema: GraphQLSchema; sgContext: SGContext } {

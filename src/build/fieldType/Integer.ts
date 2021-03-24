@@ -1,4 +1,4 @@
-import { FieldType } from '../../Definition'
+import { FieldTypeConfig } from '../../Definition'
 import { GraphQLInt } from 'graphql'
 import Sequelize from 'sequelize'
 
@@ -7,4 +7,4 @@ export default {
   inputType: GraphQLInt,
   outputType: GraphQLInt,
   columnOptions: { type: Sequelize.INTEGER }
-} as FieldType
+} as FieldTypeConfig

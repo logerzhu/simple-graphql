@@ -1,11 +1,12 @@
 import _ from 'lodash'
 import {
-  ColumnFieldOptions,
-  InputFieldOptions,
-  LinkedFieldOptions,
-  MutationOptions,
-  QueryOptions,
-  SchemaOptionConfig
+  ColumnFieldConfig,
+  InputFieldConfig,
+  InputFieldConfigMap,
+  LinkedFieldConfig,
+  MutationConfig,
+  QueryConfig,
+  SchemaOptions
 } from '../Definition'
 import Sequelize, {
   BelongsToManyOptions,
@@ -46,9 +47,7 @@ type HasManyConfig = {
     description?: string
     foreignField?: string
     hidden?: boolean
-    conditionFields?: {
-      [key: string]: InputFieldOptions
-    }
+    conditionFields?: InputFieldConfigMap
     order?: Array<Array<any>>
     outputStructure?: 'Connection' | 'Array'
   } & HasManyOptions
@@ -83,18 +82,18 @@ export default class Schema {
 
   config: {
     fields: {
-      [id: string]: ColumnFieldOptions
+      [id: string]: ColumnFieldConfig
     }
     links: {
-      [id: string]: LinkedFieldOptions
+      [id: string]: LinkedFieldConfig
     }
     associations: AssociationConfig
-    options: SchemaOptionConfig
+    options: SchemaOptions
     queries: {
-      [id: string]: QueryOptions
+      [id: string]: QueryConfig
     }
     mutations: {
-      [id: string]: MutationOptions
+      [id: string]: MutationConfig
     }
     methods: {
       [id: string]: any
@@ -104,7 +103,7 @@ export default class Schema {
     }
   }
 
-  constructor(name: string, options: SchemaOptionConfig = {}) {
+  constructor(name: string, options: SchemaOptions = {}) {
     this.name = name
     this.config = {
       fields: {},
@@ -127,7 +126,7 @@ export default class Schema {
    * Add the model base fields, and each field has a corresponding database column.
    * In default, each field generate a GraphQL field, unless it config with "hidden:true".
    */
-  fields(fields: { [id: string]: ColumnFieldOptions }): Schema {
+  fields(fields: { [id: string]: ColumnFieldConfig }): Schema {
     this.config.fields = Object.assign(this.config.fields, fields)
     return this
   }
@@ -135,7 +134,7 @@ export default class Schema {
   /**
    * Add the model link fields, and each link generate a GraphQL field but no corresponding database column.
    */
-  links(links: { [id: string]: LinkedFieldOptions }): Schema {
+  links(links: { [id: string]: LinkedFieldConfig }): Schema {
     this.config.links = Object.assign(this.config.links, links)
     return this
   }
@@ -143,7 +142,7 @@ export default class Schema {
   /**
    * Add the GraphQL query methods.
    */
-  queries(queries: { [key: string]: QueryOptions }): Schema {
+  queries(queries: { [key: string]: QueryConfig }): Schema {
     // TODO duplicate check
     this.config.queries = Object.assign(this.config.queries, queries)
     return this
@@ -152,7 +151,7 @@ export default class Schema {
   /**
    * Add the GraphQL mutataion methods.
    */
-  mutations(mutations: { [key: string]: MutationOptions }): Schema {
+  mutations(mutations: { [key: string]: MutationConfig }): Schema {
     // TODO duplicate check
     this.config.mutations = Object.assign(this.config.mutations, mutations)
     return this

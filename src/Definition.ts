@@ -46,11 +46,11 @@ export abstract class SGModel extends Model {
   static getSGContext: () => SGContext
 }
 
-export type ModelDefine = { new (): SGModel } & typeof SGModel
+export type SGModelCtrl = typeof SGModel & { new (): SGModel }
 
 export type SGContext<
   T = {
-    [key: string]: ModelDefine
+    [key: string]: SGModelCtrl
   },
   S = {
     [key: string]: any
@@ -62,21 +62,21 @@ export type SGContext<
   }
   models: T
   services: S
-  fieldType: (arg0: string) => FieldType | null | undefined
+  fieldType: (arg0: string) => FieldTypeConfig | null | undefined
 }
 
 export type ResolverContext = {
   hookFieldResolve: (
     arg0: string,
-    arg1: LinkedFieldOptions
+    arg1: LinkedFieldConfig
   ) => GraphQLFieldResolver<any, any>
   hookQueryResolve: (
     arg0: string,
-    arg1: QueryOptions
+    arg1: QueryConfig
   ) => GraphQLFieldResolver<any, any>
   hookMutationResolve: (
     arg0: string,
-    arg1: MutationOptions
+    arg1: MutationConfig
   ) => GraphQLFieldResolver<any, any>
 }
 
@@ -86,11 +86,11 @@ export type InterfaceContext = {
 }
 
 export type FieldTypeContext = {
-  fieldType: (arg0: string) => FieldType | null | undefined
+  fieldType: (arg0: string) => FieldTypeConfig | null | undefined
 }
 
-export type FieldResolve = (
-  source: any,
+export type FieldResolve<T = any> = (
+  source: T,
   args: {
     [key: string]: any
   },
@@ -108,22 +108,20 @@ export type RootResolve = (
   sgContext: SGContext
 ) => any
 
-export type FieldType = {
+export type FieldTypeConfig = {
   name: string
   description?: string
-  inputType?: GraphQLInputType | null | undefined
-  additionalInput?: {
-    [key: string]: InputFieldOptions
-  }
-  outputType?: GraphQLOutputType | null | undefined
+  inputType?: GraphQLInputType | null
+  additionalInput?: InputFieldConfigMap
+  outputType?: GraphQLOutputType | null
   outputResolve?: FieldResolve
   columnOptions?:
     | ModelAttributeColumnOptions
     | ((
         schema: Schema,
         fieldName: string,
-        options: ColumnFieldOptions
-      ) => ModelAttributeColumnOptions | null | undefined)
+        options: ColumnFieldConfig
+      ) => ModelAttributeColumnOptions | null)
 }
 
 export type TypeMetadata = {
@@ -136,9 +134,7 @@ export type OutputTypeMetadata = TypeMetadata & {
     hidden?: boolean
     resolve?: FieldResolve
     dependentFields?: Array<string>
-    input?: {
-      [key: string]: InputFieldOptions
-    }
+    input?: InputFieldConfigMap
   }
 }
 
@@ -223,22 +219,22 @@ export type TypeDefinition<T extends TypeMetadata = TypeMetadata> = (
   metadata?: T
 }
 
-export type InputFieldOptions = TypeDefinition<InputTypeMetadata>
+export type InputFieldConfig = TypeDefinition<InputTypeMetadata>
+export type InputFieldConfigMap = { [key: string]: InputFieldConfig }
 
-export type OutputFieldOptions = TypeDefinition<OutputTypeMetadata>
+export type OutputFieldConfig = TypeDefinition<OutputTypeMetadata>
+export type OutputFieldConfigMap = { [key: string]: OutputFieldConfig }
 
-export type LinkedFieldOptions = {
+export type LinkedFieldConfig = {
   description?: string
   config?: { [key: string]: any }
-  input?: {
-    [key: string]: InputFieldOptions
-  }
+  input?: InputFieldConfigMap
   dependentFields?: Array<string>
-  output: OutputFieldOptions
+  output: OutputFieldConfig
   resolve: FieldResolve
 }
 
-export type ColumnFieldOptions = TypeDefinition<
+export type ColumnFieldConfig = TypeDefinition<
   OutputTypeMetadata & InputTypeMetadata
 > & {
   metadata?: {
@@ -254,32 +250,26 @@ export type ColumnFieldOptions = TypeDefinition<
   }
 }
 
-export type DataTypeOptions = {
+export type DataTypeConfig = {
   name: string
   description?: string
   definition: TypeDefinition<OutputTypeMetadata & InputTypeMetadata>
   columnOptions?: ModelAttributeColumnOptions
 }
 
-export type QueryOptions = {
+export type QueryConfig = {
   description?: string
   config?: { [key: string]: any }
-  input?: {
-    [key: string]: InputFieldOptions
-  }
-  output: OutputFieldOptions
+  input?: InputFieldConfigMap
+  output: OutputFieldConfig
   resolve: RootResolve
 }
 
-export type MutationOptions = {
+export type MutationConfig = {
   description?: string
   config?: { [key: string]: any }
-  input: {
-    [key: string]: InputFieldOptions
-  }
-  output: {
-    [key: string]: OutputFieldOptions
-  }
+  input: InputFieldConfigMap
+  output: OutputFieldConfigMap
   mutateAndGetPayload: RootResolve
 }
 
@@ -289,7 +279,7 @@ export interface PluginOptionsType {
 
 export interface PluginsOptionsType {}
 
-export type SchemaOptionConfig = {
+export type SchemaOptions = {
   description?: string
   plugin?: PluginsOptionsType
   tableOptions?: ModelOptions<any>
@@ -298,10 +288,10 @@ export type SchemaOptionConfig = {
 export type HookAction = {
   type: 'field' | 'query' | 'mutation'
   name: string
-  options: LinkedFieldOptions | QueryOptions | MutationOptions
+  options: LinkedFieldConfig | QueryConfig | MutationConfig
 }
 
-export type HookOptions = {
+export type HookConfig = {
   description?: string
   priority?: number
   filter: (action: HookAction) => boolean
@@ -323,16 +313,16 @@ export type HookOptions = {
   ) => any
 }
 
-export type PluginOptions<T = PluginOptionsType> = {
+export type PluginConfig<T = PluginOptionsType> = {
   name: string
   description?: string
   priority?: number
   defaultOptions?: T
   applyToSchema?: (schema: Schema, options: T, schemas: Array<Schema>) => void
   applyToModel?: (
-    model: ModelDefine,
+    model: SGModelCtrl,
     options: T,
-    models: Array<ModelDefine>
+    models: Array<SGModelCtrl>
   ) => void
 }
 

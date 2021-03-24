@@ -1,10 +1,10 @@
 import { graphql, GraphQLSchema } from 'graphql'
 import {
   BuildOptions,
-  DataTypeOptions,
-  FieldType,
-  HookOptions,
-  PluginOptions,
+  DataTypeConfig,
+  FieldTypeConfig,
+  HookConfig,
+  PluginConfig,
   SGContext
 } from '../src/Definition'
 import SG, { Schema, Service } from '../src'
@@ -47,12 +47,12 @@ const sequelizeInstance = function (dbConfig) {
 class SGExecutor {
   static new: (
     config: {
-      dataTypes?: Array<DataTypeOptions>
-      fieldTypes?: Array<FieldType>
+      dataTypes?: Array<DataTypeConfig>
+      fieldTypes?: Array<FieldTypeConfig>
       schemas?: Array<Schema>
       services?: Array<Service>
-      hooks?: Array<HookOptions>
-      plugins?: Array<PluginOptions>
+      hooks?: Array<HookConfig>
+      plugins?: Array<PluginConfig>
     },
     buildOptions: BuildOptions
   ) => Promise<SGExecutor>

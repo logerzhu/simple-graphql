@@ -1,4 +1,4 @@
-import { PluginOptions, PluginOptionsType } from '../Definition'
+import { PluginConfig, PluginOptionsType } from '../Definition'
 
 declare module '../Definition' {
   interface PluginsOptionsType {
@@ -32,4 +32,4 @@ export default {
       })
     }
   }
-} as PluginOptions
+} as PluginConfig

@@ -1,5 +1,10 @@
 import _ from 'lodash'
-import { InputFieldOptions, PluginOptions, SGContext } from '../Definition'
+import {
+  InputFieldConfig,
+  InputFieldConfigMap,
+  PluginConfig,
+  SGContext
+} from '../Definition'
 import Sequelize from 'sequelize'
 
 export default {
@@ -14,13 +19,11 @@ export default {
       if (config.hidden) {
         return
       }
-      const args: {
-        [key: string]: InputFieldOptions
-      } = {}
+      const args: InputFieldConfigMap = {}
 
       const conditionFields: {
         [key: string]: {
-          definition: InputFieldOptions
+          definition: InputFieldConfig
           mapper: (
             option: { where: any; attributes: Array<string> },
             argValue: any,
@@ -133,4 +136,4 @@ export default {
       })
     })
   }
-} as PluginOptions
+} as PluginConfig

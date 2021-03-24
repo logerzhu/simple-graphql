@@ -1,4 +1,4 @@
-import { FieldType } from '../../Definition'
+import { FieldTypeConfig } from '../../Definition'
 import { GraphQLString } from 'graphql'
 import Sequelize from 'sequelize'
 
@@ -7,4 +7,4 @@ export default {
   inputType: GraphQLString,
   outputType: GraphQLString,
   columnOptions: { type: Sequelize.STRING }
-} as FieldType
+} as FieldTypeConfig

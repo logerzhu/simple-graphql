@@ -1,29 +1,27 @@
 import _Schema from './definition/Schema'
 import _Service from './definition/Service'
 
-import { SchemaOptionConfig } from './Definition'
+import { SchemaOptions } from './Definition'
 import _build from './build'
-
-import './plugin'
 
 export {
   HookAction,
-  HookOptions,
-  PluginOptions,
+  HookConfig,
+  PluginConfig,
   SGContext,
   ResolverContext,
   InterfaceContext,
   FieldTypeContext,
   FieldResolve,
   RootResolve,
-  FieldType,
-  InputFieldOptions,
-  OutputFieldOptions,
-  LinkedFieldOptions,
-  ColumnFieldOptions,
-  QueryOptions,
-  MutationOptions,
-  SchemaOptionConfig,
+  FieldTypeConfig,
+  InputFieldConfig,
+  OutputFieldConfig,
+  LinkedFieldConfig,
+  ColumnFieldConfig,
+  QueryConfig,
+  MutationConfig,
+  SchemaOptions,
   BuildOptions
 } from './Definition'
 
@@ -33,10 +31,8 @@ export type Service = _Service
 namespace SG {
   export const Schema = _Schema
   export const Service = _Service
-  export const schema = (
-    name: string,
-    options: SchemaOptionConfig = {}
-  ): _Schema => new _Schema(name, options)
+  export const schema = (name: string, options: SchemaOptions = {}): _Schema =>
+    new _Schema(name, options)
   export const service = (name: string): _Service => new _Service(name)
   export const build = _build
 }
