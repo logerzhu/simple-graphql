@@ -1,7 +1,7 @@
 import Schema from '../definition/Schema'
 import Service from '../definition/Service'
 import {
-  FieldTypeContext,
+  TypeContext,
   MutationConfig,
   MutationConfigMap,
   ResolverContext
@@ -18,7 +18,7 @@ export default (
   payloadFields: {
     [key: string]: graphql.GraphQLFieldConfig<any, any>
   },
-  context: ResolverContext & FieldTypeContext
+  context: ResolverContext & TypeContext
 ): {
   [key: string]: graphql.GraphQLFieldConfig<any, any>
 } => {

@@ -11,14 +11,14 @@ import {
 } from 'graphql'
 import StringHelper from '../utils/StringHelper'
 import {
-  FieldTypeContext,
+  TypeContext,
   LinkedFieldConfig,
   OutputFieldConfig,
   ResolverContext
 } from '../Definition'
 import toGraphQLInputFieldConfigMap from './toGraphQLInputFieldConfigMap'
 
-type Context = ResolverContext & FieldTypeContext
+type Context = ResolverContext & TypeContext
 
 const toGraphQLFieldConfigMap = function (
   name: string,

@@ -15,8 +15,8 @@ import Service from '../definition/Service'
 import {
   BuildOptions,
   DataTypeConfig,
-  FieldTypeConfig,
-  FieldTypeContext,
+  TypeConfig,
+  TypeContext,
   HookConfig,
   InterfaceContext,
   MutationConfigMap,
@@ -41,7 +41,7 @@ export default function (
   sequelize: Sequelize,
   config: {
     dataTypes?: Array<DataTypeConfig>
-    fieldTypes?: Array<FieldTypeConfig>
+    fieldTypes?: Array<TypeConfig>
     schemas?: Array<Schema>
     services?: Array<typeof Service & { new (): Service }>
     hooks?: Array<HookConfig>
@@ -67,7 +67,7 @@ export default function (
   const resolveContext = buildResolverContext(config.hooks || [], sgContext)
   const interfaceContext = buildInterfaceContext(sgContext)
 
-  const context: ResolverContext & InterfaceContext & FieldTypeContext = {
+  const context: ResolverContext & InterfaceContext & TypeContext = {
     hookFieldResolve: (name, options) =>
       resolveContext.hookFieldResolve(name, options),
     hookQueryResolve: (name, options) =>

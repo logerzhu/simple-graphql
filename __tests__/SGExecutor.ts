@@ -2,7 +2,7 @@ import { graphql, GraphQLSchema } from 'graphql'
 import {
   BuildOptions,
   DataTypeConfig,
-  FieldTypeConfig,
+  TypeConfig,
   HookConfig,
   MutationConfigMap,
   PluginConfig,
@@ -51,7 +51,7 @@ class SGExecutor {
   static new: (
     config: {
       dataTypes?: Array<DataTypeConfig>
-      fieldTypes?: Array<FieldTypeConfig>
+      fieldTypes?: Array<TypeConfig>
       schemas?: Array<Schema>
       services?: Array<typeof Service & { new (): Service }>
       hooks?: Array<HookConfig>

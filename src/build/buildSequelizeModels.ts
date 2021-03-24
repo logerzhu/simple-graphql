@@ -4,14 +4,14 @@ import Sequelize, {
   ModelCtor
 } from 'sequelize'
 import Schema from '../definition/Schema'
-import { FieldTypeContext, SGContext, SGModelCtrl } from '../Definition'
+import { TypeContext, SGContext, SGModelCtrl } from '../Definition'
 import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
 
 function toSequelizeModel(
   sequelize: Sequelize.Sequelize,
   schema: Schema,
-  context: FieldTypeContext
+  context: TypeContext
 ): ModelCtor<Model> {
   const dbDefinition = {}
 

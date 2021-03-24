@@ -68,7 +68,7 @@ export type SGContext = {
   }
   models: SGModelCtrlMap
   services: SGServiceMap
-  fieldType: (typeName: string) => FieldTypeConfig | null | undefined
+  fieldType: (typeName: string) => TypeConfig | null | undefined
 }
 
 export type ResolverContext = {
@@ -91,8 +91,8 @@ export type InterfaceContext = {
   registerInterface: (name: string, interfaceType: GraphQLInterfaceType) => void
 }
 
-export type FieldTypeContext = {
-  fieldType: (name: string) => FieldTypeConfig | null | undefined
+export type TypeContext = {
+  fieldType: (name: string) => TypeConfig | null | undefined
 }
 
 export type FieldResolve<T = any> = (
@@ -114,7 +114,7 @@ export type RootResolve = (
   sgContext: SGContext
 ) => any
 
-export type FieldTypeConfig = {
+export type TypeConfig = {
   name: string
   description?: string
   inputType?: GraphQLInputType | null
@@ -126,15 +126,15 @@ export type FieldTypeConfig = {
     | ((
         schema: Schema,
         fieldName: string,
-        options: ColumnFieldConfig
+        options: ColumnFieldTypeConfig
       ) => ModelAttributeColumnOptions | null)
 }
 
-export type TypeMetadata = {
+export type FieldTypeMetadata = {
   description?: string
 }
 
-export type OutputTypeMetadata = TypeMetadata & {
+export type OutputFieldTypeMetadata = FieldTypeMetadata & {
   config?: { [key: string]: any }
   graphql?: {
     hidden?: boolean
@@ -150,7 +150,7 @@ export type ConditionFieldMapper = (
   context: SGContext
 ) => void
 
-export type InputTypeMetadata = TypeMetadata & {
+export type InputFieldTypeMetadata = FieldTypeMetadata & {
   graphql?: {
     hidden?: boolean
     defaultValue?: any
@@ -159,7 +159,9 @@ export type InputTypeMetadata = TypeMetadata & {
 }
 
 // 基于 https://jsontypedef.com/ 扩展 sequelize / graphql 配置
-export type TypeDefinition<T extends TypeMetadata = TypeMetadata> = (
+export type FieldTypeDefinition<
+  T extends FieldTypeMetadata = FieldTypeMetadata
+> = (
   | {
       type:
         | 'String'
@@ -186,7 +188,7 @@ export type TypeDefinition<T extends TypeMetadata = TypeMetadata> = (
       mapping?: undefined
     }
   | {
-      elements: TypeDefinition<T>
+      elements: FieldTypeDefinition<T>
       type?: undefined
       enum?: undefined
       properties?: undefined
@@ -195,7 +197,7 @@ export type TypeDefinition<T extends TypeMetadata = TypeMetadata> = (
       mapping?: undefined
     }
   | {
-      properties: { [key: string]: TypeDefinition<T> }
+      properties: { [key: string]: FieldTypeDefinition<T> }
       type?: undefined
       enum?: undefined
       elements?: undefined
@@ -204,7 +206,7 @@ export type TypeDefinition<T extends TypeMetadata = TypeMetadata> = (
       mapping?: undefined
     }
   | {
-      values: TypeDefinition<T>
+      values: FieldTypeDefinition<T>
       type?: undefined
       enum?: undefined
       elements?: undefined
@@ -214,7 +216,7 @@ export type TypeDefinition<T extends TypeMetadata = TypeMetadata> = (
     }
   | {
       discriminator: string
-      mapping: { [key: string]: TypeDefinition<T> }
+      mapping: { [key: string]: FieldTypeDefinition<T> }
       type?: undefined
       enum?: undefined
       elements?: undefined
@@ -222,15 +224,15 @@ export type TypeDefinition<T extends TypeMetadata = TypeMetadata> = (
       values?: undefined
     }
 ) & {
-  definitions?: { [key: string]: TypeDefinition<T> }
+  definitions?: { [key: string]: FieldTypeDefinition<T> }
   nullable?: boolean
   metadata?: T
 }
 
-export type InputFieldConfig = TypeDefinition<InputTypeMetadata>
+export type InputFieldConfig = FieldTypeDefinition<InputFieldTypeMetadata>
 export type InputFieldConfigMap = { [key: string]: InputFieldConfig }
 
-export type OutputFieldConfig = TypeDefinition<OutputTypeMetadata>
+export type OutputFieldConfig = FieldTypeDefinition<OutputFieldTypeMetadata>
 export type OutputFieldConfigMap = { [key: string]: OutputFieldConfig }
 
 export type LinkedFieldConfig = {
@@ -243,8 +245,8 @@ export type LinkedFieldConfig = {
 }
 export type LinkedFieldConfigMap = { [key: string]: LinkedFieldConfig }
 
-export type ColumnFieldConfig = TypeDefinition<
-  OutputTypeMetadata & InputTypeMetadata
+export type ColumnFieldTypeConfig = FieldTypeDefinition<
+  OutputFieldTypeMetadata & InputFieldTypeMetadata
 > & {
   metadata?: {
     graphql?: {
@@ -259,12 +261,14 @@ export type ColumnFieldConfig = TypeDefinition<
   }
 }
 
-export type ColumnFieldConfigMap = { [key: string]: ColumnFieldConfig }
+export type ColumnFieldConfigMap = { [key: string]: ColumnFieldTypeConfig }
 
 export type DataTypeConfig = {
   name: string
   description?: string
-  definition: TypeDefinition<OutputTypeMetadata & InputTypeMetadata>
+  definition: FieldTypeDefinition<
+    OutputFieldTypeMetadata & InputFieldTypeMetadata
+  >
   columnOptions?: ModelAttributeColumnOptions
 }
 

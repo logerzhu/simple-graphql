@@ -1,8 +1,8 @@
 import {
-  ColumnFieldConfig,
+  ColumnFieldTypeConfig,
   DataTypeConfig,
-  FieldTypeConfig,
-  FieldTypeContext,
+  TypeConfig,
+  TypeContext,
   InputFieldConfig,
   InterfaceContext,
   OutputFieldConfig,
@@ -28,9 +28,9 @@ type Context = ResolverContext & InterfaceContext
 
 function buildModelType(
   schema: Schema,
-  fieldTypeContext: FieldTypeContext,
+  fieldTypeContext: TypeContext,
   context: Context
-): FieldTypeConfig {
+): TypeConfig {
   const typeName = schema.name
   return {
     name: typeName,
@@ -174,8 +174,8 @@ function buildModelType(
 
 function buildModelTypeId(
   schema: Schema,
-  fieldTypeContext: FieldTypeContext
-): FieldTypeConfig {
+  fieldTypeContext: TypeContext
+): TypeConfig {
   const typeName = schema.name + 'Id'
   const idType = globalIdType(schema.name)
   return {
@@ -188,9 +188,9 @@ function buildModelTypeId(
 
 function buildDataType(
   dataTypeOptions: DataTypeConfig,
-  fieldTypeContext: FieldTypeContext,
+  fieldTypeContext: TypeContext,
   context: Context
-): FieldTypeConfig {
+): TypeConfig {
   const toOutputType = (name: string, options: OutputFieldConfig) => {
     const outputConfigMap = toGraphQLFieldConfigMap(
       name,
@@ -229,7 +229,7 @@ function buildDataType(
     columnOptions: (
       schema: Schema,
       fieldName: string,
-      options: ColumnFieldConfig
+      options: ColumnFieldTypeConfig
     ) => {
       let columnOptions: ModelAttributeColumnOptions | null = null
       const definition = dataTypeOptions.definition
@@ -280,9 +280,9 @@ function buildDataType(
 
 function buildUnionWrapType(
   wrapType: string,
-  fieldTypeContext: FieldTypeContext,
+  fieldTypeContext: TypeContext,
   context: Context
-): FieldTypeConfig {
+): TypeConfig {
   const name = `_Union_${wrapType}`
   const typeConfig = fieldTypeContext.fieldType(wrapType) as any
   return {
@@ -309,12 +309,12 @@ function buildUnionWrapType(
 }
 
 export default function (
-  fieldTypes: Array<FieldTypeConfig>,
+  fieldTypes: Array<TypeConfig>,
   dataTypes: Array<DataTypeConfig>,
   schemas: Array<Schema>,
   context: Context
 ) {
-  const typeMap: { [key: string]: FieldTypeConfig } = {}
+  const typeMap: { [key: string]: TypeConfig } = {}
 
   const resolves = [
     function resolveFunctionType(typeName) {
@@ -493,7 +493,7 @@ export default function (
     }
   ]
 
-  const fieldTypeContext: FieldTypeContext = {
+  const fieldTypeContext: TypeContext = {
     fieldType: (typeName) => {
       if (typeMap[typeName]) {
         return typeMap[typeName]

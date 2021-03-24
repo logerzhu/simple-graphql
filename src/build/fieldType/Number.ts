@@ -1,4 +1,4 @@
-import { FieldTypeConfig } from '../../Definition'
+import { TypeConfig } from '../../Definition'
 import { GraphQLFloat } from 'graphql'
 import Sequelize from 'sequelize'
 
@@ -7,4 +7,4 @@ export default {
   inputType: GraphQLFloat,
   outputType: GraphQLFloat,
   columnOptions: { type: Sequelize.DOUBLE }
-} as FieldTypeConfig
+} as TypeConfig

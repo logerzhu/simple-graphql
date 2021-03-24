@@ -1,4 +1,4 @@
-import { FieldTypeConfig } from '../../Definition'
+import { TypeConfig } from '../../Definition'
 import Sequelize from 'sequelize'
 import GraphQLScalarTypes from './graphql'
 
@@ -7,4 +7,4 @@ export default {
   inputType: GraphQLScalarTypes.Json,
   outputType: GraphQLScalarTypes.Json,
   columnOptions: { type: Sequelize.JSON }
-} as FieldTypeConfig
+} as TypeConfig

@@ -9,7 +9,7 @@ import {
   GraphQLNonNull
 } from 'graphql'
 import StringHelper from '../utils/StringHelper'
-import { FieldTypeContext, InputFieldConfig } from '../Definition'
+import { TypeContext, InputFieldConfig } from '../Definition'
 
 import unionInputType from '../build/fieldType/unionInputType'
 
@@ -18,7 +18,7 @@ const toGraphQLInputFieldConfigMap = function (
   fields: {
     [id: string]: InputFieldConfig
   },
-  context: FieldTypeContext
+  context: TypeContext
 ): GraphQLInputFieldConfigMap {
   const toTypeName = (name: string, path: string) => {
     return (

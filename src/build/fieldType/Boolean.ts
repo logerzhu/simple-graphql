@@ -1,4 +1,4 @@
-import { FieldTypeConfig } from '../../Definition'
+import { TypeConfig } from '../../Definition'
 import Sequelize from 'sequelize'
 import { GraphQLBoolean } from 'graphql'
 
@@ -7,4 +7,4 @@ export default {
   inputType: GraphQLBoolean,
   outputType: GraphQLBoolean,
   columnOptions: { type: Sequelize.BOOLEAN }
-} as FieldTypeConfig
+} as TypeConfig

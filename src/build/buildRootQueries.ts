@@ -4,7 +4,7 @@ import * as relay from 'graphql-relay'
 import Schema from '../definition/Schema'
 import Service from '../definition/Service'
 import {
-  FieldTypeContext,
+  TypeContext,
   InterfaceContext,
   QueryConfig,
   QueryConfigMap,
@@ -16,7 +16,7 @@ import StringHelper from '../utils/StringHelper'
 
 export default (
   queryConfigMaps: Array<QueryConfigMap>,
-  context: ResolverContext & FieldTypeContext & InterfaceContext
+  context: ResolverContext & TypeContext & InterfaceContext
 ): {
   [key: string]: graphql.GraphQLFieldConfig<any, any>
 } => {

@@ -1,4 +1,4 @@
-import { FieldTypeConfig } from '../../Definition'
+import { TypeConfig } from '../../Definition'
 import Sequelize from 'sequelize'
 import GraphQLScalarTypes from './graphql'
 
@@ -7,4 +7,4 @@ export default {
   inputType: GraphQLScalarTypes.Date,
   outputType: GraphQLScalarTypes.Date,
   columnOptions: { type: Sequelize.DATE(6) }
-} as FieldTypeConfig
+} as TypeConfig
