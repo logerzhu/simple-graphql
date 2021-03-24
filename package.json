@@ -24,12 +24,12 @@
   "keywords": [
     "GraphQL",
     "ORM",
-    "Relay",
     "Sequelize",
     "MySQL",
     "PostgreSQL",
     "SQLite",
-    "MSSQL"
+    "MSSQL",
+    "JSON Typedef"
   ],
   "dependencies": {
     "@types/lodash": "^4.14.168",

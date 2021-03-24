@@ -1,11 +1,23 @@
 # Simple-GraphQL
 
-[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+### 核心功能: 
+* 避免重复代码, 基于统一的实体定义 (类似 [JSON Typedef](https://jsontypedef.com/) 的扩展) 生成 GraphQL Schema 和 Sequelize Model
+  
 
-`Simple-GraphQL` 是 [GraphQL](https://github.com/graphql/graphql-js) 的后端开发框架，目的是根据声明式的配置：
-* 自动生成`Sequelize`数据模型定义
-* 自动生成`GraphQL`接口的定义和实现
-* 自动生成数据模型对应的添加、删除、修改和查询接口
+* 可扩展的`字段类型`配置
+  * (内置) 类型 ```String Number Integer Date JSON Boolean```
+    
+
+* 可扩展的`插件`配置, 用于动态修改相关配置
+  * (内置) 生成可配置的GraphQL接口, 如 GraphQL CRUD 接口
+
+
+* 可扩展的`拦截器`配置, 用于在运行时对GraphQL接口调用的拦截.
+  * GraphQL Mutation接口的 transaction 支持
+  * 用户权限验证功能  
+    
+
+* 可扩展的单实例`服务`接口支持. 
 
 
 ## 安装
@@ -13,7 +25,8 @@
  npm install simple-graphql graphql graphql-relay -save
 
 ```
-### 文档暂无
+### 用法
+TODO
 
 ## License
 
