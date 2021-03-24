@@ -35,7 +35,7 @@ function buildModelType(
   return {
     name: typeName,
     description: schema.options.description,
-    inputType: (fieldTypeContext.fieldType(schema.name + 'Id') as any)
+    inputType: (fieldTypeContext.typeConfig(schema.name + 'Id') as any)
       .inputType,
     outputType: new GraphQLObjectType({
       name: typeName,
@@ -80,7 +80,7 @@ function buildModelType(
               context.hookQueryResolve(name, options),
             hookMutationResolve: (name, options) =>
               context.hookMutationResolve(name, options),
-            fieldType: (typeName) => fieldTypeContext.fieldType(typeName)
+            typeConfig: (typeName) => fieldTypeContext.typeConfig(typeName)
           }
         )
     }),
@@ -203,7 +203,7 @@ function buildDataType(
           context.hookQueryResolve(name, options),
         hookMutationResolve: (name, options) =>
           context.hookMutationResolve(name, options),
-        fieldType: (typeName) => fieldTypeContext.fieldType(typeName)
+        typeConfig: (typeName) => fieldTypeContext.typeConfig(typeName)
       }
     )['']
     return outputConfigMap && outputConfigMap.type
@@ -234,19 +234,19 @@ function buildDataType(
       let columnOptions: ModelAttributeColumnOptions | null = null
       const definition = dataTypeOptions.definition
       if (definition.type) {
-        const fieldType = fieldTypeContext.fieldType(definition.type)
-        if (!fieldType) {
+        const typeConfig = fieldTypeContext.typeConfig(definition.type)
+        if (!typeConfig) {
           throw new Error(`Type "${definition.type}" has not register.`)
         }
-        if (!fieldType.columnOptions) {
+        if (!typeConfig.columnOptions) {
           throw new Error(
             `Column type of "${definition.type}" is not supported.`
           )
         }
         columnOptions =
-          typeof fieldType.columnOptions === 'function'
-            ? fieldType.columnOptions(schema, fieldName, options)
-            : fieldType.columnOptions
+          typeof typeConfig.columnOptions === 'function'
+            ? typeConfig.columnOptions(schema, fieldName, options)
+            : typeConfig.columnOptions
       } else if (definition.enum) {
         columnOptions = {
           type: Sequelize.STRING(191)
@@ -284,7 +284,7 @@ function buildUnionWrapType(
   context: Context
 ): TypeConfig {
   const name = `_Union_${wrapType}`
-  const typeConfig = fieldTypeContext.fieldType(wrapType) as any
+  const typeConfig = fieldTypeContext.typeConfig(wrapType) as any
   return {
     name: name,
     description: `Union wrap type for ${wrapType}`,
@@ -361,18 +361,18 @@ export default function (
     function resolveArrayType(typeName) {
       if (typeName.startsWith('[') && typeName.endsWith(']')) {
         const subTypeName = typeName.substr(1, typeName.length - 2)
-        const fieldType = fieldTypeContext.fieldType(subTypeName)
-        if (!fieldType) {
+        const typeConfig = fieldTypeContext.typeConfig(subTypeName)
+        if (!typeConfig) {
           return null
         }
         return {
           name: typeName,
           description: `Array of type ${subTypeName}`,
-          inputType: fieldType.inputType
-            ? new GraphQLList(fieldType.inputType)
+          inputType: typeConfig.inputType
+            ? new GraphQLList(typeConfig.inputType)
             : null,
-          outputType: fieldType.outputType
-            ? new GraphQLList(fieldType.outputType)
+          outputType: typeConfig.outputType
+            ? new GraphQLList(typeConfig.outputType)
             : null,
           outputResolve: async function (root, args, context, info, sgContext) {
             const fieldName = info.fieldName
@@ -448,13 +448,13 @@ export default function (
           s.name + 'Connection' === typeName || s.name + 'Edge' === typeName
       )
       if (schema) {
-        const fieldType = fieldTypeContext.fieldType(schema.name)
-        if (!fieldType) {
+        const typeConfig = fieldTypeContext.typeConfig(schema.name)
+        if (!typeConfig) {
           return null
         }
         const connectionInfo = relay.connectionDefinitions({
           name: schema.name,
-          nodeType: fieldType.outputType as any,
+          nodeType: typeConfig.outputType as any,
           connectionFields: {
             count: {
               type: GraphQLFloat
@@ -494,7 +494,7 @@ export default function (
   ]
 
   const fieldTypeContext: TypeContext = {
-    fieldType: (typeName) => {
+    typeConfig: (typeName) => {
       if (typeMap[typeName]) {
         return typeMap[typeName]
       }

@@ -61,7 +61,7 @@ export default function (
     ),
     models: {},
     services: {},
-    fieldType: (typeName) => null
+    typeConfig: (typeName) => null
   }
 
   const resolveContext = buildResolverContext(config.hooks || [], sgContext)
@@ -82,7 +82,7 @@ export default function (
       return interfaceContext.registerInterface(name, gInterface)
     },
 
-    fieldType: (typeName) => null
+    typeConfig: (typeName) => null
   }
 
   const fieldTypeContext = buildFieldTypeContext(
@@ -91,9 +91,9 @@ export default function (
     config.schemas || [],
     context
   )
-  context.fieldType = (typeName) => fieldTypeContext.fieldType(typeName)
+  context.typeConfig = (typeName) => fieldTypeContext.typeConfig(typeName)
 
-  sgContext.fieldType = (typeName) => fieldTypeContext.fieldType(typeName)
+  sgContext.typeConfig = (typeName) => fieldTypeContext.typeConfig(typeName)
   sgContext.models = applyPluginsToModels(
     buildSequelizeModels(sequelize, config.schemas || [], sgContext),
     plugins,

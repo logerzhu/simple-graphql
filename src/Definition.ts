@@ -68,8 +68,7 @@ export type SGContext = {
   }
   models: SGModelCtrlMap
   services: SGServiceMap
-  fieldType: (typeName: string) => TypeConfig | null | undefined
-}
+} & TypeContext
 
 export type ResolverContext = {
   hookFieldResolve: (
@@ -92,7 +91,7 @@ export type InterfaceContext = {
 }
 
 export type TypeContext = {
-  fieldType: (name: string) => TypeConfig | null | undefined
+  typeConfig: (name: string) => TypeConfig | null | undefined
 }
 
 export type FieldResolve<T = any> = (

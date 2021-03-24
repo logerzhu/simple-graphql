@@ -35,17 +35,17 @@ function toSequelizeModel(
         type: Sequelize.JSON
       }
     } else if (value.type) {
-      const fieldType = context.fieldType(value.type)
-      if (!fieldType) {
+      const typeConfig = context.typeConfig(value.type)
+      if (!typeConfig) {
         throw new Error(`Type "${value.type}" has not register.`)
       }
-      if (!fieldType.columnOptions) {
+      if (!typeConfig.columnOptions) {
         throw new Error(`Column type of "${value.type}" is not supported.`)
       }
       columnOptions =
-        typeof fieldType.columnOptions === 'function'
-          ? fieldType.columnOptions(schema, key, value)
-          : fieldType.columnOptions
+        typeof typeConfig.columnOptions === 'function'
+          ? typeConfig.columnOptions(schema, key, value)
+          : typeConfig.columnOptions
     } else {
       columnOptions = {
         type: Sequelize.JSON

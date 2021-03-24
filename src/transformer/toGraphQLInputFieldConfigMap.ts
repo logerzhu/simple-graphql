@@ -31,12 +31,12 @@ const toGraphQLInputFieldConfigMap = function (
   }
 
   const inputFieldConfig = (typeName): GraphQLInputFieldConfig | null => {
-    const fieldType = context.fieldType(typeName)
-    if (!fieldType) {
+    const typeConfig = context.typeConfig(typeName)
+    if (!typeConfig) {
       throw new Error(`Type "${typeName}" has not register.`)
     }
-    if (fieldType.inputType) {
-      return { type: fieldType.inputType }
+    if (typeConfig.inputType) {
+      return { type: typeConfig.inputType }
     } else {
       return null
     }
@@ -82,7 +82,7 @@ const toGraphQLInputFieldConfigMap = function (
     } else if (field.elements) {
       if (
         field.elements.type &&
-        context.fieldType(`[${field.elements.type}]`)
+        context.typeConfig(`[${field.elements.type}]`)
       ) {
         return makeNonNull(inputFieldConfig(`[${field.elements.type}]`))
       }

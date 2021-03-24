@@ -43,20 +43,20 @@ const toGraphQLFieldConfigMap = function (
     fieldPath: string,
     typeName: string
   ): GraphQLFieldConfig<any, any> | null | undefined => {
-    const fieldType = context.fieldType(typeName)
-    if (!fieldType) {
+    const typeConfig = context.typeConfig(typeName)
+    if (!typeConfig) {
       throw new Error(`Type "${typeName}" has not register for ${fieldName}.`)
     }
-    if (fieldType.outputType) {
+    if (typeConfig.outputType) {
       const config: GraphQLFieldConfig<any, any> = {
-        type: fieldType.outputType,
+        type: typeConfig.outputType,
         args: toGraphQLInputFieldConfigMap(
           toTypeName(fieldName, fieldPath),
-          fieldType.additionalInput || {},
+          typeConfig.additionalInput || {},
           context
         )
       }
-      const outputResolve = fieldType.outputResolve
+      const outputResolve = typeConfig.outputResolve
       if (outputResolve) {
         config.resolve = context.hookFieldResolve(fieldPath, {
           output: { type: typeName },
@@ -162,7 +162,7 @@ const toGraphQLFieldConfigMap = function (
     } else if (field.elements) {
       if (
         field.elements.type &&
-        context.fieldType(`[${field.elements.type}]`)
+        context.typeConfig(`[${field.elements.type}]`)
       ) {
         return makeNonNull(fieldConfig(name, path, `[${field.elements.type}]`))
       } else {
@@ -201,7 +201,7 @@ const toGraphQLFieldConfigMap = function (
       //TODO 支持嵌套定义
       const unionTypes = _.mapValues(
         field.mapping,
-        (value, key) => context.fieldType(`_Union_${value.type}`).outputType
+        (value, key) => context.typeConfig(`_Union_${value.type}`).outputType
       )
       return makeNonNull({
         type: new GraphQLUnionType({
@@ -210,7 +210,7 @@ const toGraphQLFieldConfigMap = function (
           types: _.uniq(_.values(unionTypes)) as any, //TODO 需要 Object Type
           resolveType(value) {
             if (value && value[field.discriminator]) {
-              return (context.fieldType(
+              return (context.typeConfig(
                 `_Union_${field.mapping[value[field.discriminator]].type}` // TODO 支持嵌套定义
               ) as any).outputType
             }
