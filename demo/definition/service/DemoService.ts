@@ -1,42 +1,17 @@
 import SG from '../../../src'
-import {PluginOptions} from "../../../src/Definition";
-
-let gWeather = '晴天'
+import _ from 'lodash'
 
 declare module '../../../src/Definition' {
   interface SGServiceMap {
-    DemoService: PluginOptions & { name?: string }
+    DemoService?: DemoService
   }
 }
 
-export default SG.service('DemoService').queries({
-  weather: {
-    output: {type: 'String'},
-    resolve: async function (args, context, info) {
-      return gWeather
-    }
+export default class DemoService extends SG.Service {
+  gWeather = '晴天'
+
+  getServiceKeys() {
+    const sgContext = this.getSGContext()
+    return _.keys(sgContext.services)
   }
-}).mutations({
-  setWeather: {
-    input: {
-      weather: {
-        type: 'String',
-        nullable: false
-      }
-    },
-    output: {
-      weather: {
-        type: 'String',
-        nullable: false
-      }
-    },
-    mutateAndGetPayload: async function ({
-                                           weather
-                                         }, context, info) {
-      gWeather = weather
-      return {
-        weather: gWeather
-      }
-    }
-  }
-})
+}

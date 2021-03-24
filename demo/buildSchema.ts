@@ -43,7 +43,7 @@ export default function (sequelize: Sequelize.Sequelize) {
     services: [DemoService],
     dataTypes: [{
       name: 'Message',
-      definition:{
+      definition: {
         discriminator: 'variant',
         mapping: {
           文本: {type: 'String'},
@@ -78,6 +78,38 @@ export default function (sequelize: Sequelize.Sequelize) {
           return config.hook(action, invokeInfo, next)
         }
       }
-    }]
+    }],
+    queries: {
+      weather: {
+        output: {type: 'String'},
+        resolve: async function (args, context, info, sgContext) {
+          return sgContext.services.DemoService.gWeather
+        }
+      }
+    },
+    mutations: {
+      setWeather: {
+        input: {
+          weather: {
+            type: 'String',
+            nullable: false
+          }
+        },
+        output: {
+          weather: {
+            type: 'String',
+            nullable: false
+          }
+        },
+        mutateAndGetPayload: async function ({
+                                               weather
+                                             }, context, info, sgContext) {
+          sgContext.services.DemoService.gWeather = weather
+          return {
+            weather: weather
+          }
+        }
+      }
+    }
   }, {})
 }

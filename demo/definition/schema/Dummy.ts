@@ -1,5 +1,7 @@
 import SG from '../../../src'
 
+
+
 export default SG.schema('Dummy', {
   plugin: {
     pluralQuery: {

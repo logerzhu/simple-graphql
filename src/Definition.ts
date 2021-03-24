@@ -22,8 +22,11 @@ import hasSelection from './build/modelStaticsMethod/hasSelection'
 import findOneForGraphQL from './build/modelStaticsMethod/findOneForGraphQL'
 import findByPkForGraphQL from './build/modelStaticsMethod/findByPkForGraphQL'
 import { DataType } from 'sequelize/types/lib/data-types'
+import Service from './definition/Service'
 
-export abstract class SGModel extends Model {
+export abstract class SGModel<
+  TModelAttributes extends {} = any
+> extends Model<TModelAttributes> {
   static resolveRelayConnection: typeof resolveRelayConnection
   static resolveQueryOption: typeof resolveQueryOption
   static parseSelections: typeof parseSelections
@@ -32,7 +35,7 @@ export abstract class SGModel extends Model {
   static findOneForGraphQL: typeof findOneForGraphQL
   static findByPkForGraphQL: typeof findByPkForGraphQL
 
-  static withCache: <M extends SGModel>(
+  static withCache: <T, M extends SGModel<T>>(
     this: { new (): M } & typeof Model
   ) => {
     findAll: (options?: FindOptions) => Promise<M[]>
@@ -46,24 +49,29 @@ export abstract class SGModel extends Model {
   static getSGContext: () => SGContext
 }
 
-export type SGModelCtrl = typeof SGModel & { new (): SGModel }
+export type SGModelCtrl<TModelAttributes extends {} = any> = typeof SGModel & {
+  new (): SGModel<TModelAttributes>
+}
 
-export interface SGServiceMap {}
+export interface SGServiceMap {
+  [key: string]: Service
+}
 
-export interface SGModelCtrlMap {}
+export interface SGModelCtrlMap {
+  [key: string]: SGModelCtrl
+}
 
 export type SGContext<
-  T extends SGServiceMap = {
+  T extends SGModelCtrlMap = {
     [key: string]: SGModelCtrl
-  },
-  S extends SGServiceMap = {}
+  }
 > = {
   sequelize: Sequelize
   schemas: {
     [key: string]: Schema
   }
   models: T
-  services: S
+  services: SGServiceMap
   fieldType: (typeName: string) => FieldTypeConfig | null | undefined
 }
 

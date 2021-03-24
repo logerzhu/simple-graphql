@@ -2,7 +2,6 @@ import { Sequelize } from 'sequelize'
 import _ from 'lodash'
 
 import {
-  GraphQLFieldConfig,
   GraphQLFieldConfigMap,
   GraphQLNonNull,
   GraphQLObjectType,
@@ -44,7 +43,7 @@ export default function (
     dataTypes?: Array<DataTypeConfig>
     fieldTypes?: Array<FieldTypeConfig>
     schemas?: Array<Schema>
-    services?: Array<Service>
+    services?: Array<typeof Service & { new (): Service }>
     hooks?: Array<HookConfig>
     plugins?: Array<PluginConfig>
     queries?: QueryConfigMap
@@ -106,7 +105,6 @@ export default function (
   const rootQueries = buildRootQueries(
     [
       ...(config.schemas || []).map((schema) => schema.config.queries),
-      ...(config.services || []).map((service) => service.config.queries),
       config.queries
     ],
     context
@@ -131,7 +129,6 @@ export default function (
   const rootMutations = buildRootMutations(
     [
       ...(config.schemas || []).map((schema) => schema.config.mutations),
-      ...(config.services || []).map((service) => service.config.mutations),
       config.mutations
     ],
     payloadFields,

@@ -1,21 +1,18 @@
 // @flow
 /* eslint-env jest */
-import SG from '../../src'
 import SGExecutor from '../SGExecutor'
 
 test('Hook生成', async () => {
   const executor = await SGExecutor.new(
     {
-      services: [
-        SG.service('Test').queries({
-          test: {
-            output: { type: 'JSON' },
-            resolve: async function () {
-              return 'OK1'
-            }
+      queries: {
+        test: {
+          output: { type: 'JSON' },
+          resolve: async function () {
+            return 'OK1'
           }
-        })
-      ],
+        }
+      },
       hooks: [
         {
           description: 'Test hook',

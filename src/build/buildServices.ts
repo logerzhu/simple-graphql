@@ -1,21 +1,17 @@
 import Service from '../definition/Service'
-import { SGContext } from '../Definition'
+import { SGContext, SGModel, SGServiceMap } from '../Definition'
 
 export default (
-  services: Array<Service>,
+  services: Array<typeof Service & { new (): Service }>,
   sgContext: SGContext
-): {
-  [key: string]: Object
-} => {
+): SGServiceMap => {
   const result = {}
   for (const service of services) {
     if (result[service.name]) {
       throw new Error(`Service ${service.name} already define.`)
     }
-    result[service.name] = {
-      ...service.config.statics,
-      getSGContext: () => sgContext
-    }
+    result[service.name] = new service()
+    result[service.name].getSGContext = () => sgContext
   }
-  return result
+  return result as SGServiceMap
 }

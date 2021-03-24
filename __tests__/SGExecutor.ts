@@ -4,16 +4,19 @@ import {
   DataTypeConfig,
   FieldTypeConfig,
   HookConfig,
+  MutationConfigMap,
   PluginConfig,
+  QueryConfigMap,
   SGContext
 } from '../src/Definition'
-import SG, { Schema, Service } from '../src'
+import SG, { Schema } from '../src'
 import cls from 'cls-hooked'
 import Sequelize from 'sequelize'
+import Service from '../src/definition/Service'
 
 const namespace = cls.createNamespace('db-transaction-nsp')
 
-;(Sequelize as any).useCLS(namespace)
+Sequelize.Sequelize.useCLS(namespace)
 
 const getDbConfig = () => {
   return {
@@ -50,9 +53,11 @@ class SGExecutor {
       dataTypes?: Array<DataTypeConfig>
       fieldTypes?: Array<FieldTypeConfig>
       schemas?: Array<Schema>
-      services?: Array<Service>
+      services?: Array<typeof Service & { new (): Service }>
       hooks?: Array<HookConfig>
       plugins?: Array<PluginConfig>
+      queries?: QueryConfigMap
+      mutation?: MutationConfigMap
     },
     buildOptions: BuildOptions
   ) => Promise<SGExecutor>
