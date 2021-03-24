@@ -7,7 +7,8 @@ import {
   MutationConfigMap,
   PluginConfig,
   QueryConfigMap,
-  SGContext
+  SGContext,
+  BuildConfig
 } from '../src/Definition'
 import SG, { Schema } from '../src'
 import cls from 'cls-hooked'
@@ -49,17 +50,8 @@ const sequelizeInstance = function (dbConfig) {
 
 class SGExecutor {
   static new: (
-    config: {
-      dataTypes?: Array<DataTypeConfig>
-      fieldTypes?: Array<TypeConfig>
-      schemas?: Array<Schema>
-      services?: Array<typeof Service & { new (): Service }>
-      hooks?: Array<HookConfig>
-      plugins?: Array<PluginConfig>
-      queries?: QueryConfigMap
-      mutation?: MutationConfigMap
-    },
-    buildOptions: BuildOptions
+    config: BuildConfig,
+    options: BuildOptions
   ) => Promise<SGExecutor>
 
   graphQLSchema: GraphQLSchema
@@ -75,9 +67,9 @@ class SGExecutor {
   }
 }
 
-SGExecutor.new = async function (config, buildOptions) {
+SGExecutor.new = async function (config, options) {
   const sequelize = sequelizeInstance(getDbConfig())
-  const result = SG.build(sequelize, config, buildOptions)
+  const result = SG.build(sequelize, config, options)
   await sequelize.sync({
     force: true
   })

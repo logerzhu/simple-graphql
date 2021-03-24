@@ -1,12 +1,12 @@
 import {
   ColumnFieldTypeConfig,
   DataTypeConfig,
-  TypeConfig,
-  TypeContext,
   InputFieldConfig,
   InterfaceContext,
   OutputFieldConfig,
-  ResolverContext
+  ResolverContext,
+  TypeConfig,
+  TypeContext
 } from '../Definition'
 import Schema from '../definition/Schema'
 import {
@@ -17,10 +17,10 @@ import {
 } from 'graphql'
 import * as relay from 'graphql-relay'
 import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
-import globalIdType from './fieldType/globalIdType'
+import globalIdType from './type/globalIdType'
 import Sequelize, { ModelAttributeColumnOptions } from 'sequelize'
 import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConfigMap'
-import innerFieldTypes from './fieldType'
+import innerFieldTypes from './type'
 import innerDataTypes from './dataType'
 import _ from 'lodash'
 
@@ -309,7 +309,7 @@ function buildUnionWrapType(
 }
 
 export default function (
-  fieldTypes: Array<TypeConfig>,
+  types: Array<TypeConfig>,
   dataTypes: Array<DataTypeConfig>,
   schemas: Array<Schema>,
   context: Context
@@ -509,7 +509,7 @@ export default function (
     }
   }
 
-  for (const f of [...innerFieldTypes, ...fieldTypes]) {
+  for (const f of [...innerFieldTypes, ...types]) {
     typeMap[f.name] = f
   }
 

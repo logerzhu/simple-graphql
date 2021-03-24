@@ -9,9 +9,9 @@ import {
   GraphQLNonNull
 } from 'graphql'
 import StringHelper from '../utils/StringHelper'
-import { TypeContext, InputFieldConfig } from '../Definition'
+import { InputFieldConfig, TypeContext } from '../Definition'
 
-import unionInputType from '../build/fieldType/unionInputType'
+import unionInputType from '../build/type/unionInputType'
 
 const toGraphQLInputFieldConfigMap = function (
   name: string,

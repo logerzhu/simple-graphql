@@ -1,14 +1,12 @@
 import * as graphql from 'graphql'
 import _ from 'lodash'
 import * as relay from 'graphql-relay'
-import Schema from '../definition/Schema'
-import Service from '../definition/Service'
 import {
-  TypeContext,
   InterfaceContext,
   QueryConfig,
   QueryConfigMap,
-  ResolverContext
+  ResolverContext,
+  TypeContext
 } from '../Definition'
 import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
 import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConfigMap'

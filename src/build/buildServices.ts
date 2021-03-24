@@ -1,5 +1,5 @@
 import Service from '../definition/Service'
-import { SGContext, SGModel, SGServiceMap } from '../Definition'
+import { SGContext, SGServiceMap } from '../Definition'
 
 export default (
   services: Array<typeof Service & { new (): Service }>,

@@ -11,10 +11,10 @@ import {
 } from 'graphql'
 import StringHelper from '../utils/StringHelper'
 import {
-  TypeContext,
   LinkedFieldConfig,
   OutputFieldConfig,
-  ResolverContext
+  ResolverContext,
+  TypeContext
 } from '../Definition'
 import toGraphQLInputFieldConfigMap from './toGraphQLInputFieldConfigMap'
 

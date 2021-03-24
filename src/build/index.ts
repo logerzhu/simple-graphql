@@ -9,21 +9,13 @@ import {
   GraphQLSchemaConfig
 } from 'graphql'
 
-import Schema from '../definition/Schema'
-import Service from '../definition/Service'
-
 import {
+  BuildConfig,
   BuildOptions,
-  DataTypeConfig,
-  TypeConfig,
-  TypeContext,
-  HookConfig,
   InterfaceContext,
-  MutationConfigMap,
-  PluginConfig,
-  QueryConfigMap,
   ResolverContext,
-  SGContext
+  SGContext,
+  TypeContext
 } from '../Definition'
 
 import applyPluginsToSchemas from './applyPluginsToSchemas'
@@ -39,16 +31,7 @@ import buildRootMutations from './buildRootMutations'
 
 export default function (
   sequelize: Sequelize,
-  config: {
-    dataTypes?: Array<DataTypeConfig>
-    fieldTypes?: Array<TypeConfig>
-    schemas?: Array<Schema>
-    services?: Array<typeof Service & { new (): Service }>
-    hooks?: Array<HookConfig>
-    plugins?: Array<PluginConfig>
-    queries?: QueryConfigMap
-    mutations?: MutationConfigMap
-  },
+  config: BuildConfig,
   buildOptions: BuildOptions
 ): { graphQLSchema: GraphQLSchema; sgContext: SGContext } {
   const plugins = buildPlugins(config.plugins || [])
@@ -86,7 +69,7 @@ export default function (
   }
 
   const fieldTypeContext = buildFieldTypeContext(
-    config.fieldTypes || [],
+    config.types || [],
     config.dataTypes || [],
     config.schemas || [],
     context

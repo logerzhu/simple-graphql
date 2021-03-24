@@ -1,10 +1,8 @@
-import Schema from '../definition/Schema'
-import Service from '../definition/Service'
 import {
-  TypeContext,
   MutationConfig,
   MutationConfigMap,
-  ResolverContext
+  ResolverContext,
+  TypeContext
 } from '../Definition'
 import * as graphql from 'graphql'
 import _ from 'lodash'

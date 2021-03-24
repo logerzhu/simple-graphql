@@ -346,6 +346,17 @@ export type BuildOptions = {
   plugin?: PluginOptionsMap
 }
 
+export type BuildConfig = {
+  dataTypes?: Array<DataTypeConfig>
+  types?: Array<TypeConfig>
+  schemas?: Array<Schema>
+  services?: Array<typeof Service & { new (): Service }>
+  hooks?: Array<HookConfig>
+  plugins?: Array<PluginConfig>
+  queries?: QueryConfigMap
+  mutations?: MutationConfigMap
+}
+
 export interface CacheManager {
   get: (key: string) => Promise<any>
 
