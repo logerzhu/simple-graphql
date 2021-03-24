@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { ColumnFieldTypeConfig, SGModelCtrl } from '../../Definition'
+import { ColumnFieldConfig, SGModelCtrl } from '../../Definition'
 
 type Selection = { name: string; selections?: Array<Selection> }
 
@@ -16,7 +16,7 @@ export default function (
   const dbModel = this
   const schema = dbModel.getSGContext().schemas[this.name]
 
-  const getFieldName = (key: string, config: ColumnFieldTypeConfig) => {
+  const getFieldName = (key: string, config: ColumnFieldConfig) => {
     if (config.type && dbModel.getSGContext().schemas[config.type] != null) {
       return key + 'Id'
     } else {

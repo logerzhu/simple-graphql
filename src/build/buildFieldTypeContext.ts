@@ -1,5 +1,5 @@
 import {
-  ColumnFieldTypeConfig,
+  ColumnFieldConfig,
   DataTypeConfig,
   InputFieldConfig,
   InterfaceContext,
@@ -229,7 +229,7 @@ function buildDataType(
     columnOptions: (
       schema: Schema,
       fieldName: string,
-      options: ColumnFieldTypeConfig
+      options: ColumnFieldConfig
     ) => {
       let columnOptions: ModelAttributeColumnOptions | null = null
       const definition = dataTypeOptions.definition

@@ -125,7 +125,7 @@ export type TypeConfig = {
     | ((
         schema: Schema,
         fieldName: string,
-        options: ColumnFieldTypeConfig
+        options: ColumnFieldConfig
       ) => ModelAttributeColumnOptions | null)
 }
 
@@ -244,7 +244,7 @@ export type LinkedFieldConfig = {
 }
 export type LinkedFieldConfigMap = { [key: string]: LinkedFieldConfig }
 
-export type ColumnFieldTypeConfig = FieldTypeDefinition<
+export type ColumnFieldConfig = FieldTypeDefinition<
   OutputFieldTypeMetadata & InputFieldTypeMetadata
 > & {
   metadata?: {
@@ -260,7 +260,7 @@ export type ColumnFieldTypeConfig = FieldTypeDefinition<
   }
 }
 
-export type ColumnFieldConfigMap = { [key: string]: ColumnFieldTypeConfig }
+export type ColumnFieldConfigMap = { [key: string]: ColumnFieldConfig }
 
 export type DataTypeConfig = {
   name: string

@@ -2,7 +2,7 @@ import _ from 'lodash'
 import Sequelize from 'sequelize'
 import StringHelper from '../utils/StringHelper'
 import {
-  ColumnFieldTypeConfig,
+  ColumnFieldConfig,
   ConditionFieldMapper,
   InputFieldConfig,
   InputFieldConfigMap,
@@ -78,7 +78,7 @@ const getSearchFields = (
   } = {}
   _.forOwn(
     {
-      id: { type: schema.name + 'Id' } as ColumnFieldTypeConfig,
+      id: { type: schema.name + 'Id' } as ColumnFieldConfig,
       ...schema.config.fields,
       ...additionFields
     },
