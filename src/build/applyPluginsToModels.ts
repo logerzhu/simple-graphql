@@ -11,9 +11,7 @@ export default (
 
   plugins.forEach((plugin) => {
     for (const model of models) {
-      let options = ((model.sgSchema.config.options || {}).plugin || {})[
-        plugin.name
-      ]
+      let options = ((model.sgSchema.options || {}).plugin || {})[plugin.name]
       if (options === undefined) {
         options = defaultOptions[plugin.name]
       }

@@ -48,13 +48,15 @@ export abstract class SGModel extends Model {
 
 export type SGModelCtrl = typeof SGModel & { new (): SGModel }
 
+export interface SGServiceMap {}
+
+export interface SGModelCtrlMap {}
+
 export type SGContext<
-  T = {
+  T extends SGServiceMap = {
     [key: string]: SGModelCtrl
   },
-  S = {
-    [key: string]: any
-  }
+  S extends SGServiceMap = {}
 > = {
   sequelize: Sequelize
   schemas: {
@@ -62,31 +64,31 @@ export type SGContext<
   }
   models: T
   services: S
-  fieldType: (arg0: string) => FieldTypeConfig | null | undefined
+  fieldType: (typeName: string) => FieldTypeConfig | null | undefined
 }
 
 export type ResolverContext = {
   hookFieldResolve: (
-    arg0: string,
-    arg1: LinkedFieldConfig
+    path: string,
+    config: LinkedFieldConfig
   ) => GraphQLFieldResolver<any, any>
   hookQueryResolve: (
-    arg0: string,
-    arg1: QueryConfig
+    path: string,
+    config: QueryConfig
   ) => GraphQLFieldResolver<any, any>
   hookMutationResolve: (
-    arg0: string,
-    arg1: MutationConfig
+    path: string,
+    config: MutationConfig
   ) => GraphQLFieldResolver<any, any>
 }
 
 export type InterfaceContext = {
-  interface: (arg0: string) => GraphQLInterfaceType
-  registerInterface: (arg0: string, arg1: GraphQLInterfaceType) => void
+  interface: (name: string) => GraphQLInterfaceType
+  registerInterface: (name: string, interfaceType: GraphQLInterfaceType) => void
 }
 
 export type FieldTypeContext = {
-  fieldType: (arg0: string) => FieldTypeConfig | null | undefined
+  fieldType: (name: string) => FieldTypeConfig | null | undefined
 }
 
 export type FieldResolve<T = any> = (
@@ -235,6 +237,7 @@ export type LinkedFieldConfig = {
   output: OutputFieldConfig
   resolve: FieldResolve
 }
+export type LinkedFieldConfigMap = { [key: string]: LinkedFieldConfig }
 
 export type ColumnFieldConfig = TypeDefinition<
   OutputTypeMetadata & InputTypeMetadata
@@ -252,6 +255,8 @@ export type ColumnFieldConfig = TypeDefinition<
   }
 }
 
+export type ColumnFieldConfigMap = { [key: string]: ColumnFieldConfig }
+
 export type DataTypeConfig = {
   name: string
   description?: string
@@ -266,6 +271,7 @@ export type QueryConfig = {
   output: OutputFieldConfig
   resolve: RootResolve
 }
+export type QueryConfigMap = { [key: string]: QueryConfig }
 
 export type MutationConfig = {
   description?: string
@@ -274,6 +280,7 @@ export type MutationConfig = {
   output: OutputFieldConfigMap
   mutateAndGetPayload: RootResolve
 }
+export type MutationConfigMap = { [key: string]: MutationConfig }
 
 export interface PluginOptions {
   enable: boolean

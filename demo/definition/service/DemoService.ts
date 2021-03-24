@@ -1,6 +1,13 @@
 import SG from '../../../src'
+import {PluginOptions} from "../../../src/Definition";
 
 let gWeather = '晴天'
+
+declare module '../../../src/Definition' {
+  interface SGServiceMap {
+    DemoService: PluginOptions & { name?: string }
+  }
+}
 
 export default SG.service('DemoService').queries({
   weather: {

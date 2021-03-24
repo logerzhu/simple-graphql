@@ -15,7 +15,7 @@ function toSequelizeModel(
 ): ModelCtor<Model> {
   const dbDefinition = {}
 
-  const versionConfig = (schema.config.options.tableOptions || {}).version
+  const versionConfig = (schema.options.tableOptions || {}).version
   let versionField = null
   if (versionConfig === true || typeof versionConfig === 'string') {
     versionField = typeof versionConfig === 'string' ? versionConfig : 'version'
@@ -64,11 +64,7 @@ function toSequelizeModel(
       // }
     }
   })
-  sequelize.define(
-    schema.name,
-    dbDefinition,
-    schema.config.options.tableOptions
-  )
+  sequelize.define(schema.name, dbDefinition, schema.options.tableOptions)
   return sequelize.model(schema.name)
 }
 

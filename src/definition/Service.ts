@@ -1,20 +1,16 @@
-import { MutationConfig, QueryConfig } from '../Definition'
+import { MutationConfigMap, QueryConfigMap } from '../Definition'
 
 export default class Service {
   name: string
 
   config: {
-    queries: {
-      [id: string]: QueryConfig
-    }
-    mutations: {
-      [id: string]: MutationConfig
-    }
+    queries: QueryConfigMap
+    mutations: MutationConfigMap
     statics: {
       [id: string]: any
     }
   }
-
+  Ø
   constructor(name: string) {
     this.name = name
     this.config = {
@@ -27,7 +23,7 @@ export default class Service {
   /**
    * Add the GraphQL query methods.
    */
-  queries(queries: { [key: string]: QueryConfig }): Service {
+  queries(queries: QueryConfigMap): Service {
     this.config.queries = Object.assign(this.config.queries, queries)
     return this
   }
@@ -35,7 +31,7 @@ export default class Service {
   /**
    * Add the GraphQL mutataion methods.
    */
-  mutations(mutations: { [key: string]: MutationConfig }): Service {
+  mutations(mutations: MutationConfigMap): Service {
     this.config.mutations = Object.assign(this.config.mutations, mutations)
     return this
   }

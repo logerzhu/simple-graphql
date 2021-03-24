@@ -1,10 +1,10 @@
 import _ from 'lodash'
 import {
-  ColumnFieldConfig,
+  ColumnFieldConfigMap,
   InputFieldConfigMap,
-  LinkedFieldConfig,
-  MutationConfig,
-  QueryConfig,
+  LinkedFieldConfigMap,
+  MutationConfigMap,
+  QueryConfigMap,
   SchemaOptions
 } from '../Definition'
 import Sequelize, {
@@ -80,20 +80,11 @@ export default class Schema {
   sequelize: Sequelize.Sequelize
 
   config: {
-    fields: {
-      [id: string]: ColumnFieldConfig
-    }
-    links: {
-      [id: string]: LinkedFieldConfig
-    }
+    fields: ColumnFieldConfigMap
+    links: LinkedFieldConfigMap
     associations: AssociationConfig
-    options: SchemaOptions
-    queries: {
-      [id: string]: QueryConfig
-    }
-    mutations: {
-      [id: string]: MutationConfig
-    }
+    queries: QueryConfigMap
+    mutations: MutationConfigMap
     methods: {
       [id: string]: any
     }
@@ -101,6 +92,8 @@ export default class Schema {
       [id: string]: any
     }
   }
+
+  options: SchemaOptions
 
   constructor(name: string, options: SchemaOptions = {}) {
     this.name = name
@@ -113,19 +106,19 @@ export default class Schema {
         hasMany: {},
         belongsToMany: {}
       },
-      options: options,
       queries: {},
       mutations: {},
       methods: {},
       statics: {}
     }
+    this.options = options
   }
 
   /**
    * Add the model base fields, and each field has a corresponding database column.
    * In default, each field generate a GraphQL field, unless it config with "hidden:true".
    */
-  fields(fields: { [id: string]: ColumnFieldConfig }): Schema {
+  fields(fields: ColumnFieldConfigMap): Schema {
     this.config.fields = Object.assign(this.config.fields, fields)
     return this
   }
@@ -133,7 +126,7 @@ export default class Schema {
   /**
    * Add the model link fields, and each link generate a GraphQL field but no corresponding database column.
    */
-  links(links: { [id: string]: LinkedFieldConfig }): Schema {
+  links(links: LinkedFieldConfigMap): Schema {
     this.config.links = Object.assign(this.config.links, links)
     return this
   }
@@ -141,7 +134,7 @@ export default class Schema {
   /**
    * Add the GraphQL query methods.
    */
-  queries(queries: { [key: string]: QueryConfig }): Schema {
+  queries(queries: QueryConfigMap): Schema {
     // TODO duplicate check
     this.config.queries = Object.assign(this.config.queries, queries)
     return this
@@ -150,7 +143,7 @@ export default class Schema {
   /**
    * Add the GraphQL mutataion methods.
    */
-  mutations(mutations: { [key: string]: MutationConfig }): Schema {
+  mutations(mutations: MutationConfigMap): Schema {
     // TODO duplicate check
     this.config.mutations = Object.assign(this.config.mutations, mutations)
     return this

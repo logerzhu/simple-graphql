@@ -14,7 +14,7 @@ export default {
   priority: 100,
   description: 'Add version field to Schema',
   applyToSchema: (schema, options, schemas) => {
-    const versionConfig = (schema.config.options.tableOptions || {}).version
+    const versionConfig = (schema.options.tableOptions || {}).version
     if (versionConfig === true || typeof versionConfig === 'string') {
       const versionField =
         typeof versionConfig === 'string' ? versionConfig : 'version'

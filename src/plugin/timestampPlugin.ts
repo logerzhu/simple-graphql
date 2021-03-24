@@ -37,7 +37,7 @@ export default {
       }
     })
 
-    if (schema.config.options?.tableOptions?.paranoid) {
+    if (schema.options?.tableOptions?.paranoid) {
       schema.fields({
         deletedAt: {
           type: 'Date',

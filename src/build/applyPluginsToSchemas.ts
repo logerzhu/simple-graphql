@@ -12,7 +12,7 @@ export default (
 
   plugins.forEach((plugin) => {
     for (const schema of schemas) {
-      let options: PluginOptions = ((schema.config.options || {}).plugin || {})[
+      let options: PluginOptions = ((schema.options || {}).plugin || {})[
         plugin.name
       ]
       if (options === undefined) {

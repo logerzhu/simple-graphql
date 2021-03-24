@@ -40,7 +40,7 @@ export default {
         properties: {}
       }
     }
-    const versionConfig = (schema.config.options.tableOptions || {}).version
+    const versionConfig = (schema.options.tableOptions || {}).version
     if (versionConfig === true || typeof versionConfig === 'string') {
       inputFields[
         typeof versionConfig === 'string' ? versionConfig : 'version'

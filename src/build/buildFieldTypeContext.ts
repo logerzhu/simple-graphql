@@ -34,7 +34,7 @@ function buildModelType(
   const typeName = schema.name
   return {
     name: typeName,
-    description: schema.config.options.description,
+    description: schema.options.description,
     inputType: (fieldTypeContext.fieldType(schema.name + 'Id') as any)
       .inputType,
     outputType: new GraphQLObjectType({
