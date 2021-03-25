@@ -9,12 +9,12 @@ import {
   PluginConfig,
   PluginOptions
 } from '../Definition'
-import { Schema } from '../index'
+import { SGSchema } from '../index'
 
 const getSearchFields = (
   additionFields: InputFieldConfigMap,
-  schema: Schema,
-  schemas: Array<Schema>
+  schema: SGSchema,
+  schemas: Array<SGSchema>
 ) => {
   const isModelType = (fieldOptions: InputFieldConfig) => {
     return (

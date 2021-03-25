@@ -1,9 +1,9 @@
-import SG from '../../../src'
+import {SGSchema} from '../../../src'
 
-export default SG.schema('UserProfile', {
+export default new SGSchema('UserProfile', {
   plugin: {
     singularQuery: {
-      enable:true
+      enable: true
     }
   }
 }).fields({

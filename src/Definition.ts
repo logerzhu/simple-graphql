@@ -13,7 +13,7 @@ import {
   ModelOptions,
   Sequelize
 } from 'sequelize'
-import Schema from './definition/Schema'
+import { SGSchema } from './definition/SGSchema'
 import resolveRelayConnection from './build/modelStaticsMethod/resolveRelayConnection'
 import resolveQueryOption from './build/modelStaticsMethod/resolveQueryOption'
 import parseSelections from './build/modelStaticsMethod/parseSelections'
@@ -45,7 +45,7 @@ export interface SGModelStatic {
   }
 
   clearCache: () => Promise<void>
-  sgSchema: Schema
+  sgSchema: SGSchema
 
   getSGContext: () => SGContext
 }
@@ -69,7 +69,7 @@ export interface SGModelCtrlMap {
 export type SGContext = {
   sequelize: Sequelize
   schemas: {
-    [key: string]: Schema
+    [key: string]: SGSchema
   }
   models: SGModelCtrlMap
   services: SGServiceMap
@@ -128,7 +128,7 @@ export type TypeConfig = {
   columnOptions?:
     | ModelAttributeColumnOptions
     | ((
-        schema: Schema,
+        schema: SGSchema,
         fieldName: string,
         options: ColumnFieldConfig
       ) => ModelAttributeColumnOptions | null)
@@ -339,7 +339,11 @@ export type PluginConfig<T = PluginOptions> = {
   description?: string
   priority?: number
   defaultOptions?: T
-  applyToSchema?: (schema: Schema, options: T, schemas: Array<Schema>) => void
+  applyToSchema?: (
+    schema: SGSchema,
+    options: T,
+    schemas: Array<SGSchema>
+  ) => void
   applyToModel?: (
     model: SGModelCtrl,
     options: T,
@@ -354,7 +358,7 @@ export type BuildOptions = {
 export type BuildConfig = {
   dataTypes?: Array<DataTypeConfig>
   types?: Array<TypeConfig>
-  schemas?: Array<Schema>
+  schemas?: Array<SGSchema>
   services?: Array<typeof SGService & { new (): SGService }>
   hooks?: Array<HookConfig>
   plugins?: Array<PluginConfig>

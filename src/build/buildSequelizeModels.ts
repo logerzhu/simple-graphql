@@ -3,14 +3,14 @@ import Sequelize, {
   ModelAttributeColumnOptions,
   ModelCtor
 } from 'sequelize'
-import Schema from '../definition/Schema'
+import { SGSchema } from '../definition/SGSchema'
 import { SGContext, SGModelCtrl, TypeContext } from '../Definition'
 import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
 
 function toSequelizeModel(
   sequelize: Sequelize.Sequelize,
-  schema: Schema,
+  schema: SGSchema,
   context: TypeContext
 ): ModelCtor<Model> {
   const dbDefinition = {}
@@ -69,7 +69,7 @@ function toSequelizeModel(
 }
 
 function buildModelAssociations(
-  schemas: Array<Schema>,
+  schemas: Array<SGSchema>,
   models: {
     [id: string]: SGModelCtrl
   }
@@ -114,7 +114,7 @@ function buildModelAssociations(
 
 export default (
   sequelize: Sequelize.Sequelize,
-  schemas: Array<Schema>,
+  schemas: Array<SGSchema>,
   context: SGContext
 ): Array<SGModelCtrl> => {
   const result: {

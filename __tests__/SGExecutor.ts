@@ -1,6 +1,6 @@
 import { graphql, GraphQLSchema } from 'graphql'
 import { BuildConfig, BuildOptions, SGContext } from '../src/Definition'
-import SG from '../src'
+import { buildGraphQLContext } from '../src'
 import cls from 'cls-hooked'
 import Sequelize from 'sequelize'
 
@@ -58,7 +58,7 @@ class SGExecutor {
 
 SGExecutor.new = async function (config, options) {
   const sequelize = sequelizeInstance(getDbConfig())
-  const result = SG.build(sequelize, config, options)
+  const result = buildGraphQLContext(sequelize, config, options)
   await sequelize.sync({
     force: true
   })

@@ -1,6 +1,6 @@
-import SG from '../../../src'
+import {SGSchema} from '../../../src'
 
-export default SG.schema('Todo', {
+export default new SGSchema('Todo', {
   tableOptions: {
     underscored: true
   },

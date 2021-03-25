@@ -29,7 +29,7 @@ import buildServices from './buildServices'
 import buildRootQueries from './buildRootQueries'
 import buildRootMutations from './buildRootMutations'
 
-export default function (
+export function buildGraphQLContext(
   sequelize: Sequelize,
   config: BuildConfig,
   buildOptions: BuildOptions

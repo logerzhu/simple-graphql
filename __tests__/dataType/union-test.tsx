@@ -1,6 +1,6 @@
 // @flow
 /* eslint-env jest */
-import SG from '../../src'
+import { SGSchema } from '../../src'
 import SGExecutor from '../SGExecutor'
 import _ from 'lodash'
 
@@ -25,7 +25,7 @@ test('Union数据类型生成', async () => {
         }
       ],
       schemas: [
-        SG.schema('Dummy', {
+        new SGSchema('Dummy', {
           plugin: {
             addMutation: {
               enable: true

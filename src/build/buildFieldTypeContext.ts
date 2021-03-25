@@ -8,7 +8,7 @@ import {
   TypeConfig,
   TypeContext
 } from '../Definition'
-import Schema from '../definition/Schema'
+import { SGSchema } from '../definition/SGSchema'
 import {
   GraphQLFloat,
   GraphQLList,
@@ -27,7 +27,7 @@ import _ from 'lodash'
 type Context = ResolverContext & InterfaceContext
 
 function buildModelType(
-  schema: Schema,
+  schema: SGSchema,
   fieldTypeContext: TypeContext,
   context: Context
 ): TypeConfig {
@@ -173,7 +173,7 @@ function buildModelType(
 }
 
 function buildModelTypeId(
-  schema: Schema,
+  schema: SGSchema,
   fieldTypeContext: TypeContext
 ): TypeConfig {
   const typeName = schema.name + 'Id'
@@ -227,7 +227,7 @@ function buildDataType(
     inputType: inputType,
     outputType: outputType,
     columnOptions: (
-      schema: Schema,
+      schema: SGSchema,
       fieldName: string,
       options: ColumnFieldConfig
     ) => {
@@ -311,7 +311,7 @@ function buildUnionWrapType(
 export default function (
   types: Array<TypeConfig>,
   dataTypes: Array<DataTypeConfig>,
-  schemas: Array<Schema>,
+  schemas: Array<SGSchema>,
   context: Context
 ) {
   const typeMap: { [key: string]: TypeConfig } = {}

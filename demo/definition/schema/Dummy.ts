@@ -1,20 +1,18 @@
-import SG from '../../../src'
+import {SGSchema} from '../../../src'
 
-
-
-export default SG.schema('Dummy', {
+export default new SGSchema('Dummy', {
   plugin: {
     pluralQuery: {
-      enable:true
+      enable: true
     },
     addMutation: {
-      enable:true
+      enable: true
     },
     updateMutation: {
-      enable:true
+      enable: true
     },
     deleteMutation: {
-      enable:true
+      enable: true
     }
   }
 }).fields({

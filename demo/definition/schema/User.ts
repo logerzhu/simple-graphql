@@ -1,6 +1,6 @@
-import SG from '../../../src'
+import {SGSchema} from '../../../src'
 
-export default SG.schema('User', {
+export default new SGSchema('User', {
   description: '用户',
   plugin: {
     addMutation: {

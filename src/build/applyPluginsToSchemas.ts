@@ -1,13 +1,13 @@
-import Schema from '../definition/Schema'
+import { SGSchema } from '../definition/SGSchema'
 import { PluginConfig, PluginOptions, PluginOptionsMap } from '../Definition'
 
 export default (
-  schemas: Array<Schema>,
+  schemas: Array<SGSchema>,
   plugins: Array<PluginConfig>,
   defaultOptions: PluginOptionsMap
 ) => {
   const result: {
-    [key: string]: Schema
+    [key: string]: SGSchema
   } = {}
 
   plugins.forEach((plugin) => {
