@@ -1,19 +1,8 @@
 import { graphql, GraphQLSchema } from 'graphql'
-import {
-  BuildOptions,
-  DataTypeConfig,
-  TypeConfig,
-  HookConfig,
-  MutationConfigMap,
-  PluginConfig,
-  QueryConfigMap,
-  SGContext,
-  BuildConfig
-} from '../src/Definition'
-import SG, { Schema } from '../src'
+import { BuildConfig, BuildOptions, SGContext } from '../src/Definition'
+import SG from '../src'
 import cls from 'cls-hooked'
 import Sequelize from 'sequelize'
-import Service from '../src/definition/Service'
 
 const namespace = cls.createNamespace('db-transaction-nsp')
 

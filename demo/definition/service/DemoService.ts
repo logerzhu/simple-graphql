@@ -1,4 +1,4 @@
-import SG from '../../../src'
+import {SGService} from '../../../src'
 import _ from 'lodash'
 
 declare module '../../../src/Definition' {
@@ -7,7 +7,7 @@ declare module '../../../src/Definition' {
   }
 }
 
-export default class DemoService extends SG.Service {
+export default class DemoService extends SGService {
   gWeather = '晴天'
 
   getServiceKeys() {

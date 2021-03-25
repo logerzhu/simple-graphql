@@ -22,7 +22,6 @@ import hasSelection from './build/modelStaticsMethod/hasSelection'
 import findOneForGraphQL from './build/modelStaticsMethod/findOneForGraphQL'
 import findByPkForGraphQL from './build/modelStaticsMethod/findByPkForGraphQL'
 import { DataType } from 'sequelize/types/lib/data-types'
-import Service from './definition/Service'
 
 export abstract class SGModel<
   TModelAttributes extends {} = any
@@ -55,8 +54,12 @@ export type SGModelCtrl<TModelAttributes extends {} = any> = typeof SGModel & {
   new (): SGModel<TModelAttributes>
 } & SGModelStatic
 
+export abstract class SGService {
+  getSGContext: () => SGContext
+}
+
 export interface SGServiceMap {
-  [key: string]: Service
+  [key: string]: SGService
 }
 
 export interface SGModelCtrlMap {
@@ -352,7 +355,7 @@ export type BuildConfig = {
   dataTypes?: Array<DataTypeConfig>
   types?: Array<TypeConfig>
   schemas?: Array<Schema>
-  services?: Array<typeof Service & { new (): Service }>
+  services?: Array<typeof SGService & { new (): SGService }>
   hooks?: Array<HookConfig>
   plugins?: Array<PluginConfig>
   queries?: QueryConfigMap
