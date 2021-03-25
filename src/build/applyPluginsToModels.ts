@@ -18,7 +18,7 @@ export default (
       if (options === undefined) {
         options = plugin.defaultOptions
       }
-      if (options != null && options !== false && plugin.applyToModel) {
+      if (options != null && options.enable === true && plugin.applyToModel) {
         plugin.applyToModel(model, options, models)
       }
     }

@@ -54,9 +54,7 @@ const toGraphQLInputFieldConfigMap = function (
       config.description = field.metadata?.description
       if (field.metadata?.graphql?.defaultValue) {
         config.defaultValue = field.metadata?.graphql?.defaultValue
-        config.description = `${config.description || ''}  默认值: ${
-          config.defaultValue
-        }`
+        config.description = config.description
       }
       if (
         field.nullable === false &&
