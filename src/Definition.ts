@@ -50,8 +50,8 @@ export interface SGModelStatic {
   getSGContext: () => SGContext
 }
 
-export type SGModelCtrl<TModelAttributes extends {} = any> = typeof SGModel & {
-  new (): SGModel<TModelAttributes>
+export type SGModelCtrl<T extends SGModel = SGModel> = typeof SGModel & {
+  new (): T
 } & SGModelStatic
 
 export abstract class SGService {
