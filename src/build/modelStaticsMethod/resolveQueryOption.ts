@@ -165,7 +165,7 @@ export default function (args: {
   attributes?: Array<string>
   include?: Array<any>
   order?: Array<Array<any>>
-  info: GraphQLResolveInfo
+  info?: GraphQLResolveInfo
   path?: string
   eagerHasMany?: boolean
 }) {
@@ -178,13 +178,13 @@ export default function (args: {
     path,
     eagerHasMany = true
   } = args
-  const fragments = info.fragments || []
+  const fragments = info?.fragments || []
 
   const sgContext = this.getSGContext()
 
   let selections = []
 
-  ;(info.fieldNodes || []).forEach((node) => {
+  ;(info?.fieldNodes || []).forEach((node) => {
     selections = _.union(
       selections,
       dbModel.parseSelections(

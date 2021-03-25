@@ -24,11 +24,9 @@ import findByPkForGraphQL from './build/modelStaticsMethod/findByPkForGraphQL'
 import { DataType } from 'sequelize/types/lib/data-types'
 import Service from './definition/Service'
 
-export interface SGModelInstance {}
-
-export abstract class SGModel<TModelAttributes extends {} = any>
-  extends Model<TModelAttributes>
-  implements SGModelInstance {}
+export abstract class SGModel<
+  TModelAttributes extends {} = any
+> extends Model<TModelAttributes> {}
 
 export interface SGModelStatic {
   resolveRelayConnection: typeof resolveRelayConnection
