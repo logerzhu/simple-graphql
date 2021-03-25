@@ -24,18 +24,22 @@ import findByPkForGraphQL from './build/modelStaticsMethod/findByPkForGraphQL'
 import { DataType } from 'sequelize/types/lib/data-types'
 import Service from './definition/Service'
 
-export abstract class SGModel<
-  TModelAttributes extends {} = any
-> extends Model<TModelAttributes> {
-  static resolveRelayConnection: typeof resolveRelayConnection
-  static resolveQueryOption: typeof resolveQueryOption
-  static parseSelections: typeof parseSelections
-  static parseAttributes: typeof parseAttributes
-  static hasSelection: typeof hasSelection
-  static findOneForGraphQL: typeof findOneForGraphQL
-  static findByPkForGraphQL: typeof findByPkForGraphQL
+export interface SGModelInstance {}
 
-  static withCache: <T, M extends SGModel<T>>(
+export abstract class SGModel<TModelAttributes extends {} = any>
+  extends Model<TModelAttributes>
+  implements SGModelInstance {}
+
+export interface SGModelStatic {
+  resolveRelayConnection: typeof resolveRelayConnection
+  resolveQueryOption: typeof resolveQueryOption
+  parseSelections: typeof parseSelections
+  parseAttributes: typeof parseAttributes
+  hasSelection: typeof hasSelection
+  findOneForGraphQL: typeof findOneForGraphQL
+  findByPkForGraphQL: typeof findByPkForGraphQL
+
+  withCache: <T, M extends SGModel<T>>(
     this: { new (): M } & typeof Model
   ) => {
     findAll: (options?: FindOptions) => Promise<M[]>
@@ -43,15 +47,15 @@ export abstract class SGModel<
     count: (options?: CountOptions) => Promise<number>
   }
 
-  static clearCache: () => Promise<void>
-  static sgSchema: Schema
+  clearCache: () => Promise<void>
+  sgSchema: Schema
 
-  static getSGContext: () => SGContext
+  getSGContext: () => SGContext
 }
 
 export type SGModelCtrl<TModelAttributes extends {} = any> = typeof SGModel & {
   new (): SGModel<TModelAttributes>
-}
+} & SGModelStatic
 
 export interface SGServiceMap {
   [key: string]: Service

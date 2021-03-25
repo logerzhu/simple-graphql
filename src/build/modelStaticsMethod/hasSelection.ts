@@ -1,12 +1,16 @@
 import _ from 'lodash'
 import { GraphQLResolveInfo } from 'graphql'
+import { SGModelCtrl } from '../../Definition'
 
-export default function (args: { info: GraphQLResolveInfo; path: string }) {
+export default function (
+  this: SGModelCtrl,
+  args: { info: GraphQLResolveInfo; path: string }
+) {
   const dbModel = this
 
   const { info, path } = args
 
-  const fragments = info.fragments || []
+  const fragments = info.fragments || {}
 
   let selections = []
 
