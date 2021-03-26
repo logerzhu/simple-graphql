@@ -42,7 +42,7 @@ const toGraphQLFieldConfigMap = function (
     fieldName: string,
     fieldPath: string,
     typeName: string
-  ): GraphQLFieldConfig<any, any> | null | undefined => {
+  ): GraphQLFieldConfig<any, any> | undefined => {
     const typeConfig = context.typeConfig(typeName)
     if (!typeConfig) {
       throw new Error(`Type "${typeName}" has not register for ${fieldName}.`)
@@ -65,7 +65,7 @@ const toGraphQLFieldConfigMap = function (
       }
       return config
     } else {
-      return null
+      return undefined
     }
   }
 
@@ -74,7 +74,9 @@ const toGraphQLFieldConfigMap = function (
     path: string,
     field: OutputFieldConfig
   ): GraphQLFieldConfig<any, any> | null => {
-    const makeNonNull = function (config: GraphQLFieldConfig<any, any> | null) {
+    const makeNonNull = function (
+      config: GraphQLFieldConfig<any, any> | undefined
+    ) {
       if (config == null) {
         return null
       }
@@ -201,7 +203,7 @@ const toGraphQLFieldConfigMap = function (
       //TODO 支持嵌套定义
       const unionTypes = _.mapValues(
         field.mapping,
-        (value, key) => context.typeConfig(`_Union_${value.type}`).outputType
+        (value, key) => context.typeConfig(`_Union_${value.type}`)?.outputType
       )
       return makeNonNull({
         type: new GraphQLUnionType({

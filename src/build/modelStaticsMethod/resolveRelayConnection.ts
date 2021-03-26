@@ -1,6 +1,17 @@
 import _ from 'lodash'
+import { SGContext, SGModel, SGModelCtrl } from '../../Definition'
+import { GraphQLResolveInfo } from 'graphql'
+import { FindOptions, Order, OrderItem } from 'sequelize'
+import { BindOrReplacements } from 'sequelize/types/lib/query-interface'
+import { Includeable, WhereOptions } from 'sequelize/types/lib/model'
+import { Selection } from './parseSelections'
+import { SGSchema } from '../../definition/SGSchema'
 
-const isPrimaryOrder = ({ orderConfig, schema, sgContext }) => {
+const isPrimaryOrder = (
+  sgContext: SGContext,
+  schema: SGSchema,
+  orderConfig
+) => {
   if (_.isArray(orderConfig)) {
     for (let i of orderConfig) {
       if (i.model && i.as) {
@@ -24,21 +35,24 @@ const isPrimaryOrder = ({ orderConfig, schema, sgContext }) => {
   return true
 }
 
-export default async function (args: {
-  pagination?: {
-    after?: string
-    first?: number
-    before?: string
-    last?: number
+export default async function <M extends SGModel>(
+  this: SGModelCtrl<M>,
+  args: {
+    pagination?: {
+      after?: string
+      first?: number
+      before?: string
+      last?: number
+    }
+    selectionInfo?: GraphQLResolveInfo
+    include?: Includeable | Includeable[]
+    attributes?: Array<string>
+    where?: WhereOptions
+    bind?: BindOrReplacements
+    order?: OrderItem[]
+    subQuery?: boolean
   }
-  selectionInfo?: Object
-  include?: Array<any>
-  attributes?: Array<string>
-  where?: any
-  bind?: any
-  order?: Array<Array<any>>
-  subQuery?: boolean
-}): Promise<{
+): Promise<{
   pageInfo: {
     startCursor: string | number
     endCursor: string | number
@@ -46,7 +60,7 @@ export default async function (args: {
     hasNextPage: boolean
   }
   edges: Array<{
-    node: any
+    node: M
     cursor: string | number
   }>
   count: number
@@ -55,30 +69,31 @@ export default async function (args: {
   const sgContext = dbModel.getSGContext()
   let {
     pagination = {},
-    selectionInfo = {},
     include = [],
     where = {},
     attributes,
     bind = [],
-    order = [['id', 'ASC']],
     subQuery
   } = args
   let { after, first = 100, before, last } = pagination
 
   const option = dbModel.resolveQueryOption({
-    info: selectionInfo,
+    info: args.selectionInfo,
     path: 'edges.node',
     include: include,
-    order: order,
+    order: args.order || [['id', 'ASC']],
     attributes: attributes
   })
   include = option.include
-  order = option.order
+  let order = option.order
   attributes = option.attributes
 
-  const getSelections = (info) => {
+  const getSelections = (info?: GraphQLResolveInfo) => {
+    if (!info) {
+      return []
+    }
     const fragments = info.fragments || {}
-    let selections = []
+    let selections: Selection[] = []
 
     ;(info.fieldNodes || []).forEach((node) => {
       selections = _.union(
@@ -96,56 +111,71 @@ export default async function (args: {
   const needCount =
     last != null ||
     before != null ||
-    getSelections(selectionInfo).find(
+    getSelections(args.selectionInfo).find(
       (s) => s.name === 'count' || s.name.startsWith('pageInfo')
     ) != null
 
-  const count = needCount
-    ? await (dbModel.withCache ? dbModel.withCache() : dbModel).count({
-        distinct: 'id',
-        include: include,
-        where: where,
-        bind: bind,
-        subQuery: subQuery
-      })
-    : 0
+  const getCountResult = async () => {
+    if (!needCount) {
+      return 0
+    } else {
+      return dbModel.withCache
+        ? await dbModel.withCache().count({
+            attributes: attributes,
+            distinct: true,
+            include: include,
+            where: where
+            // bind: bind  #TODO 需要测试
+          })
+        : await dbModel.count({
+            attributes: attributes,
+            distinct: true,
+            include: include,
+            where: where
+            // bind: bind  #TODO 需要测试
+          })
+    }
+  }
+  const count = await getCountResult()
 
   if (last != null || before != null) {
     first = last || 100
-    before = before || count + 1
+    before = before || '' + (count + 1)
     after = '' + (count - (parseInt(before) - 1))
-    order = order.map((o) => {
-      const r = [...o]
-      if (
-        isPrimaryOrder({
-          orderConfig: r,
-          schema: sgContext.schemas[dbModel.name],
-          sgContext: sgContext
-        })
-      ) {
-        // TODO Need to hand order field is null case
-        switch (r[r.length - 1].toLocaleUpperCase()) {
-          case 'ASC':
-            r[r.length - 1] = 'DESC'
-            break
-          case 'DESC':
-            r[r.length - 1] = 'ASC'
-            break
-          default:
-            r.push('DESC')
+    order = order.map((orderItem) => {
+      if (Array.isArray(orderItem)) {
+        const revertItem = [...orderItem]
+        if (
+          isPrimaryOrder(sgContext, sgContext.schemas[dbModel.name], revertItem)
+        ) {
+          switch (
+            (revertItem[revertItem.length - 1] as string).toLocaleUpperCase()
+          ) {
+            case 'ASC':
+              revertItem[revertItem.length - 1] = 'DESC'
+              break
+            case 'DESC':
+              revertItem[revertItem.length - 1] = 'ASC'
+              break
+            default:
+              revertItem.push('DESC')
+          }
         }
       }
-      return r
+      return orderItem
     })
   }
 
   const offset = Math.max(after != null ? parseInt(after) : 0, 0)
-  const rows = dbModel.hasSelection({
-    info: selectionInfo,
-    path: 'edges'
-  })
-    ? await (dbModel.withCache ? dbModel.withCache() : dbModel).findAll({
-        distinct: 'id',
+
+  const getRows = async function () {
+    if (
+      dbModel.hasSelection({
+        info: args.selectionInfo,
+        path: 'edges'
+      })
+    ) {
+      const findOptions: FindOptions = {
         include: include,
         where: where,
         attributes: attributes,
@@ -154,8 +184,15 @@ export default async function (args: {
         limit: first,
         offset: offset,
         subQuery: subQuery
-      })
-    : []
+      }
+      return dbModel.withCache
+        ? await dbModel.withCache().findAll(findOptions)
+        : await dbModel.findAll(findOptions)
+    }
+    return []
+  }
+  const rows = await getRows()
+
   let index = 0
   if (last || before) {
     return {

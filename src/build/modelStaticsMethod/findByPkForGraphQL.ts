@@ -5,13 +5,13 @@ import { SGModel, SGModelCtrl } from '../../Definition'
 import getFindOptionsKey from '../../plugin/cache/getFindOptionsKey'
 
 export default async function <M extends SGModel>(
-  this: SGModelCtrl,
+  this: SGModelCtrl<M>,
   id: number,
   options: FindOptions,
   context: any,
   info: GraphQLResolveInfo,
   path?: string
-) {
+): Promise<M | null> {
   const dbModel = this
 
   if (context == null) context = {}

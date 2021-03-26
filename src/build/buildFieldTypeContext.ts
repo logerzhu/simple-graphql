@@ -5,6 +5,7 @@ import {
   InterfaceContext,
   OutputFieldConfig,
   ResolverContext,
+  SGModel,
   TypeConfig,
   TypeContext
 } from '../Definition'
@@ -138,7 +139,8 @@ function buildModelType(
     },
     columnOptions: (schema, fieldName, options) => {
       const foreignField = fieldName
-      let onDelete = options.metadata?.column?.onDelete || 'RESTRICT'
+      let onDelete: string | undefined =
+        options.metadata?.column?.onDelete || 'RESTRICT'
       let constraints = true
       if (options.metadata?.column?.constraints !== undefined) {
         constraints = options.metadata.column.constraints
@@ -273,6 +275,8 @@ function buildDataType(
           }
         }
         return columnOptions
+      } else {
+        return null
       }
     }
   }
@@ -316,35 +320,7 @@ export default function (
 ) {
   const typeMap: { [key: string]: TypeConfig } = {}
 
-  const resolves = [
-    function resolveFunctionType(typeName) {
-      if (typeof typeName !== 'string') {
-        switch (typeName) {
-          case Date:
-            console.warn(
-              "Field type name should be string. Please change Date to 'Date'."
-            )
-            return typeMap.Date
-          case String:
-            console.warn(
-              "Field type name should be string. Please change String to 'String'."
-            )
-            return typeMap.String
-          case Number:
-            console.warn(
-              "Field type name should be string. Please change Number to 'Number'."
-            )
-            return typeMap.Number
-          case JSON:
-            console.warn(
-              "Field type name should be string. Please change JSON to 'JSON'."
-            )
-            return typeMap.JSON
-          default:
-            throw new Error(`Unknown type ${typeName}`)
-        }
-      }
-    },
+  const resolves: Array<(string) => TypeConfig | undefined> = [
     function resolveInterfaceType(typeName) {
       if (typeName.endsWith('Interface')) {
         const gIntf = context.interface(
@@ -363,7 +339,7 @@ export default function (
         const subTypeName = typeName.substr(1, typeName.length - 2)
         const typeConfig = fieldTypeContext.typeConfig(subTypeName)
         if (!typeConfig) {
-          return null
+          return undefined
         }
         return {
           name: typeName,
@@ -406,15 +382,18 @@ export default function (
                 const option = dbModel.resolveQueryOption({
                   info: info
                 })
-                const list = await (dbModel.withCache
-                  ? dbModel.withCache()
-                  : dbModel
-                ).findAll({
-                  where: { id: { [Sequelize.Op.in as any]: ids } },
-                  include: option.include,
-                  attributes: option.attributes
-                })
-                const result = []
+                const list = dbModel.withCache
+                  ? await dbModel.withCache().findAll({
+                      where: { id: { [Sequelize.Op.in as any]: ids } },
+                      include: option.include,
+                      attributes: option.attributes
+                    })
+                  : await dbModel.findAll({
+                      where: { id: { [Sequelize.Op.in as any]: ids } },
+                      include: option.include,
+                      attributes: option.attributes
+                    })
+                const result: SGModel[] = []
                 for (const id of ids) {
                   const element = list.find((e) => '' + e.id === '' + id)
                   if (element) {
@@ -450,7 +429,7 @@ export default function (
       if (schema) {
         const typeConfig = fieldTypeContext.typeConfig(schema.name)
         if (!typeConfig) {
-          return null
+          return undefined
         }
         const connectionInfo = relay.connectionDefinitions({
           name: schema.name,

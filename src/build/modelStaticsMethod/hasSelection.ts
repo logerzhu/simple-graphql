@@ -1,26 +1,28 @@
 import _ from 'lodash'
 import { GraphQLResolveInfo } from 'graphql'
-import { SGModelCtrl } from '../../Definition'
+import { SGModel, SGModelCtrl } from '../../Definition'
+import { Selection } from './parseSelections'
 
-export default function (
-  this: SGModelCtrl,
-  args: { info: GraphQLResolveInfo; path: string }
-) {
+export default function <M extends SGModel>(
+  this: SGModelCtrl<M>,
+  args: { info?: GraphQLResolveInfo; path: string }
+): boolean {
   const dbModel = this
 
   const { info, path } = args
 
+  if (!info) {
+    return false
+  }
+
   const fragments = info.fragments || {}
 
-  let selections = []
+  let selections: Array<Selection> = []
 
   ;(info.fieldNodes || []).forEach((node) => {
     selections = _.union(
       selections,
-      dbModel.parseSelections(
-        fragments,
-        node.selectionSet && node.selectionSet.selections
-      )
+      dbModel.parseSelections(fragments, node.selectionSet?.selections)
     )
   })
 

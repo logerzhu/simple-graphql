@@ -75,7 +75,7 @@ export default new SGSchema('User', {
   },
   p1: {
     output: {type: 'String'},
-    dependentFields: ['p2', 'blocked'],
+    dependentFields: ['blocked'],
     resolve: async function ({
                                password,
                                blocked

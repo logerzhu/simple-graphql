@@ -76,5 +76,5 @@ test('Hook生成', async () => {
     {}
   )
   expect(result.errors).toBeUndefined()
-  expect(result.data.test).toEqual('Pass')
+  expect(result?.data?.test).toEqual('Pass')
 })

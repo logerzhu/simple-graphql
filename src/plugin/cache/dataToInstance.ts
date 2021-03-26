@@ -4,7 +4,7 @@ import { Includeable, IncludeOptions } from 'sequelize'
 function restoreTimestamps(
   data: any,
   instance: SGModel,
-  include?: Includeable[]
+  include?: Includeable | Includeable[]
 ) {
   const timestampFields = ['createdAt', 'updatedAt', 'deletedAt']
 
@@ -18,24 +18,30 @@ function restoreTimestamps(
     instance.setDataValue('version' as any, data['version'])
   }
 
-  for (let i of (include || []) as IncludeOptions[]) {
-    if (data[i.as]) {
-      if (Array.isArray(data[i.as])) {
-        for (let index = 0; index < data[i.as].length; index++) {
-          restoreTimestamps(
-            data[i.as][index],
-            instance[i.as][index],
-            i.include as IncludeOptions[]
-          )
+  const restore = (includeItem: Includeable) => {
+    if ((includeItem as IncludeOptions).as) {
+      const item = includeItem as IncludeOptions
+      const field = item.as as string
+      if (data[field]) {
+        if (Array.isArray(data[field])) {
+          for (let index = 0; index < data[field].length; index++) {
+            restoreTimestamps(
+              data[field][index],
+              instance[field][index],
+              item.include
+            )
+          }
+        } else {
+          restoreTimestamps(data[field], instance[field], item.include)
         }
-      } else {
-        restoreTimestamps(
-          data[i.as],
-          instance[i.as],
-          i.include as IncludeOptions[]
-        )
       }
     }
+  }
+
+  if (Array.isArray(include)) {
+    include.forEach((i) => restore(i))
+  } else if (include) {
+    restore(include)
   }
 }
 

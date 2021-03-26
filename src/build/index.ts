@@ -42,8 +42,8 @@ export function buildGraphQLContext(
       plugins,
       buildOptions.plugin || {}
     ),
-    models: {},
-    services: {},
+    models: {} as any,
+    services: {} as any,
     typeConfig: (typeName) => null
   }
 
@@ -88,7 +88,7 @@ export function buildGraphQLContext(
   const rootQueries = buildRootQueries(
     [
       ...(config.schemas || []).map((schema) => schema.config.queries),
-      config.queries
+      config.queries || {}
     ],
     context
   )
@@ -112,7 +112,7 @@ export function buildGraphQLContext(
   const rootMutations = buildRootMutations(
     [
       ...(config.schemas || []).map((schema) => schema.config.mutations),
-      config.mutations
+      config.mutations || {}
     ],
     payloadFields,
     context

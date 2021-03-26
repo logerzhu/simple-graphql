@@ -11,7 +11,9 @@ import Sequelize, {
   BelongsToManyOptions,
   BelongsToOptions,
   HasManyOptions,
-  HasOneOptions
+  HasOneOptions,
+  Order,
+  OrderItem
 } from 'sequelize'
 
 /**
@@ -47,7 +49,7 @@ type HasManyConfig = {
     foreignField?: string
     hidden?: boolean
     conditionFields?: InputFieldConfigMap
-    order?: Array<Array<any>>
+    order?: OrderItem[]
     outputStructure?: 'Connection' | 'Array'
   } & HasManyOptions
 }

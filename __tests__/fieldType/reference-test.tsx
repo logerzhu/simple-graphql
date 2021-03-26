@@ -89,7 +89,7 @@ test('引用类型生成', async () => {
     }
   )
   expect(addDummy1.errors).toBeUndefined()
-  const dummy1 = addDummy1.data.addDummy1.addedDummy1Edge.node
+  const dummy1 = addDummy1?.data?.addDummy1.addedDummy1Edge.node
   expect(dummy1.name).toEqual(dummy1Data.name)
 
   const dummy2Data = {
@@ -134,7 +134,7 @@ test('引用类型生成', async () => {
     }
   )
   expect(addDummy2.errors).toBeUndefined()
-  const dummy2 = addDummy2.data.addDummy2.addedDummy2Edge.node
+  const dummy2 = addDummy2?.data?.addDummy2.addedDummy2Edge.node
   expect(dummy2.name).toEqual(dummy2Data.name)
   expect(dummy2.dummyA).toEqual(dummy1)
   expect(dummy2.dummyB).toEqual(dummy1)
@@ -163,7 +163,7 @@ test('引用类型生成', async () => {
   )
 
   expect(querySingleResult.errors).toBeUndefined()
-  const qDummy1 = querySingleResult.data.dummy1
+  const qDummy1 = querySingleResult?.data?.dummy1
   expect(qDummy1.name).toEqual(dummy1Data.name)
   expect(qDummy1.dummyA).toEqual({ id: dummy2.id, name: dummy2.name })
   expect(qDummy1.dummyB).toEqual([{ id: dummy2.id, name: dummy2.name }])

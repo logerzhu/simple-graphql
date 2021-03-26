@@ -25,7 +25,9 @@ import { DataType } from 'sequelize/types/lib/data-types'
 
 export abstract class SGModel<
   TModelAttributes extends {} = any
-> extends Model<TModelAttributes> {}
+> extends Model<TModelAttributes> {
+  id: number
+}
 
 export interface SGModelStatic {
   resolveRelayConnection: typeof resolveRelayConnection
@@ -96,7 +98,7 @@ export type InterfaceContext = {
 }
 
 export type TypeContext = {
-  typeConfig: (name: string) => TypeConfig | null | undefined
+  typeConfig: (name: string) => TypeConfig | null
 }
 
 export type FieldResolve<T = any> = (

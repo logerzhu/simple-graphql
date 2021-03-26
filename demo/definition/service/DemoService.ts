@@ -3,7 +3,7 @@ import _ from 'lodash'
 
 declare module '../../../src/Definition' {
   interface SGServiceMap {
-    DemoService?: DemoService
+    DemoService: DemoService
   }
 }
 

@@ -5,12 +5,12 @@ import getFindOptionsKey from '../../plugin/cache/getFindOptionsKey'
 import { SGModel, SGModelCtrl } from '../../Definition'
 
 export default async function <M extends SGModel>(
-  this: SGModelCtrl,
+  this: SGModelCtrl<M>,
   options: FindOptions,
   context: any,
   info: GraphQLResolveInfo,
   path?: string
-) {
+): Promise<M | null> {
   const dbModel = this
 
   if (context == null) context = {}
@@ -19,9 +19,9 @@ export default async function <M extends SGModel>(
   const key = `${dbModel.name}.findOne`
 
   if (!context._SGLoaders[key]) {
-    context._SGLoaders[key] = new DataLoader(
+    context._SGLoaders[key] = new DataLoader<FindOptions, M | null>(
       async function (conditions) {
-        const result = []
+        const result: (M | null)[] = []
         for (let cond of conditions) {
           if (dbModel.withCache) {
             result.push(await dbModel.withCache().findOne(cond))

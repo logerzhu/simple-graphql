@@ -123,7 +123,7 @@ test('Add/Update/Delete Test', async () => {
     }
   )
   expect(addResult.errors).toBeUndefined()
-  const dummy1 = addResult.data.addDummy.addedDummyEdge.node
+  const dummy1 = addResult?.data?.addDummy?.addedDummyEdge?.node
 
   const updateValues = {
     number: 13.2,
@@ -184,7 +184,7 @@ test('Add/Update/Delete Test', async () => {
   )
 
   expect(updateResult.errors).toBeUndefined()
-  const changedDummy1 = updateResult.data.updateDummy.changedDummy
+  const changedDummy1 = updateResult?.data?.updateDummy?.changedDummy
   expect(changedDummy1.number).toEqual(updateValues.number)
   expect(changedDummy1.numbers).toEqual(updateValues.numbers)
   expect(changedDummy1.boolean).toEqual(updateValues.boolean)
@@ -227,7 +227,7 @@ test('Add/Update/Delete Test', async () => {
     {}
   )
   expect(deleteResult.errors).toBeUndefined()
-  expect(deleteResult.data.deleteDummy.deletedDummy.number).toEqual(
+  expect(deleteResult?.data?.deleteDummy?.deletedDummy?.number).toEqual(
     updateValues.number
   )
 })

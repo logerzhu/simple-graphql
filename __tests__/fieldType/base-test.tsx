@@ -84,5 +84,5 @@ test('基本类型生成', async () => {
     }
   )
   expect(addResult.errors).toBeUndefined()
-  expect(addResult.data.addDummy.addedDummyEdge.node).toEqual(values)
+  expect(addResult?.data?.addDummy?.addedDummyEdge?.node).toEqual(values)
 })

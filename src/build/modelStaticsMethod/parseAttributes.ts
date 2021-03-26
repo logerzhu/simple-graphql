@@ -1,13 +1,17 @@
 import _ from 'lodash'
-import { ColumnFieldConfig, SGModelCtrl } from '../../Definition'
+import { ColumnFieldConfig, SGModel, SGModelCtrl } from '../../Definition'
 
-type Selection = { name: string; selections?: Array<Selection> }
+type Selection = {
+  namedType?: string
+  name: string
+  selections?: Array<Selection>
+}
 
-export default function (
-  this: SGModelCtrl,
+export default function <M extends SGModel>(
+  this: SGModelCtrl<M>,
   args: {
     attributes: Array<string>
-    selections: Array<any>
+    selections?: Array<Selection>
   }
 ): {
   attributes: Array<string>
@@ -56,11 +60,14 @@ export default function (
       (hasManyConfig.conditionFields == null ||
         _.keys(hasManyConfig.conditionFields).length === 0)
     ) {
-      ;(hasManyConfig.order || [['id', 'ASC']]).forEach((p) => {
-        if (typeof p[0] === 'string') {
-          push(option.additionFields, `${fieldName}.${p[0]}`)
-        }
-      })
+      const order = hasManyConfig.order || [['id', 'ASC']]
+      if (Array.isArray(order)) {
+        order.forEach((p) => {
+          if (typeof p[0] === 'string') {
+            push(option.additionFields, `${fieldName}.${p[0]}`)
+          }
+        })
+      }
     }
 
     const linkConfig = schema.config.links[fieldName]

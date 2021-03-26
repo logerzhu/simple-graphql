@@ -31,13 +31,32 @@ export default {
       )
     }
 
+    const valuesInputFieldMap: InputFieldConfigMap = {}
+
+    _.forOwn(schema.config.fields, (value, key) => {
+      if (isModelType(value)) {
+        if (!key.endsWith('Id')) {
+          key = key + 'Id'
+        }
+      }
+      if (
+        value.metadata?.graphql?.hidden !== true &&
+        value?.metadata?.graphql?.updatable !== false
+      ) {
+        valuesInputFieldMap[key] = {
+          ...value,
+          nullable: true,
+          metadata: { description: value.metadata?.description }
+        }
+      }
+    })
     const inputFields: InputFieldConfigMap = {
       id: {
         type: schema.name + 'Id',
         nullable: false
       },
       values: {
-        properties: {}
+        properties: valuesInputFieldMap
       }
     }
     const versionConfig = (schema.options.tableOptions || {}).version
@@ -49,23 +68,7 @@ export default {
         nullable: true
       }
     }
-    _.forOwn(schema.config.fields, (value, key) => {
-      if (isModelType(value)) {
-        if (!key.endsWith('Id')) {
-          key = key + 'Id'
-        }
-      }
-      if (
-        value.metadata?.graphql?.hidden !== true &&
-        value?.metadata?.graphql?.updatable !== false
-      ) {
-        inputFields.values.properties[key] = {
-          ...value,
-          nullable: true,
-          metadata: { description: value.metadata?.description }
-        }
-      }
-    })
+
     if (_.keys(inputFields.values.properties).length === 0) {
       return
     }

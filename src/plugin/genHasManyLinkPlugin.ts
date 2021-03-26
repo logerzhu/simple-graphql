@@ -6,6 +6,7 @@ import {
   PluginConfig
 } from '../Definition'
 import Sequelize from 'sequelize'
+import { FindOptions } from 'sequelize/types/lib/model'
 
 export default {
   name: 'genHasManyLink',
@@ -99,22 +100,17 @@ export default {
                 info: info,
                 attributes: queryOption.attributes
               })
+              const findOptions: FindOptions = {
+                where: queryOption.where,
+                bind: queryOption.bind,
+                include: option.include,
+                attributes: option.attributes,
+                order: option.order
+              }
               if (dbModel.withCache) {
-                return dbModel.withCache().findAll({
-                  where: queryOption.where,
-                  bind: queryOption.bind,
-                  include: option.include,
-                  attributes: option.attributes,
-                  order: option.order
-                })
+                return dbModel.withCache().findAll(findOptions)
               } else {
-                return dbModel.findAll({
-                  where: queryOption.where,
-                  bind: queryOption.bind,
-                  include: option.include,
-                  attributes: option.attributes,
-                  order: option.order
-                })
+                return dbModel.findAll(findOptions)
               }
             } else {
               const { condition, ...relayArgs } = args || {}
@@ -124,7 +120,7 @@ export default {
                 where: queryOption.where,
                 bind: queryOption.bind,
                 attributes: queryOption.attributes,
-                order: config.order || [['id', 'ASC']]
+                order: config.order
               })
             }
           }

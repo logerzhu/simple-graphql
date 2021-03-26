@@ -16,7 +16,7 @@ function toSequelizeModel(
   const dbDefinition = {}
 
   const versionConfig = (schema.options.tableOptions || {}).version
-  let versionField = null
+  let versionField: string | null = null
   if (versionConfig === true || typeof versionConfig === 'string') {
     versionField = typeof versionConfig === 'string' ? versionConfig : 'version'
   }

@@ -71,10 +71,10 @@ export default {
           sgContext
         ) {
           const dbModel = sgContext.models[schema.name]
-          const bulkDatas = []
+          const bulkDatas: any[] = []
 
           for (const value of values) {
-            const attrs = {}
+            const attrs: any = {}
             _.forOwn(schema.config.fields, (options, key) => {
               if (isModelType(options)) {
                 if (!key.endsWith('Id')) {

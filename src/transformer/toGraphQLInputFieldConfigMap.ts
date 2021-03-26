@@ -117,7 +117,14 @@ const toGraphQLInputFieldConfigMap = function (
             StringHelper.toInitialUpperCase(toTypeName(name, path)) + 'Input',
           inputValueTypes: _.mapValues(
             field.mapping,
-            (options, key) => inputFieldConfig(options.type).type //TODO 支持嵌套类型
+            (options, key) => {
+              const inputType = inputFieldConfig(options.type)
+              if (inputType) {
+                return inputType.type
+              } else {
+                throw new Error(`类型 ${options.type} 没有InputType配置`)
+              }
+            } //TODO 支持嵌套类型
           )
         })
       })

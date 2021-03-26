@@ -1,11 +1,18 @@
 import { FragmentDefinitionNode, SelectionNode } from 'graphql'
+import { SGModel, SGModelCtrl } from '../../Definition'
+
+export type Selection = {
+  namedType?: string
+  name: string
+  selections?: Array<Selection>
+}
 
 export default function parseSelections(
   fragments: { [key: string]: FragmentDefinitionNode },
-  selections: ReadonlyArray<SelectionNode>,
+  selections?: ReadonlyArray<SelectionNode>,
   base?: { namedType: string }
 ) {
-  const result = []
+  const result: Array<Selection> = []
   if (selections) {
     selections.forEach((selection) => {
       if (selection.kind === 'Field') {

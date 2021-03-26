@@ -1,7 +1,16 @@
 import _ from 'lodash'
 import { GraphQLResolveInfo } from 'graphql'
+import { SGSchema } from '../../definition/SGSchema'
+import { SGContext, SGModel, SGModelCtrl } from '../../Definition'
+import { Selection } from './parseSelections'
+import { Order, OrderItem } from 'sequelize'
+import Model, {
+  Includeable,
+  IncludeOptions,
+  ModelStatic
+} from 'sequelize/types/lib/model'
 
-const fieldToSelection = (field) => {
+function fieldToSelection(field: string) {
   const index = field.indexOf('.')
   if (index === -1) {
     return { name: field }
@@ -13,108 +22,191 @@ const fieldToSelection = (field) => {
   }
 }
 
-const convertOrder = ({ orderPaths = [], schema, order, sgContext }) => {
-  order = order || []
-  return order.map((p) => {
-    const mapField = (iSchema, iField) => {
-      const [first, ...other] = iField.split('.')
-
-      const ass = iSchema.config.associations
-
-      const iConfig =
-        ass.belongsTo[first] || ass.hasOne[first] || ass.hasMany[first]
-      if (iConfig) {
-        return [
-          {
-            model: sgContext.models[iConfig.target],
-            as: first
-          },
-          ...mapField(sgContext.schemas[iConfig.target], other.join('.'))
-        ]
-      } else {
-        return [iField]
-      }
-    }
-
-    const [first, ...other] = p
-    if (typeof first === 'string') {
-      return [...orderPaths, ...mapField(schema, first), ...other]
-    } else {
-      return [...orderPaths, first, ...other]
-    }
-  })
+function getOrderFields(order: Order): string[] {
+  if (Array.isArray(order)) {
+    return order
+      .map((orderItem) => {
+        if (Array.isArray(orderItem)) {
+          const column = orderItem[0]
+          if (typeof column === 'string') {
+            return column
+          }
+        }
+        //避免null的检查
+        return '&#$&'
+      })
+      .filter((orderItem) => orderItem !== '&#$&')
+  } else {
+    return []
+  }
 }
 
-const buildQueryOption = function ({
-  sgContext,
-  attributes,
-  include,
-  schema,
-  selections,
-  orderPaths,
-  eagerHasMany
+/*
+ 排序设置中的字段, 如果是["a.b.c", "desc"]格式, 转换成
+ [{ model: A; as: 'a' }, { model: B; as: 'b' } ,"c","desc"]
+ */
+function convertOrderItem(
+  sgContext: SGContext,
+  schema: SGSchema,
+  orderItem: [string, any]
+) {
+  const [column, sort] = orderItem
+
+  const [first, ...other] = column.split('.')
+  const ass = schema.config.associations
+  const iConfig =
+    ass.belongsTo[first] || ass.hasOne[first] || ass.hasMany[first]
+  if (iConfig) {
+    return [
+      {
+        model: sgContext.models[iConfig.target],
+        as: first
+      },
+      ...convertOrderItem(sgContext, sgContext.schemas[iConfig.target], [
+        other.join('.'),
+        sort
+      ])
+    ]
+  } else {
+    return orderItem
+  }
+}
+
+function convertOrder(
+  sgContext: SGContext,
+  schema: SGSchema,
+  order: Order,
+  parents: { model: SGModelCtrl; as: string }[]
+): OrderItem[] {
+  function patchParent(item): OrderItem {
+    if (Array.isArray(item)) {
+      return [...parents, ...item] as OrderItem
+    } else {
+      return [...parents, item] as OrderItem
+    }
+  }
+
+  if (Array.isArray(order)) {
+    return order.map((orderItem) => {
+      if (Array.isArray(orderItem)) {
+        const [column, sort] = orderItem
+        if (typeof column === 'string') {
+          return patchParent(
+            convertOrderItem(sgContext, schema, [column, sort])
+          )
+        } else {
+          return patchParent(orderItem)
+        }
+      } else {
+        return patchParent([orderItem])
+      }
+    })
+  }
+  return [patchParent(order)]
+}
+
+const buildQueryOption = function (args: {
+  sgContext: SGContext
+  schema: SGSchema
+  include: Includeable | Includeable[]
+  attributes?: string[]
+  selections?: Selection[]
+  eagerHasMany: boolean
+  parents?: { model: SGModelCtrl; as: string }[]
 }) {
+  const {
+    sgContext,
+    schema,
+    attributes,
+    selections,
+    eagerHasMany,
+    parents = []
+  } = args
+
   const parseAttributesOption = sgContext.models[schema.name].parseAttributes({
-    attributes: attributes,
+    attributes: attributes || [],
     selections: selections
   })
-  selections = [
-    ...(selections || []),
-    ...parseAttributesOption.additionSelections
-  ]
 
-  let additionOrder = []
-  for (let selection of selections) {
-    let config =
-      schema.config.associations.belongsTo[selection.name] ||
-      schema.config.associations.hasOne[selection.name]
-    const hasManyConfig = schema.config.associations.hasMany[selection.name]
+  let additionOrder: OrderItem[] = []
 
-    if (!config && eagerHasMany) {
-      if (
-        hasManyConfig &&
-        hasManyConfig.outputStructure === 'Array' &&
-        (hasManyConfig.conditionFields == null ||
-          hasManyConfig.conditionFields.length === 0)
-      ) {
-        config = hasManyConfig
-
-        // add hasManyConfig order config
-        additionOrder = [
-          ...additionOrder,
-          ...convertOrder({
-            orderPaths: [
-              ...orderPaths,
-              {
-                model: sgContext.models[config.target],
-                as: selection.name
-              }
-            ],
-            schema: sgContext.schemas[config.target],
-            order: config.order || [['id', 'ASC']],
-            sgContext: sgContext
-          })
-        ]
+  const include = (() => {
+    const copy = (i: Includeable): Includeable => {
+      if (typeof i === 'object' && (i as IncludeOptions).as != null) {
+        return { ...i }
+      } else {
+        return i
       }
     }
+    if (Array.isArray(args.include)) {
+      return args.include.map((i) => copy(i))
+    } else if (args.include) {
+      return [copy(args.include)]
+    } else {
+      return []
+    }
+  })()
+
+  for (let selection of [
+    ...(selections || []),
+    ...parseAttributesOption.additionSelections
+  ]) {
+    const hasOneOrBelongsToConfig =
+      schema.config.associations.belongsTo[selection.name] ||
+      schema.config.associations.hasOne[selection.name]
+
+    const hasManyConfig = schema.config.associations.hasMany[selection.name]
+
+    let config = hasOneOrBelongsToConfig
+
+    if (!hasOneOrBelongsToConfig && eagerHasMany) {
+      if (
+        hasManyConfig?.outputStructure === 'Array' &&
+        (hasManyConfig.conditionFields == null ||
+          _.keys(hasManyConfig.conditionFields).length === 0)
+      ) {
+        config = hasManyConfig
+        // add hasManyConfig order config
+        additionOrder.push(
+          ...convertOrder(
+            sgContext,
+            sgContext.schemas[hasManyConfig.target],
+            hasManyConfig.order || [['id', 'ASC']],
+            [
+              {
+                model: sgContext.models[hasManyConfig.target],
+                as: selection.name
+              }
+            ]
+          )
+        )
+      }
+    }
+
     if (config) {
-      const exit = include.filter((i) => i.as === selection.name)[0]
+      const exit: IncludeOptions | undefined = (() => {
+        return include.find(
+          (i) => (i as IncludeOptions).as === selection.name
+        ) as IncludeOptions
+      })()
+
+      const option = buildQueryOption({
+        sgContext: sgContext,
+        attributes: (exit?.attributes as string[]) || [], //TODO
+        include: exit?.include || [],
+        schema: sgContext.schemas[config.target],
+        selections: selection.selections,
+        parents: [
+          ...parents,
+          {
+            model: sgContext.models[config.target],
+            as: selection.name
+          }
+        ],
+        eagerHasMany: eagerHasMany
+      })
+
       if (exit) {
-        const option = buildQueryOption({
-          sgContext: sgContext,
-          attributes: exit.attributes || [],
-          include: [...(exit.include || [])],
-          schema: sgContext.schemas[config.target],
-          selections: selection.selections,
-          orderPaths: [
-            ...orderPaths,
-            {
-              model: sgContext.models[config.target],
-              as: selection.name
-            }
-          ],
-          eagerHasMany: eagerHasMany
-        })
         exit.include = option.include
         exit.attributes = option.attributes
         additionOrder = _.unionBy(
@@ -123,27 +215,12 @@ const buildQueryOption = function ({
           JSON.stringify
         )
       } else {
-        const option = buildQueryOption({
-          sgContext: sgContext,
-          attributes: [],
-          include: [],
-          schema: sgContext.schemas[config.target],
-          selections: selection.selections,
-          orderPaths: [
-            ...orderPaths,
-            {
-              model: sgContext.models[config.target],
-              as: selection.name
-            }
-          ],
-          eagerHasMany: eagerHasMany
-        })
         include.push({
           model: sgContext.models[config.target],
           as: selection.name,
           include: option.include,
           attributes: option.attributes,
-          nullable: true
+          required: false
         })
         additionOrder = _.unionBy(
           additionOrder,
@@ -161,14 +238,21 @@ const buildQueryOption = function ({
   }
 }
 
-export default function (args: {
-  attributes?: Array<string>
-  include?: Array<any>
-  order?: Array<Array<any>>
-  info?: GraphQLResolveInfo
-  path?: string
-  eagerHasMany?: boolean
-}) {
+export default function <M extends SGModel>(
+  this: SGModelCtrl<M>,
+  args: {
+    attributes?: Array<string>
+    include?: Includeable | Includeable[]
+    order?: Order
+    info?: GraphQLResolveInfo
+    path?: string
+    eagerHasMany?: boolean
+  }
+): {
+  include: Includeable | Includeable[]
+  attributes: Array<string>
+  order: OrderItem[]
+} {
   const dbModel = this
   const {
     include = [],
@@ -178,21 +262,23 @@ export default function (args: {
     path,
     eagerHasMany = true
   } = args
-  const fragments = info?.fragments || []
+  const fragments = info?.fragments || {}
 
   const sgContext = this.getSGContext()
 
-  let selections = []
+  let selections: Selection[] = []
 
-  ;(info?.fieldNodes || []).forEach((node) => {
-    selections = _.union(
-      selections,
-      dbModel.parseSelections(
-        fragments,
-        node.selectionSet && node.selectionSet.selections
+  if (info?.fieldNodes) {
+    info.fieldNodes.forEach((node) => {
+      selections = _.union(
+        selections,
+        dbModel.parseSelections(
+          fragments,
+          node.selectionSet && node.selectionSet.selections
+        )
       )
-    )
-  })
+    })
+  }
 
   if (path) {
     path.split('.').forEach((p) => {
@@ -204,25 +290,23 @@ export default function (args: {
 
   selections = [
     ...selections,
-    ..._.union(
-      attributes || [],
-      (order || []).filter((o) => typeof o[0] === 'string').map((o) => o[0])
-    ).map((field) => fieldToSelection(field))
+    ..._.union(attributes || [], getOrderFields(order)).map((field) =>
+      fieldToSelection(field)
+    )
   ]
 
-  const mainOrder = convertOrder({
-    schema: sgContext.schemas[dbModel.name],
-    order: order,
-    sgContext: sgContext
-  })
+  const mainOrder = convertOrder(
+    sgContext,
+    sgContext.schemas[dbModel.name],
+    order,
+    []
+  )
 
   const option = buildQueryOption({
     sgContext: sgContext,
-    attributes: [],
-    include: [...include],
+    include: include,
     schema: sgContext.schemas[dbModel.name],
     selections: selections,
-    orderPaths: [],
     eagerHasMany: eagerHasMany
   })
 

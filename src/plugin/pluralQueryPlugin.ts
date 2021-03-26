@@ -200,9 +200,7 @@ export default {
                   enum: _.keys(searchFields)
                 },
                 order: {
-                  elements: {
-                    enum: ['ASC', 'DESC']
-                  }
+                  enum: ['ASC', 'DESC']
                 }
               }
             },

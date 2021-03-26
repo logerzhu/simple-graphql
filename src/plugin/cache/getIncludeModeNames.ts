@@ -1,14 +1,21 @@
 import { CountOptions, FindOptions } from 'sequelize'
 import _ from 'lodash'
+import { Includeable, IncludeOptions } from 'sequelize/types/lib/model'
 
-export default (options: FindOptions | CountOptions) => {
-  options = options || {}
-  const ins = []
-  const addInclude = (include: any) => {
-    // TODO 完善include表的计算, 目前只考虑 IncludeOptions 情况
-    for (let i of include || []) {
-      ins.push(i.model.name)
-      addInclude(i.include)
+export default (options?: FindOptions | CountOptions) => {
+  if (!options) {
+    return []
+  }
+  const ins: string[] = []
+  const addInclude = (include?: Includeable | Includeable[]) => {
+    if (Array.isArray(include)) {
+      include.forEach((i) => addInclude(i))
+    } else if (include) {
+      const model = (include as IncludeOptions).model
+      if (model) {
+        ins.push(model.name)
+      }
+      addInclude((include as IncludeOptions).include)
     }
   }
   addInclude(options.include)
