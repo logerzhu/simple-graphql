@@ -30,7 +30,6 @@ export default {
         schemas.find((s) => s.name === fieldOptions.type) != null
       )
     }
-
     const valuesInputFieldMap: InputFieldConfigMap = {}
 
     _.forOwn(schema.config.fields, (value, key) => {
@@ -94,14 +93,10 @@ export default {
               if (!key.endsWith('Id')) {
                 key = key + 'Id'
               }
-              if (typeof args.values[key] !== 'undefined') {
-                if (dbModel.options.underscored) {
-                  values[StringHelper.toUnderscoredName(key)] = args.values[key]
-                } else {
-                  values[key] = args.values[key]
-                }
+              if (args.values[key] !== undefined) {
+                values[key] = args.values[key]
               }
-            } else if (typeof args.values[key] !== 'undefined') {
+            } else if (args.values[key] !== undefined) {
               values[key] = args.values[key]
             }
           })

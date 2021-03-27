@@ -80,14 +80,10 @@ export default {
                 if (!key.endsWith('Id')) {
                   key = key + 'Id'
                 }
-                if (typeof value[key] !== 'undefined') {
-                  if (dbModel.options.underscored) {
-                    attrs[StringHelper.toUnderscoredName(key)] = value[key]
-                  } else {
-                    attrs[key] = value[key]
-                  }
+                if (value[key] !== undefined) {
+                  attrs[key] = value[key]
                 }
-              } else if (typeof value[key] !== 'undefined') {
+              } else if (value[key] !== undefined) {
                 attrs[key] = value[key]
               }
             })

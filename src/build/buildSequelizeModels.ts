@@ -7,13 +7,15 @@ import { SGSchema } from '../definition/SGSchema'
 import { SGContext, SGModelCtrl, TypeContext } from '../Definition'
 import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
+import StringHelper from '../utils/StringHelper'
+import { ModelAttributes } from 'sequelize/types/lib/model'
 
 function toSequelizeModel(
   sequelize: Sequelize.Sequelize,
   schema: SGSchema,
   context: TypeContext
 ): ModelCtor<Model> {
-  const dbDefinition = {}
+  const dbDefinition: { [key: string]: ModelAttributeColumnOptions } = {}
 
   const versionConfig = (schema.options.tableOptions || {}).version
   let versionField: string | null = null
@@ -58,10 +60,6 @@ function toSequelizeModel(
         ...dbDefinition[key],
         ...(value.metadata?.column || {})
       }
-      // TODO underscored support
-      // if ((sequelize.options.define || {}).underscored && dbDefinition[key].field == null) {
-      //     dbDefinition[key].field = StringHelper.toUnderscoredName(key);
-      // }
     }
   })
   sequelize.define(schema.name, dbDefinition, schema.options.tableOptions)
