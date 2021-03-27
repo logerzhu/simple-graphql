@@ -1,5 +1,9 @@
 import { CountOptions, FindOptions } from 'sequelize'
-import md5 from 'md5'
+import crypto from 'crypto'
+
+function md5(source: string) {
+  return crypto.createHash('md5').update(source).digest('hex')
+}
 
 export default (dbModel, options: FindOptions | CountOptions) => {
   options = options || {}

@@ -1,14 +1,15 @@
 import { GraphQLError, GraphQLScalarType, Kind } from 'graphql'
-import moment from 'moment'
 
 export default new GraphQLScalarType({
   name: 'Date',
 
   serialize(value) {
     if (typeof value === 'string') {
-      const nValue = moment(value, 'YYYY-MM-DD HH:mm:ss.SSS ZZ')
-      if (nValue.isValid()) {
-        value = nValue.toDate()
+      const dataTime = Date.parse(value)
+      if (isNaN(dataTime)) {
+        throw new TypeError('Field error: value is not an instance of Date')
+      } else {
+        value = new Date(dataTime)
       }
     }
     if (!(value instanceof Date)) {
@@ -22,11 +23,12 @@ export default new GraphQLScalarType({
 
   parseValue(value) {
     if (typeof value === 'string') {
-      const result = moment(value)
-      if (!result.isValid()) {
-        throw new GraphQLError('Query error: Invalid date')
+      const dataTime = Date.parse(value)
+      if (isNaN(dataTime)) {
+        throw new TypeError('Query error: Invalid date')
+      } else {
+        return new Date(dataTime)
       }
-      return result.toDate()
     } else {
       throw new GraphQLError('Query error: Invalid date')
     }
@@ -39,14 +41,11 @@ export default new GraphQLScalarType({
         [ast]
       )
     }
-    const result = moment(ast.value)
-    if (!result.isValid()) {
-      throw new GraphQLError('Query error: Invalid date', [ast])
+    const dataTime = Date.parse(ast.value)
+    if (isNaN(dataTime)) {
+      throw new TypeError('Query error: Invalid date')
+    } else {
+      return new Date(dataTime)
     }
-    return result.toDate()
-
-    // if (ast.value !== result.toJSON()) {
-    //  throw new GraphQLError('Query error: Invalid date format, only accepts: YYYY-MM-DDTHH:MM:SS.SSSZ', [ast])
-    // }
   }
 })

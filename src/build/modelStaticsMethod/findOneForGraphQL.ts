@@ -19,7 +19,7 @@ export default async function <M extends SGModel>(
   const key = `${dbModel.name}.findOne`
 
   if (!context._SGLoaders[key]) {
-    context._SGLoaders[key] = new DataLoader<FindOptions, M | null>(
+    context._SGLoaders[key] = new DataLoader<FindOptions, M | null, string>(
       async function (conditions) {
         const result: (M | null)[] = []
         for (let cond of conditions) {
