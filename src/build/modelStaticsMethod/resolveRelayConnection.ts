@@ -121,14 +121,12 @@ export default async function <M extends SGModel>(
     } else {
       return dbModel.withCache
         ? await dbModel.withCache().count({
-            attributes: attributes,
             distinct: true,
             include: include,
             where: where
             // bind: bind  #TODO 需要测试
           })
         : await dbModel.count({
-            attributes: attributes,
             distinct: true,
             include: include,
             where: where
