@@ -52,10 +52,8 @@ const toGraphQLInputFieldConfigMap = function (
         return null
       }
       config.description = field.metadata?.description
-      if (field.metadata?.graphql?.defaultValue) {
-        config.defaultValue = field.metadata?.graphql?.defaultValue
-        config.description = config.description
-      }
+      config.defaultValue = field.metadata?.graphql?.defaultValue
+
       if (
         field.nullable === false &&
         !(config.type instanceof GraphQLNonNull)
