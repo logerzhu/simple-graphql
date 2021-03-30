@@ -40,8 +40,8 @@ export default async function <M extends SGModel>(
 
   const option = dbModel.resolveQueryOption({
     attributes: options.attributes as string[],
-    include: options.include as Includeable[],
-    order: options.order as any,
+    include: options.include,
+    order: options.order,
     info: info,
     path: path
   })

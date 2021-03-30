@@ -36,8 +36,7 @@ function buildModelType(
   return {
     name: typeName,
     description: schema.options.description,
-    inputType: (fieldTypeContext.typeConfig(schema.name + 'Id') as any)
-      .inputType,
+    inputType: fieldTypeContext.typeConfig(schema.name + 'Id')?.inputType,
     outputType: new GraphQLObjectType({
       name: typeName,
       interfaces: [context.interface('Node')],
@@ -288,7 +287,10 @@ function buildUnionWrapType(
   context: Context
 ): TypeConfig {
   const name = `_Union_${wrapType}`
-  const typeConfig = fieldTypeContext.typeConfig(wrapType) as any
+  const typeConfig = fieldTypeContext.typeConfig(wrapType)
+  if (!typeConfig?.outputType) {
+    throw new Error(`Type ${wrapType} has not register`)
+  }
   return {
     name: name,
     description: `Union wrap type for ${wrapType}`,
@@ -299,7 +301,7 @@ function buildUnionWrapType(
         variant: { type: GraphQLString },
         value: {
           type: typeConfig.outputType,
-          resolve: typeConfig.outputResolve
+          resolve: typeConfig?.outputResolve
             ? context.hookFieldResolve('value', {
                 output: { type: wrapType },
                 resolve: typeConfig.outputResolve
@@ -384,12 +386,12 @@ export default function (
                 })
                 const list = dbModel.withCache
                   ? await dbModel.withCache().findAll({
-                      where: { id: { [Sequelize.Op.in as any]: ids } },
+                      where: { id: { [Sequelize.Op.in]: ids } },
                       include: option.include,
                       attributes: option.attributes
                     })
                   : await dbModel.findAll({
-                      where: { id: { [Sequelize.Op.in as any]: ids } },
+                      where: { id: { [Sequelize.Op.in]: ids } },
                       include: option.include,
                       attributes: option.attributes
                     })
@@ -433,7 +435,7 @@ export default function (
         }
         const connectionInfo = relay.connectionDefinitions({
           name: schema.name,
-          nodeType: typeConfig.outputType as any,
+          nodeType: typeConfig.outputType,
           connectionFields: {
             count: {
               type: GraphQLFloat

@@ -56,15 +56,21 @@ export default function unionInputType(options: {
     parseLiteral: function (ast) {
       let type
       try {
-        const fields = ((<ObjectValueNode>ast).fields || []) as any
-        for (let i = 0; i < fields.length; i++) {
-          if (_.get(fields[i], 'name.value') === typeKey) {
-            type = _.get(fields[i], 'value.value')
-            break
+        if (ast.kind === 'ObjectValue') {
+          const fields = ast.fields
+          for (let i = 0; i < fields.length; i++) {
+            if (fields[i].name.value === typeKey) {
+              const value = fields[i].value
+              if (value.kind === 'StringValue') {
+                type = value.value
+                break
+              }
+            }
           }
         }
+
         if (!type) {
-          throw new Error()
+          throw new Error(`Miss properties ${typeKey}`)
         }
       } catch (err) {
         throw new GraphQLError(

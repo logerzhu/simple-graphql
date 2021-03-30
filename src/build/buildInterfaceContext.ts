@@ -20,7 +20,7 @@ export default (context: SGContext): InterfaceContext => {
         const type = obj._fieldType
         const typeConfig = context.typeConfig(type)
         if (typeConfig) {
-          return typeConfig.outputType as any
+          return typeConfig.outputType
         }
         throw new Error(`Type ${type} not exist.`)
       }

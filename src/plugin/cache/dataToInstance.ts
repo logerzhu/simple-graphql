@@ -11,11 +11,11 @@ function restoreTimestamps(
   for (const field of timestampFields) {
     const value = data[field]
     if (value) {
-      instance.setDataValue(field as any, new Date(value))
+      instance.setDataValue(field, new Date(value))
     }
   }
   if (data['version'] != null) {
-    instance.setDataValue('version' as any, data['version'])
+    instance.setDataValue('version', data['version'])
   }
 
   const restore = (includeItem: Includeable) => {
