@@ -17,9 +17,9 @@ test('Hook生成', async () => {
         {
           description: 'Test hook',
           priority: 3,
-          filter: ({ type, name, options }) => true,
+          filter: ({ type, name, targetConfig }) => true,
           hook: async function (
-            { type, name, options },
+            { type, name, targetConfig },
             { source, args, context, info, sgContext },
             next
           ) {
@@ -33,9 +33,9 @@ test('Hook生成', async () => {
         {
           description: 'Test hook',
           priority: 1,
-          filter: ({ type, name, options }) => true,
+          filter: ({ type, name, targetConfig }) => true,
           hook: async function (
-            { type, name, options },
+            { type, name, targetConfig },
             { source, args, context, info, sgContext },
             next
           ) {
@@ -49,9 +49,9 @@ test('Hook生成', async () => {
         {
           description: 'Test hook',
           priority: 2,
-          filter: ({ type, name, options }) => true,
+          filter: ({ type, name, targetConfig }) => true,
           hook: async function (
-            { type, name, options },
+            { type, name, targetConfig },
             { source, args, context, info, sgContext },
             next
           ) {

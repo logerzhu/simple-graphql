@@ -57,7 +57,7 @@ export default function (sequelize: Sequelize.Sequelize) {
       filter: ({
                  type,
                  name,
-                 options
+                 targetConfig
                }) => type === 'mutation',
       hook: async function (action, invokeInfo, next) {
         return (sequelize as any).transaction(t => {
@@ -70,10 +70,10 @@ export default function (sequelize: Sequelize.Sequelize) {
       filter: ({
                  type,
                  name,
-                 options
-               }) => type === 'mutation' && options.config != null && options.config.hook != null,
+                 targetConfig
+               }) => type === 'mutation' && targetConfig.config != null && targetConfig.config.hook != null,
       hook: async function (action, invokeInfo, next) {
-        const config = action.options.config
+        const config = action.targetConfig.config
         if (config && config.hook) {
           return config.hook(action, invokeInfo, next)
         }

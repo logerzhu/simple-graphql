@@ -308,18 +308,18 @@ export type SchemaOptions = {
   tableOptions?: ModelOptions<any>
 }
 
-export type HookAction = {
+export type HookTarget = {
   type: 'field' | 'query' | 'mutation'
   name: string
-  options: LinkedFieldConfig | QueryConfig | MutationConfig
+  targetConfig: LinkedFieldConfig | QueryConfig | MutationConfig
 }
 
 export type HookConfig = {
   description?: string
   priority?: number
-  filter: (action: HookAction) => boolean
+  filter: (target: HookTarget) => boolean
   hook: (
-    action: HookAction,
+    target: HookTarget,
     invokeInfo: {
       source: any
       args:
