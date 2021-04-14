@@ -15,7 +15,7 @@ type CacheOptions = PluginOptions & {
 }
 
 declare module '../Definition' {
-  interface PluginOptionsMap {
+  export interface PluginOptionsMap {
     cache?: CacheOptions
   }
 }

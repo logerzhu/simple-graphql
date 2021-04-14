@@ -14,7 +14,7 @@ type SaveMutationOptions = PluginOptions & {
 }
 
 declare module '../Definition' {
-  interface PluginOptionsMap {
+  export interface PluginOptionsMap {
     saveMutation?: SaveMutationOptions
   }
 }

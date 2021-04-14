@@ -14,7 +14,7 @@ type UpdateMutationOptions = PluginOptions & {
 }
 
 declare module '../Definition' {
-  interface PluginOptionsMap {
+  export interface PluginOptionsMap {
     updateMutation?: UpdateMutationOptions
   }
 }

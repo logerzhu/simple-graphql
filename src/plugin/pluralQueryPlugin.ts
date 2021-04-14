@@ -154,7 +154,7 @@ type PluralQueryOptions = PluginOptions & {
 }
 
 declare module '../Definition' {
-  interface PluginOptionsMap {
+  export interface PluginOptionsMap {
     pluralQuery?: PluralQueryOptions
   }
 }

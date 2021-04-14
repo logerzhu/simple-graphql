@@ -14,7 +14,7 @@ type AddMutationOptions = PluginOptions & {
 }
 
 declare module '../Definition' {
-  interface PluginOptionsMap {
+  export interface PluginOptionsMap {
     addMutation?: AddMutationOptions
   }
 }

@@ -1,7 +1,7 @@
 import { PluginConfig, PluginOptions } from '../Definition'
 
 declare module '../Definition' {
-  interface PluginOptionsMap {
+  export interface PluginOptionsMap {
     version?: PluginOptions
   }
 }

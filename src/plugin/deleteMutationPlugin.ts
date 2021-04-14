@@ -7,7 +7,7 @@ type DeleteMutationOptions = PluginOptions & {
 }
 
 declare module '../Definition' {
-  interface PluginOptionsMap {
+  export interface PluginOptionsMap {
     deleteMutation?: DeleteMutationOptions
   }
 }

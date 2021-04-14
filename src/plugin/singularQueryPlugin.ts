@@ -15,7 +15,7 @@ type SingularQueryOptions = PluginOptions & {
 }
 
 declare module '../Definition' {
-  interface PluginOptionsMap {
+  export interface PluginOptionsMap {
     singularQuery?: SingularQueryOptions
   }
 }
