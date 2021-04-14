@@ -54,7 +54,7 @@ export default {
 
       schema.links({
         [key]: {
-          config: config.config,
+          hookOptions: config.hookOptions,
           description: config.description,
           input: args,
           output:

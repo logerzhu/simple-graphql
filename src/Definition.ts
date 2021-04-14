@@ -101,12 +101,14 @@ export type TypeContext = {
   typeConfig: (name: string) => TypeConfig | null
 }
 
+export interface ResolveContext {}
+
 export type FieldResolve<T = any> = (
   source: T,
   args: {
     [key: string]: any
   },
-  context: any,
+  context: ResolveContext,
   info: GraphQLResolveInfo,
   sgContext: SGContext
 ) => any
@@ -115,7 +117,7 @@ export type RootResolve = (
   args: {
     [key: string]: any
   },
-  context: any,
+  context: ResolveContext,
   info: GraphQLResolveInfo,
   sgContext: SGContext
 ) => any
@@ -141,7 +143,7 @@ export type FieldTypeMetadata = {
 }
 
 export type OutputFieldTypeMetadata = FieldTypeMetadata & {
-  config?: { [key: string]: any }
+  hookOptions?: HookOptionsMap
   graphql?: {
     hidden?: boolean
     resolve?: FieldResolve
@@ -243,7 +245,7 @@ export type OutputFieldConfigMap = { [key: string]: OutputFieldConfig }
 
 export type LinkedFieldConfig = {
   description?: string
-  config?: { [key: string]: any }
+  hookOptions?: HookOptionsMap
   input?: InputFieldConfigMap
   dependentFields?: Array<string>
   output: OutputFieldConfig
@@ -280,7 +282,7 @@ export type DataTypeConfig = {
 
 export type QueryConfig = {
   description?: string
-  config?: { [key: string]: any }
+  hookOptions?: HookOptionsMap
   input?: InputFieldConfigMap
   output: OutputFieldConfig
   resolve: RootResolve
@@ -289,7 +291,7 @@ export type QueryConfigMap = { [key: string]: QueryConfig }
 
 export type MutationConfig = {
   description?: string
-  config?: { [key: string]: any }
+  hookOptions?: HookOptionsMap
   input: InputFieldConfigMap
   output: OutputFieldConfigMap
   mutateAndGetPayload: RootResolve
@@ -308,32 +310,46 @@ export type SchemaOptions = {
   tableOptions?: ModelOptions<any>
 }
 
-export type HookTarget = {
-  type: 'field' | 'query' | 'mutation'
-  name: string
-  targetConfig: LinkedFieldConfig | QueryConfig | MutationConfig
-}
+export interface HookOptionsMap {}
 
-export type HookConfig = {
+export type HookTarget<T = any> = {
+  name: string
+  options?: T
+} & (
+  | {
+      type: 'field'
+      targetConfig: LinkedFieldConfig
+    }
+  | {
+      type: 'query'
+      targetConfig: QueryConfig
+    }
+  | {
+      type: 'mutation'
+      targetConfig: MutationConfig
+    }
+)
+
+export type HookFunc<T = any> = (
+  target: HookTarget<T>,
+  invokeInfo: {
+    source?: any
+    args: {
+      [key: string]: any
+    }
+    context: ResolveContext
+    info: GraphQLResolveInfo
+    sgContext: SGContext
+  },
+  next: () => Promise<any>
+) => Promise<any>
+
+export type HookConfig<T = any> = {
+  key: string
   description?: string
   priority?: number
-  filter: (target: HookTarget) => boolean
-  hook: (
-    target: HookTarget,
-    invokeInfo: {
-      source: any
-      args:
-        | {
-            [key: string]: any
-          }
-        | null
-        | undefined
-      context: any
-      info: GraphQLResolveInfo
-      sgContext: SGContext
-    },
-    next: () => any
-  ) => any
+  filter?: (target: HookTarget<T>) => boolean
+  hook: HookFunc<T>
 }
 
 export type PluginConfig<T = PluginOptions> = {

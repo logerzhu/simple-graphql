@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import {
+  HookOptionsMap,
   InputFieldConfig,
   InputFieldConfigMap,
   PluginConfig,
@@ -7,9 +8,14 @@ import {
 } from '../Definition'
 import StringHelper from '../utils/StringHelper'
 
+type SaveMutationOptions = PluginOptions & {
+  name?: string
+  hookOptions?: HookOptionsMap
+}
+
 declare module '../Definition' {
   interface PluginOptionsMap {
-    saveMutation?: PluginOptions & { name?: string }
+    saveMutation?: SaveMutationOptions
   }
 }
 
@@ -55,7 +61,7 @@ export default {
 
     schema.mutations({
       [config.name || name]: {
-        config: config,
+        hookOptions: config.hookOptions,
         input: inputFields,
         output: {
           [savedName]: { type: schema.name }
@@ -85,4 +91,4 @@ export default {
       }
     })
   }
-} as PluginConfig<PluginOptions & { name?: string }>
+} as PluginConfig<SaveMutationOptions>

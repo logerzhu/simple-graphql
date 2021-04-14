@@ -39,9 +39,6 @@ export default new SGSchema('Todo', {
     output: {
       elements: {type: 'Todo'}
     },
-    config: {
-      acl: 'User'
-    },
     input: {
       ownerId: {
         type: 'UserId',

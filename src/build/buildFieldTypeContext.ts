@@ -63,7 +63,7 @@ function buildModelType(
                 metadata: {
                   description:
                     value.description || value.output.metadata?.description,
-                  config: value.config,
+                  hookOptions: value.hookOptions,
                   graphql: {
                     input: value.input,
                     dependentFields: value.dependentFields,

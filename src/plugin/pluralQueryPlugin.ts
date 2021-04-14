@@ -4,6 +4,7 @@ import StringHelper from '../utils/StringHelper'
 import {
   ColumnFieldConfig,
   ConditionFieldMapper,
+  HookOptionsMap,
   InputFieldConfig,
   InputFieldConfigMap,
   PluginConfig,
@@ -146,12 +147,15 @@ const getSearchFields = (
   return searchFields
 }
 
+type PluralQueryOptions = PluginOptions & {
+  name?: string
+  conditionFields?: InputFieldConfigMap
+  hookOptions?: HookOptionsMap
+}
+
 declare module '../Definition' {
   interface PluginOptionsMap {
-    pluralQuery?: PluginOptions & {
-      name?: string
-      conditionFields?: InputFieldConfigMap
-    }
+    pluralQuery?: PluralQueryOptions
   }
 }
 
@@ -175,7 +179,7 @@ export default {
       [`${StringHelper.toInitialLowerCase(
         config.name || schema.name + 's'
       )}`]: {
-        config: config,
+        hookOptions: config.hookOptions,
         output: { type: schema.name + 'Connection' },
         input: {
           ...(_.keys(searchFields).length > 0
@@ -246,9 +250,4 @@ export default {
       }
     })
   }
-} as PluginConfig<
-  PluginOptions & {
-    name?: string
-    conditionFields?: InputFieldConfigMap
-  }
->
+} as PluginConfig<PluralQueryOptions>

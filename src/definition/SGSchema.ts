@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import {
   ColumnFieldConfigMap,
+  HookOptionsMap,
   InputFieldConfigMap,
   LinkedFieldConfigMap,
   MutationConfigMap,
@@ -21,7 +22,7 @@ import Sequelize, {
  */
 export type HasOneConfig = {
   [key: string]: {
-    config?: Object
+    hookOptions?: HookOptionsMap
     hidden?: boolean
     target: string
     description?: string
@@ -43,7 +44,7 @@ export type BelongsToConfig = {
 
 type HasManyConfig = {
   [key: string]: {
-    config?: { [key: string]: any }
+    hookOptions?: HookOptionsMap
     target: string
     description?: string
     foreignField?: string

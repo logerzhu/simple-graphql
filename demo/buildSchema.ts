@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize'
 import path from 'path'
 import fs from 'fs'
-import {SGSchema, buildGraphQLContext} from '../src'
+import {SGSchema, buildGraphQLContext, HookConfig, HookFunc} from '../src'
 import DemoService from './definition/service/DemoService'
 
 export default function (sequelize: Sequelize.Sequelize) {
@@ -52,6 +52,7 @@ export default function (sequelize: Sequelize.Sequelize) {
       }
     }],
     hooks: [{
+      key:'transaction',
       description: 'Enable transaction on mutations',
       priority: 100,
       filter: ({
@@ -65,20 +66,22 @@ export default function (sequelize: Sequelize.Sequelize) {
         })
       }
     }, {
+      key:'hook',
       description: '自定义hook',
       priority: 99,
       filter: ({
                  type,
                  name,
-                 targetConfig
-               }) => type === 'mutation' && targetConfig.config != null && targetConfig.config.hook != null,
-      hook: async function (action, invokeInfo, next) {
-        const config = action.targetConfig.config
-        if (config && config.hook) {
-          return config.hook(action, invokeInfo, next)
+                 targetConfig,
+        options
+               }) => type === 'mutation' && options != null,
+      hook: async function (target,
+                            invokeInfo, next) {
+        if (target.options) {
+          return target.options(target, invokeInfo, next)
         }
       }
-    }],
+    } as HookConfig<HookFunc>],
     queries: {
       weather: {
         output: {type: 'String'},

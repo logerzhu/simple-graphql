@@ -91,7 +91,7 @@ const toGraphQLFieldConfigMap = function (
       config.description = field.metadata?.description
       const finalField: LinkedFieldConfig = {
         description: config.description,
-        config: field.metadata?.config,
+        hookOptions: field.metadata?.hookOptions,
         input: field.metadata?.graphql?.input,
         dependentFields: field.metadata?.graphql?.dependentFields,
         output: field,

@@ -2,15 +2,21 @@ import * as _ from 'lodash'
 
 import StringHelper from '../utils/StringHelper'
 import {
+  HookOptionsMap,
   InputFieldConfig,
   InputFieldConfigMap,
   PluginConfig,
   PluginOptions
 } from '../Definition'
 
+type SingularQueryOptions = PluginOptions & {
+  name?: string
+  hookOptions?: HookOptionsMap
+}
+
 declare module '../Definition' {
   interface PluginOptionsMap {
-    singularQuery?: PluginOptions & { name?: string }
+    singularQuery?: SingularQueryOptions
   }
 }
 
@@ -62,7 +68,7 @@ export default {
 
     schema.queries({
       [config.name || name]: {
-        config: config,
+        hookOptions: config.hookOptions,
         output: { type: schema.name },
         input: searchFields,
         resolve: async function (args, context, info, sgContext) {
@@ -82,4 +88,4 @@ export default {
       }
     })
   }
-} as PluginConfig<PluginOptions & { name?: string }>
+} as PluginConfig<SingularQueryOptions>

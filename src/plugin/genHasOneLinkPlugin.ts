@@ -15,7 +15,7 @@ export default {
       }
       schema.links({
         [key]: {
-          config: config.config,
+          hookOptions: config.hookOptions,
           output: { type: config.target },
           description: config.description,
           dependentFields: ['id'],

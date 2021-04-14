@@ -1,4 +1,10 @@
-import { HookConfig, ResolverContext, SGContext } from '../Definition'
+import {
+  HookConfig,
+  HookFunc,
+  HookTarget,
+  ResolverContext,
+  SGContext
+} from '../Definition'
 
 export default (
   hooks: Array<HookConfig>,
@@ -16,17 +22,21 @@ export default (
     }
   })
 
-  const applyHooks = (action) => {
-    let hookFunc = (action, invokeInfo, next) => next()
+  const applyHooks = (target: HookTarget) => {
+    let hookFunc: HookFunc = (target, invokeInfo, next) => next()
 
     ;[...finalHooks].reverse().forEach((hook) => {
       const func = hookFunc
-      if (!hook.filter || hook.filter(action)) {
-        hookFunc = (action, invokeInfo, next) =>
+      const hookTarget = {
+        ...target,
+        options: target.targetConfig.hookOptions?.[hook.key]
+      }
+      if (hook.filter == null || hook.filter(hookTarget)) {
+        hookFunc = (target, invokeInfo, next) =>
           hook.hook(
-            action,
+            hookTarget,
             invokeInfo,
-            func.bind(null, action, invokeInfo, next)
+            func.bind(null, target, invokeInfo, next)
           )
       }
     })
@@ -35,12 +45,16 @@ export default (
 
   return {
     hookFieldResolve: (name, options) => {
-      const action = { type: 'field', name: name, options: options }
-      const hookFunc = applyHooks(action)
+      const target: HookTarget = {
+        type: 'field',
+        name: name,
+        targetConfig: options
+      }
+      const hookFunc = applyHooks(target)
 
       return (source, args, context, info) =>
         hookFunc(
-          action,
+          target,
           {
             source: source,
             args: args,
@@ -52,12 +66,16 @@ export default (
         )
     },
     hookQueryResolve: (name, options) => {
-      const action = { type: 'query', name: name, options: options }
-      const hookFunc = applyHooks(action)
+      const target: HookTarget = {
+        type: 'query',
+        name: name,
+        targetConfig: options
+      }
+      const hookFunc = applyHooks(target)
 
       return (source, args, context, info) =>
         hookFunc(
-          action,
+          target,
           {
             source: source,
             args: args,
@@ -69,12 +87,16 @@ export default (
         )
     },
     hookMutationResolve: (name, options) => {
-      const action = { type: 'mutation', name: name, options: options }
-      const hookFunc = applyHooks(action)
+      const target: HookTarget = {
+        type: 'mutation',
+        name: name,
+        targetConfig: options
+      }
+      const hookFunc = applyHooks(target)
 
       return (source, args, context, info) =>
         hookFunc(
-          action,
+          target,
           {
             source: source,
             args: args,

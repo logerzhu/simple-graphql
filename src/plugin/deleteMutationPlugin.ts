@@ -1,9 +1,14 @@
 import StringHelper from '../utils/StringHelper'
-import { PluginConfig, PluginOptions } from '../Definition'
+import { HookOptionsMap, PluginConfig, PluginOptions } from '../Definition'
+
+type DeleteMutationOptions = PluginOptions & {
+  name?: string
+  hookOptions?: HookOptionsMap
+}
 
 declare module '../Definition' {
   interface PluginOptionsMap {
-    deleteMutation?: PluginOptions & { name?: string }
+    deleteMutation?: DeleteMutationOptions
   }
 }
 
@@ -19,7 +24,7 @@ export default {
     const { enable, ...config } = options
     schema.mutations({
       [config.name || name]: {
-        config: config,
+        hookOptions: config.hookOptions,
         input: {
           id: {
             type: schema.name + 'Id',
@@ -44,4 +49,4 @@ export default {
       }
     })
   }
-} as PluginConfig<PluginOptions & { name?: string }>
+} as PluginConfig<DeleteMutationOptions>

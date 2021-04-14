@@ -15,6 +15,7 @@ test('Hook生成', async () => {
       },
       hooks: [
         {
+          key: 'test1',
           description: 'Test hook',
           priority: 3,
           filter: ({ type, name, targetConfig }) => true,
@@ -31,6 +32,7 @@ test('Hook生成', async () => {
           }
         },
         {
+          key: 'test2',
           description: 'Test hook',
           priority: 1,
           filter: ({ type, name, targetConfig }) => true,
@@ -47,6 +49,7 @@ test('Hook生成', async () => {
           }
         },
         {
+          key: 'test3',
           description: 'Test hook',
           priority: 2,
           filter: ({ type, name, targetConfig }) => true,
