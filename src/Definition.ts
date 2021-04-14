@@ -345,7 +345,7 @@ export type HookFunc<T = any> = (
 ) => Promise<any>
 
 export type HookConfig<T = any> = {
-  key: string
+  name: string
   description?: string
   priority?: number
   filter?: (target: HookTarget<T>) => boolean

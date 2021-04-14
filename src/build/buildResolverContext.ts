@@ -29,7 +29,7 @@ export default (
       const func = hookFunc
       const hookTarget = {
         ...target,
-        options: target.targetConfig.hookOptions?.[hook.key]
+        options: target.targetConfig.hookOptions?.[hook.name]
       }
       if (hook.filter == null || hook.filter(hookTarget)) {
         hookFunc = (target, invokeInfo, next) =>
