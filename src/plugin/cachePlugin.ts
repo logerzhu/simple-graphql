@@ -15,7 +15,7 @@ type CacheOptions = SGPluginOptions & {
 }
 
 declare module '..' {
-  export interface PluginOptionsMap {
+  export interface SGPluginOptionsMap {
     cache?: CacheOptions
   }
 }

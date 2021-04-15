@@ -1,7 +1,7 @@
 import { SGPluginConfig, SGPluginOptions } from '..'
 
 declare module '..' {
-  export interface PluginOptionsMap {
+  export interface SGPluginOptionsMap {
     timestamp?: SGPluginOptions
   }
 }

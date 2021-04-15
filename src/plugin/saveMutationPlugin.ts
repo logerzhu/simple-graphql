@@ -14,7 +14,7 @@ type SaveMutationOptions = SGPluginOptions & {
 }
 
 declare module '..' {
-  export interface PluginOptionsMap {
+  export interface SGPluginOptionsMap {
     saveMutation?: SaveMutationOptions
   }
 }
