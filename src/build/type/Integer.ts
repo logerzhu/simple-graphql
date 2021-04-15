@@ -1,4 +1,4 @@
-import { TypeConfig } from '../../index'
+import { SGTypeConfig } from '../../index'
 import { GraphQLInt } from 'graphql'
 import Sequelize from 'sequelize'
 
@@ -7,4 +7,4 @@ export default {
   inputType: GraphQLInt,
   outputType: GraphQLInt,
   columnOptions: { type: Sequelize.INTEGER }
-} as TypeConfig
+} as SGTypeConfig

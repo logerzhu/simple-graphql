@@ -2,16 +2,16 @@ import * as _ from 'lodash'
 
 import StringHelper from '../utils/StringHelper'
 import {
-  HookOptionsMap,
-  InputFieldConfig,
-  InputFieldConfigMap,
-  PluginConfig,
-  PluginOptions
+  SGHookOptionsMap,
+  SGInputFieldConfig,
+  SGInputFieldConfigMap,
+  SGPluginConfig,
+  SGPluginOptions
 } from '../index'
 
-type SingularQueryOptions = PluginOptions & {
+type SingularQueryOptions = SGPluginOptions & {
   name?: string
-  hookOptions?: HookOptionsMap
+  hookOptions?: SGHookOptionsMap
 }
 
 declare module '../index' {
@@ -30,7 +30,7 @@ export default {
   applyToSchema: function singularQuery(schema, options, schemas): void {
     const name = StringHelper.toInitialLowerCase(schema.name)
 
-    const isModelType = (fieldOptions: InputFieldConfig) => {
+    const isModelType = (fieldOptions: SGInputFieldConfig) => {
       return (
         fieldOptions.type &&
         schemas.find((s) => s.name === fieldOptions.type) != null
@@ -38,7 +38,7 @@ export default {
     }
     //TODO support mapper setting
 
-    const searchFields: InputFieldConfigMap = {
+    const searchFields: SGInputFieldConfigMap = {
       id: {
         type: schema.name + 'Id',
         metadata: {
@@ -88,4 +88,4 @@ export default {
       }
     })
   }
-} as PluginConfig<SingularQueryOptions>
+} as SGPluginConfig<SingularQueryOptions>

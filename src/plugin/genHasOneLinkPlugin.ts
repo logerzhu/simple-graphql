@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { PluginConfig } from '../index'
+import { SGPluginConfig } from '../index'
 
 export default {
   name: 'genHasOneLink',
@@ -41,4 +41,4 @@ export default {
       })
     })
   }
-} as PluginConfig
+} as SGPluginConfig

@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { ColumnFieldConfig, SGModel, SGModelCtrl } from '../../index'
+import { SGColumnFieldConfig, SGModel, SGModelCtrl } from '../../index'
 
 type Selection = {
   namedType?: string
@@ -20,7 +20,7 @@ export default function <M extends SGModel>(
   const dbModel = this
   const schema = dbModel.getSGContext().schemas[this.name]
 
-  const getFieldName = (key: string, config: ColumnFieldConfig) => {
+  const getFieldName = (key: string, config: SGColumnFieldConfig) => {
     if (config.type && dbModel.getSGContext().schemas[config.type] != null) {
       return key + 'Id'
     } else {

@@ -1,16 +1,16 @@
 import {
-  CacheManager,
-  HookOptionsMap,
-  PluginConfig,
-  PluginOptions
+  SGCacheManager,
+  SGHookOptionsMap,
+  SGPluginConfig,
+  SGPluginOptions
 } from '../index'
 import Sequelize from 'sequelize'
 import LruCacheManager from './cache/LruCacheManager'
 import Cache from './cache/Cache'
 
-type CacheOptions = PluginOptions & {
+type CacheOptions = SGPluginOptions & {
   prefix?: string
-  cacheManager?: CacheManager
+  cacheManager?: SGCacheManager
   expire?: number
 }
 
@@ -102,4 +102,4 @@ export default {
       return cleanCache(options)
     })
   }
-} as PluginConfig<CacheOptions>
+} as SGPluginConfig<CacheOptions>

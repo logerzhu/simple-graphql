@@ -1,8 +1,8 @@
-import { PluginConfig, PluginOptions } from '../index'
+import { SGPluginConfig, SGPluginOptions } from '../index'
 
 declare module '../index' {
   export interface PluginOptionsMap {
-    version?: PluginOptions
+    version?: SGPluginOptions
   }
 }
 
@@ -32,4 +32,4 @@ export default {
       })
     }
   }
-} as PluginConfig
+} as SGPluginConfig

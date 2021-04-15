@@ -12,19 +12,19 @@ import {
 import StringHelper from '../utils/StringHelper'
 import toGraphQLInputFieldConfigMap from './toGraphQLInputFieldConfigMap'
 import {
-  LinkedFieldConfig,
-  OutputFieldConfig,
-  ResolverContext,
-  TypeContext
+  SGLinkedFieldConfig,
+  SGOutputFieldConfig,
+  SGResolverContext,
+  SGTypeContext
 } from '../index'
 
-type Context = ResolverContext & TypeContext
+type Context = SGResolverContext & SGTypeContext
 
 const toGraphQLFieldConfigMap = function (
   name: string,
   postfix: string,
   fields: {
-    [id: string]: OutputFieldConfig
+    [id: string]: SGOutputFieldConfig
   },
   context: Context
 ): GraphQLFieldConfigMap<any, any> {
@@ -72,7 +72,7 @@ const toGraphQLFieldConfigMap = function (
   const convert = (
     name: string,
     path: string,
-    field: OutputFieldConfig
+    field: SGOutputFieldConfig
   ): GraphQLFieldConfig<any, any> | null => {
     const makeNonNull = function (
       config: GraphQLFieldConfig<any, any> | undefined
@@ -89,7 +89,7 @@ const toGraphQLFieldConfigMap = function (
       }
 
       config.description = field.metadata?.description
-      const finalField: LinkedFieldConfig = {
+      const finalField: SGLinkedFieldConfig = {
         description: config.description,
         hookOptions: field.metadata?.hookOptions,
         input: field.metadata?.graphql?.input,

@@ -1,9 +1,9 @@
 import _ from 'lodash'
 import {
-  ConditionFieldMapper,
-  InputFieldConfig,
-  InputFieldConfigMap,
-  PluginConfig
+  SGConditionFieldMapper,
+  SGInputFieldConfig,
+  SGInputFieldConfigMap,
+  SGPluginConfig
 } from '../index'
 import Sequelize from 'sequelize'
 import { FindOptions } from 'sequelize/types/lib/model'
@@ -20,12 +20,12 @@ export default {
       if (config.hidden) {
         return
       }
-      const args: InputFieldConfigMap = {}
+      const args: SGInputFieldConfigMap = {}
 
       const conditionFields: {
         [key: string]: {
-          definition: InputFieldConfig
-          mapper: ConditionFieldMapper
+          definition: SGInputFieldConfig
+          mapper: SGConditionFieldMapper
         }
       } = {}
       _.forOwn(config.conditionFields || {}, async function (value, key) {
@@ -128,4 +128,4 @@ export default {
       })
     })
   }
-} as PluginConfig
+} as SGPluginConfig

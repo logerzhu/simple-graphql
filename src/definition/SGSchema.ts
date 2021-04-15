@@ -8,13 +8,13 @@ import Sequelize, {
   OrderItem
 } from 'sequelize'
 import {
-  ColumnFieldConfigMap,
-  HookOptionsMap,
-  InputFieldConfigMap,
-  LinkedFieldConfigMap,
-  MutationConfigMap,
-  QueryConfigMap,
-  SchemaOptions
+  SGColumnFieldConfigMap,
+  SGHookOptionsMap,
+  SGInputFieldConfigMap,
+  SGLinkedFieldConfigMap,
+  SGMutationConfigMap,
+  SGQueryConfigMap,
+  SGSchemaOptions
 } from '../index'
 
 /**
@@ -22,7 +22,7 @@ import {
  */
 export type HasOneConfig = {
   [key: string]: {
-    hookOptions?: HookOptionsMap
+    hookOptions?: SGHookOptionsMap
     hidden?: boolean
     target: string
     description?: string
@@ -44,12 +44,12 @@ export type BelongsToConfig = {
 
 type HasManyConfig = {
   [key: string]: {
-    hookOptions?: HookOptionsMap
+    hookOptions?: SGHookOptionsMap
     target: string
     description?: string
     foreignField?: string
     hidden?: boolean
-    conditionFields?: InputFieldConfigMap
+    conditionFields?: SGInputFieldConfigMap
     order?: OrderItem[]
     outputStructure?: 'Connection' | 'Array'
   } & HasManyOptions
@@ -83,11 +83,11 @@ export class SGSchema {
   sequelize: Sequelize.Sequelize
 
   config: {
-    fields: ColumnFieldConfigMap
-    links: LinkedFieldConfigMap
+    fields: SGColumnFieldConfigMap
+    links: SGLinkedFieldConfigMap
     associations: AssociationConfig
-    queries: QueryConfigMap
-    mutations: MutationConfigMap
+    queries: SGQueryConfigMap
+    mutations: SGMutationConfigMap
     methods: {
       [id: string]: any
     }
@@ -96,9 +96,9 @@ export class SGSchema {
     }
   }
 
-  options: SchemaOptions
+  options: SGSchemaOptions
 
-  constructor(name: string, options: SchemaOptions = {}) {
+  constructor(name: string, options: SGSchemaOptions = {}) {
     this.name = name
     this.config = {
       fields: {},
@@ -121,7 +121,7 @@ export class SGSchema {
    * Add the model base fields, and each field has a corresponding database column.
    * In default, each field generate a GraphQL field, unless it config with "hidden:true".
    */
-  fields(fields: ColumnFieldConfigMap): SGSchema {
+  fields(fields: SGColumnFieldConfigMap): SGSchema {
     this.config.fields = Object.assign(this.config.fields, fields)
     return this
   }
@@ -129,7 +129,7 @@ export class SGSchema {
   /**
    * Add the model link fields, and each link generate a GraphQL field but no corresponding database column.
    */
-  links(links: LinkedFieldConfigMap): SGSchema {
+  links(links: SGLinkedFieldConfigMap): SGSchema {
     this.config.links = Object.assign(this.config.links, links)
     return this
   }
@@ -137,7 +137,7 @@ export class SGSchema {
   /**
    * Add the GraphQL query methods.
    */
-  queries(queries: QueryConfigMap): SGSchema {
+  queries(queries: SGQueryConfigMap): SGSchema {
     // TODO duplicate check
     this.config.queries = Object.assign(this.config.queries, queries)
     return this
@@ -146,7 +146,7 @@ export class SGSchema {
   /**
    * Add the GraphQL mutataion methods.
    */
-  mutations(mutations: MutationConfigMap): SGSchema {
+  mutations(mutations: SGMutationConfigMap): SGSchema {
     // TODO duplicate check
     this.config.mutations = Object.assign(this.config.mutations, mutations)
     return this

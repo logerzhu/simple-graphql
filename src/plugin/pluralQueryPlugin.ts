@@ -2,29 +2,29 @@ import _ from 'lodash'
 import Sequelize from 'sequelize'
 import StringHelper from '../utils/StringHelper'
 import {
-  ColumnFieldConfig,
-  ConditionFieldMapper,
-  HookOptionsMap,
-  InputFieldConfig,
-  InputFieldConfigMap,
-  PluginConfig,
-  PluginOptions
+  SGColumnFieldConfig,
+  SGConditionFieldMapper,
+  SGHookOptionsMap,
+  SGInputFieldConfig,
+  SGInputFieldConfigMap,
+  SGPluginConfig,
+  SGPluginOptions
 } from '../index'
 import { SGSchema } from '../index'
 
 const getSearchFields = (
-  additionFields: InputFieldConfigMap,
+  additionFields: SGInputFieldConfigMap,
   schema: SGSchema,
   schemas: Array<SGSchema>
 ) => {
-  const isModelType = (fieldOptions: InputFieldConfig) => {
+  const isModelType = (fieldOptions: SGInputFieldConfig) => {
     return (
       fieldOptions.type &&
       schemas.find((s) => s.name === fieldOptions.type) != null
     )
   }
 
-  const advanceType = (options: InputFieldConfig): InputFieldConfig => {
+  const advanceType = (options: SGInputFieldConfig): SGInputFieldConfig => {
     if (options.elements) {
       return {
         properties: {
@@ -35,7 +35,7 @@ const getSearchFields = (
       return options
     }
 
-    const aType: InputFieldConfigMap = {
+    const aType: SGInputFieldConfigMap = {
       ne: options,
       eq: options,
       in: {
@@ -73,13 +73,13 @@ const getSearchFields = (
 
   const searchFields: {
     [key: string]: {
-      definition: InputFieldConfig
-      mapper: ConditionFieldMapper
+      definition: SGInputFieldConfig
+      mapper: SGConditionFieldMapper
     }
   } = {}
   _.forOwn(
     {
-      id: { type: schema.name + 'Id' } as ColumnFieldConfig,
+      id: { type: schema.name + 'Id' } as SGColumnFieldConfig,
       ...schema.config.fields,
       ...additionFields
     },
@@ -147,10 +147,10 @@ const getSearchFields = (
   return searchFields
 }
 
-type PluralQueryOptions = PluginOptions & {
+type PluralQueryOptions = SGPluginOptions & {
   name?: string
-  conditionFields?: InputFieldConfigMap
-  hookOptions?: HookOptionsMap
+  conditionFields?: SGInputFieldConfigMap
+  hookOptions?: SGHookOptionsMap
 }
 
 declare module '../index' {
@@ -250,4 +250,4 @@ export default {
       }
     })
   }
-} as PluginConfig<PluralQueryOptions>
+} as SGPluginConfig<PluralQueryOptions>

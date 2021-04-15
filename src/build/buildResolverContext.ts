@@ -1,15 +1,15 @@
 import {
-  HookConfig,
-  HookFunc,
-  HookTarget,
-  ResolverContext,
+  SGHookConfig,
+  SGHookFunc,
+  SGHookTarget,
+  SGResolverContext,
   SGContext
 } from '../index'
 
 export default (
-  hooks: Array<HookConfig>,
+  hooks: Array<SGHookConfig>,
   sgContext: SGContext
-): ResolverContext => {
+): SGResolverContext => {
   const finalHooks = [...hooks].sort((p1, p2) => {
     const p1n = p1.priority || 0
     const p2n = p2.priority || 0
@@ -22,8 +22,8 @@ export default (
     }
   })
 
-  const applyHooks = (target: HookTarget) => {
-    let hookFunc: HookFunc = (target, invokeInfo, next) => next()
+  const applyHooks = (target: SGHookTarget) => {
+    let hookFunc: SGHookFunc = (target, invokeInfo, next) => next()
 
     ;[...finalHooks].reverse().forEach((hook) => {
       const func = hookFunc
@@ -45,7 +45,7 @@ export default (
 
   return {
     hookFieldResolve: (name, options) => {
-      const target: HookTarget = {
+      const target: SGHookTarget = {
         type: 'field',
         name: name,
         targetConfig: options
@@ -66,7 +66,7 @@ export default (
         )
     },
     hookQueryResolve: (name, options) => {
-      const target: HookTarget = {
+      const target: SGHookTarget = {
         type: 'query',
         name: name,
         targetConfig: options
@@ -87,7 +87,7 @@ export default (
         )
     },
     hookMutationResolve: (name, options) => {
-      const target: HookTarget = {
+      const target: SGHookTarget = {
         type: 'mutation',
         name: name,
         targetConfig: options

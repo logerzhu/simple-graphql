@@ -1,4 +1,4 @@
-import { TypeConfig } from '../../index'
+import { SGTypeConfig } from '../../index'
 import { GraphQLFloat } from 'graphql'
 import Sequelize from 'sequelize'
 
@@ -7,4 +7,4 @@ export default {
   inputType: GraphQLFloat,
   outputType: GraphQLFloat,
   columnOptions: { type: Sequelize.DOUBLE }
-} as TypeConfig
+} as SGTypeConfig

@@ -1,16 +1,16 @@
 import _ from 'lodash'
 import {
-  HookOptionsMap,
-  InputFieldConfig,
-  InputFieldConfigMap,
-  PluginConfig,
-  PluginOptions
+  SGHookOptionsMap,
+  SGInputFieldConfig,
+  SGInputFieldConfigMap,
+  SGPluginConfig,
+  SGPluginOptions
 } from '../index'
 import StringHelper from '../utils/StringHelper'
 
-type SaveMutationOptions = PluginOptions & {
+type SaveMutationOptions = SGPluginOptions & {
   name?: string
-  hookOptions?: HookOptionsMap
+  hookOptions?: SGHookOptionsMap
 }
 
 declare module '../index' {
@@ -30,8 +30,8 @@ export default {
     const name = 'save' + StringHelper.toInitialUpperCase(schema.name)
     const savedName = 'saved' + StringHelper.toInitialUpperCase(schema.name)
 
-    const inputFields: InputFieldConfigMap = {}
-    const isModelType = (fieldOptions: InputFieldConfig) => {
+    const inputFields: SGInputFieldConfigMap = {}
+    const isModelType = (fieldOptions: SGInputFieldConfig) => {
       return (
         fieldOptions.type &&
         schemas.find((s) => s.name === fieldOptions.type) != null
@@ -91,4 +91,4 @@ export default {
       }
     })
   }
-} as PluginConfig<SaveMutationOptions>
+} as SGPluginConfig<SaveMutationOptions>

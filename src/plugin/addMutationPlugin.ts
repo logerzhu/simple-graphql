@@ -1,16 +1,16 @@
 import _ from 'lodash'
 import {
-  HookOptionsMap,
-  InputFieldConfig,
-  InputFieldConfigMap,
-  PluginConfig,
-  PluginOptions
+  SGHookOptionsMap,
+  SGInputFieldConfig,
+  SGInputFieldConfigMap,
+  SGPluginConfig,
+  SGPluginOptions
 } from '../index'
 import StringHelper from '../utils/StringHelper'
 
-type AddMutationOptions = PluginOptions & {
+type AddMutationOptions = SGPluginOptions & {
   name?: string
-  hookOptions?: HookOptionsMap
+  hookOptions?: SGHookOptionsMap
 }
 
 declare module '../index' {
@@ -31,8 +31,8 @@ export default {
     const addedName =
       'added' + StringHelper.toInitialUpperCase(schema.name) + 'Edge'
 
-    const inputFields: InputFieldConfigMap = {}
-    const isModelType = (fieldOptions: InputFieldConfig) => {
+    const inputFields: SGInputFieldConfigMap = {}
+    const isModelType = (fieldOptions: SGInputFieldConfig) => {
       return (
         fieldOptions.type &&
         schemas.find((s) => s.name === fieldOptions.type) != null
@@ -91,4 +91,4 @@ export default {
       }
     })
   }
-} as PluginConfig<AddMutationOptions>
+} as SGPluginConfig<AddMutationOptions>

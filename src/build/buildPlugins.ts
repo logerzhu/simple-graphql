@@ -1,7 +1,7 @@
 import innerPlugins from '../plugin'
-import { PluginConfig } from '../index'
+import { SGPluginConfig } from '../index'
 
-export default (plugins: Array<PluginConfig>): Array<PluginConfig> => {
+export default (plugins: Array<SGPluginConfig>): Array<SGPluginConfig> => {
   return [...innerPlugins, ...plugins]
     .sort((p1, p2) => {
       const p1n = p1.priority || 0

@@ -5,23 +5,23 @@ import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
 import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConfigMap'
 import StringHelper from '../utils/StringHelper'
 import {
-  InterfaceContext,
-  QueryConfig,
-  QueryConfigMap,
-  ResolverContext,
-  TypeContext
+  SGInterfaceContext,
+  SGQueryConfig,
+  SGQueryConfigMap,
+  SGResolverContext,
+  SGTypeContext
 } from '../index'
 
 export default (
-  queryConfigMaps: Array<QueryConfigMap>,
-  context: ResolverContext & TypeContext & InterfaceContext
+  queryConfigMaps: Array<SGQueryConfigMap>,
+  context: SGResolverContext & SGTypeContext & SGInterfaceContext
 ): {
   [key: string]: graphql.GraphQLFieldConfig<any, any>
 } => {
   const queries: {
     [key: string]: graphql.GraphQLFieldConfig<any, any>
   } = {}
-  const addQuery = (name: string, options: QueryConfig) => {
+  const addQuery = (name: string, options: SGQueryConfig) => {
     if (queries[name]) {
       throw new Error(`Query ${name} already defined.`)
     }

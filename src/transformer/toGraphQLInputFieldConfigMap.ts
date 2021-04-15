@@ -11,14 +11,14 @@ import {
 import StringHelper from '../utils/StringHelper'
 
 import unionInputType from '../build/type/unionInputType'
-import { InputFieldConfig, TypeContext } from '../index'
+import { SGInputFieldConfig, SGTypeContext } from '../index'
 
 const toGraphQLInputFieldConfigMap = function (
   name: string,
   fields: {
-    [id: string]: InputFieldConfig
+    [id: string]: SGInputFieldConfig
   },
-  context: TypeContext
+  context: SGTypeContext
 ): GraphQLInputFieldConfigMap {
   const toTypeName = (name: string, path: string) => {
     return (
@@ -45,7 +45,7 @@ const toGraphQLInputFieldConfigMap = function (
   const convert = (
     name: string,
     path: string,
-    field: InputFieldConfig
+    field: SGInputFieldConfig
   ): GraphQLInputFieldConfig | null => {
     const makeNonNull = function (config: GraphQLInputFieldConfig | null) {
       if (config == null) {

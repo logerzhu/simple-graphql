@@ -10,12 +10,12 @@ import {
 } from 'graphql'
 
 import {
-  BuildConfig,
-  BuildOptions,
-  InterfaceContext,
-  ResolverContext,
+  SGBuildConfig,
+  SGBuildOptions,
+  SGInterfaceContext,
+  SGResolverContext,
   SGContext,
-  TypeContext
+  SGTypeContext
 } from '../index'
 
 import applyPluginsToSchemas from './applyPluginsToSchemas'
@@ -31,8 +31,8 @@ import buildRootMutations from './buildRootMutations'
 
 export function buildGraphQLContext(
   sequelize: Sequelize,
-  config: BuildConfig,
-  buildOptions: BuildOptions
+  config: SGBuildConfig,
+  buildOptions: SGBuildOptions
 ): { graphQLSchema: GraphQLSchema; sgContext: SGContext } {
   const plugins = buildPlugins(config.plugins || [])
   const sgContext: SGContext = {
@@ -50,7 +50,7 @@ export function buildGraphQLContext(
   const resolveContext = buildResolverContext(config.hooks || [], sgContext)
   const interfaceContext = buildInterfaceContext(sgContext)
 
-  const context: ResolverContext & InterfaceContext & TypeContext = {
+  const context: SGResolverContext & SGInterfaceContext & SGTypeContext = {
     hookFieldResolve: (name, options) =>
       resolveContext.hookFieldResolve(name, options),
     hookQueryResolve: (name, options) =>

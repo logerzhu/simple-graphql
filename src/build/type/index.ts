@@ -5,7 +5,7 @@ import Date from './Date'
 import JSON from './JSON'
 import Number from './Number'
 import StringField from './String'
-import { TypeConfig } from '../../index'
+import { SGTypeConfig } from '../../index'
 
 export default [
   Id,
@@ -15,4 +15,4 @@ export default [
   JSON,
   Number,
   StringField
-] as Array<TypeConfig>
+] as Array<SGTypeConfig>

@@ -76,90 +76,90 @@ export type SGContext = {
   }
   models: SGModelCtrlMap
   services: SGServiceMap
-} & TypeContext
-export type ResolverContext = {
+} & SGTypeContext
+export type SGResolverContext = {
   hookFieldResolve: (
     path: string,
-    config: LinkedFieldConfig
+    config: SGLinkedFieldConfig
   ) => GraphQLFieldResolver<any, any>
   hookQueryResolve: (
     path: string,
-    config: QueryConfig
+    config: SGQueryConfig
   ) => GraphQLFieldResolver<any, any>
   hookMutationResolve: (
     path: string,
-    config: MutationConfig
+    config: SGMutationConfig
   ) => GraphQLFieldResolver<any, any>
 }
-export type InterfaceContext = {
+export type SGInterfaceContext = {
   interface: (name: string) => GraphQLInterfaceType
   registerInterface: (name: string, interfaceType: GraphQLInterfaceType) => void
 }
-export type TypeContext = {
-  typeConfig: (name: string) => TypeConfig | null
+export type SGTypeContext = {
+  typeConfig: (name: string) => SGTypeConfig | null
 }
 
-export interface ResolveContext {}
+export interface SGResolveContext {}
 
-export type FieldResolve<T = any> = (
+export type SGFieldResolve<T = any> = (
   source: T,
   args: {
     [key: string]: any
   },
-  context: ResolveContext,
+  context: SGResolveContext,
   info: GraphQLResolveInfo,
   sgContext: SGContext
 ) => any
-export type RootResolve = (
+export type SGRootResolve = (
   args: {
     [key: string]: any
   },
-  context: ResolveContext,
+  context: SGResolveContext,
   info: GraphQLResolveInfo,
   sgContext: SGContext
 ) => any
-export type TypeConfig = {
+export type SGTypeConfig = {
   name: string
   description?: string
   inputType?: GraphQLInputType | null
-  additionalInput?: InputFieldConfigMap
+  additionalInput?: SGInputFieldConfigMap
   outputType?: GraphQLOutputType | null
-  outputResolve?: FieldResolve
+  outputResolve?: SGFieldResolve
   columnOptions?:
     | ModelAttributeColumnOptions
     | ((
         schema: SGSchema,
         fieldName: string,
-        options: ColumnFieldConfig
+        options: SGColumnFieldConfig
       ) => ModelAttributeColumnOptions | null)
 }
-export type FieldTypeMetadata = {
+export type SGFieldTypeMetadata = {
   description?: string
 }
-export type OutputFieldTypeMetadata = FieldTypeMetadata & {
-  hookOptions?: HookOptionsMap
+export type SGOutputFieldTypeMetadata = SGFieldTypeMetadata & {
+  hookOptions?: SGHookOptionsMap
   graphql?: {
     hidden?: boolean
-    resolve?: FieldResolve
+    resolve?: SGFieldResolve
     dependentFields?: Array<string>
-    input?: InputFieldConfigMap
+    input?: SGInputFieldConfigMap
   }
 }
-export type ConditionFieldMapper = (
+export type SGConditionFieldMapper = (
   option: { where: any; attributes: Array<string> },
   argValue: any,
   context: SGContext
 ) => void
-export type InputFieldTypeMetadata = FieldTypeMetadata & {
+export type SGInputFieldTypeMetadata = SGFieldTypeMetadata & {
   graphql?: {
     hidden?: boolean
     defaultValue?: any
-    mapper?: ConditionFieldMapper
+    mapper?: SGConditionFieldMapper
   }
 }
 // 基于 https://jsontypedef.com/ 扩展 sequelize / graphql 配置
-export type FieldTypeDefinition<
-  T extends FieldTypeMetadata = FieldTypeMetadata
+export type SGFieldTypeDefinition<
+  T extends SGFieldTypeMetadata = SGFieldTypeMetadata
 > = (
   | {
       type:
@@ -187,7 +187,7 @@ export type FieldTypeDefinition<
       mapping?: undefined
     }
   | {
-      elements: FieldTypeDefinition<T>
+      elements: SGFieldTypeDefinition<T>
       type?: undefined
       enum?: undefined
       properties?: undefined
@@ -196,7 +196,7 @@ export type FieldTypeDefinition<
       mapping?: undefined
     }
   | {
-      properties: { [key: string]: FieldTypeDefinition<T> }
+      properties: { [key: string]: SGFieldTypeDefinition<T> }
       type?: undefined
       enum?: undefined
       elements?: undefined
@@ -205,7 +205,7 @@ export type FieldTypeDefinition<
       mapping?: undefined
     }
   | {
-      values: FieldTypeDefinition<T>
+      values: SGFieldTypeDefinition<T>
       type?: undefined
       enum?: undefined
       elements?: undefined
@@ -215,7 +215,7 @@ export type FieldTypeDefinition<
     }
   | {
       discriminator: string
-      mapping: { [key: string]: FieldTypeDefinition<T> }
+      mapping: { [key: string]: SGFieldTypeDefinition<T> }
       type?: undefined
       enum?: undefined
       elements?: undefined
@@ -223,25 +223,25 @@ export type FieldTypeDefinition<
       values?: undefined
     }
 ) & {
-  definitions?: { [key: string]: FieldTypeDefinition<T> }
+  definitions?: { [key: string]: SGFieldTypeDefinition<T> }
   nullable?: boolean
   metadata?: T
 }
-export type InputFieldConfig = FieldTypeDefinition<InputFieldTypeMetadata>
-export type InputFieldConfigMap = { [key: string]: InputFieldConfig }
-export type OutputFieldConfig = FieldTypeDefinition<OutputFieldTypeMetadata>
-export type OutputFieldConfigMap = { [key: string]: OutputFieldConfig }
-export type LinkedFieldConfig = {
+export type SGInputFieldConfig = SGFieldTypeDefinition<SGInputFieldTypeMetadata>
+export type SGInputFieldConfigMap = { [key: string]: SGInputFieldConfig }
+export type SGOutputFieldConfig = SGFieldTypeDefinition<SGOutputFieldTypeMetadata>
+export type SGOutputFieldConfigMap = { [key: string]: SGOutputFieldConfig }
+export type SGLinkedFieldConfig = {
   description?: string
-  hookOptions?: HookOptionsMap
-  input?: InputFieldConfigMap
+  hookOptions?: SGHookOptionsMap
+  input?: SGInputFieldConfigMap
   dependentFields?: Array<string>
-  output: OutputFieldConfig
-  resolve: FieldResolve
+  output: SGOutputFieldConfig
+  resolve: SGFieldResolve
 }
-export type LinkedFieldConfigMap = { [key: string]: LinkedFieldConfig }
-export type ColumnFieldConfig = FieldTypeDefinition<
-  OutputFieldTypeMetadata & InputFieldTypeMetadata
+export type SGLinkedFieldConfigMap = { [key: string]: SGLinkedFieldConfig }
+export type SGColumnFieldConfig = SGFieldTypeDefinition<
+  SGOutputFieldTypeMetadata & SGInputFieldTypeMetadata
 > & {
   metadata?: {
     graphql?: {
@@ -255,84 +255,84 @@ export type ColumnFieldConfig = FieldTypeDefinition<
     }
   }
 }
-export type ColumnFieldConfigMap = { [key: string]: ColumnFieldConfig }
-export type DataTypeConfig = {
+export type SGColumnFieldConfigMap = { [key: string]: SGColumnFieldConfig }
+export type SGDataTypeConfig = {
   name: string
   description?: string
-  definition: FieldTypeDefinition<
-    OutputFieldTypeMetadata & InputFieldTypeMetadata
+  definition: SGFieldTypeDefinition<
+    SGOutputFieldTypeMetadata & SGInputFieldTypeMetadata
   >
   columnOptions?: ModelAttributeColumnOptions
 }
-export type QueryConfig = {
+export type SGQueryConfig = {
   description?: string
-  hookOptions?: HookOptionsMap
-  input?: InputFieldConfigMap
-  output: OutputFieldConfig
-  resolve: RootResolve
+  hookOptions?: SGHookOptionsMap
+  input?: SGInputFieldConfigMap
+  output: SGOutputFieldConfig
+  resolve: SGRootResolve
 }
-export type QueryConfigMap = { [key: string]: QueryConfig }
-export type MutationConfig = {
+export type SGQueryConfigMap = { [key: string]: SGQueryConfig }
+export type SGMutationConfig = {
   description?: string
-  hookOptions?: HookOptionsMap
-  input: InputFieldConfigMap
-  output: OutputFieldConfigMap
-  mutateAndGetPayload: RootResolve
+  hookOptions?: SGHookOptionsMap
+  input: SGInputFieldConfigMap
+  output: SGOutputFieldConfigMap
+  mutateAndGetPayload: SGRootResolve
 }
-export type MutationConfigMap = { [key: string]: MutationConfig }
+export type SGMutationConfigMap = { [key: string]: SGMutationConfig }
 
-export interface PluginOptions {
+export interface SGPluginOptions {
   enable: boolean
 }
 
-export interface PluginOptionsMap {}
+export interface SGPluginOptionsMap {}
 
-export type SchemaOptions = {
+export type SGSchemaOptions = {
   description?: string
-  plugin?: PluginOptionsMap
+  plugin?: SGPluginOptionsMap
   tableOptions?: ModelOptions<any>
 }
 
-export interface HookOptionsMap {}
+export interface SGHookOptionsMap {}
 
-export type HookTarget<T = any> = {
+export type SGHookTarget<T = any> = {
   name: string
   options?: T
 } & (
   | {
       type: 'field'
-      targetConfig: LinkedFieldConfig
+      targetConfig: SGLinkedFieldConfig
     }
   | {
       type: 'query'
-      targetConfig: QueryConfig
+      targetConfig: SGQueryConfig
     }
   | {
       type: 'mutation'
-      targetConfig: MutationConfig
+      targetConfig: SGMutationConfig
     }
 )
-export type HookFunc<T = any> = (
-  target: HookTarget<T>,
+export type SGHookFunc<T = any> = (
+  target: SGHookTarget<T>,
   invokeInfo: {
     source?: any
     args: {
       [key: string]: any
     }
-    context: ResolveContext
+    context: SGResolveContext
     info: GraphQLResolveInfo
     sgContext: SGContext
   },
   next: () => Promise<any>
 ) => Promise<any>
-export type HookConfig<T = any> = {
+export type SGHookConfig<T = any> = {
   name: string
   description?: string
   priority?: number
-  filter?: (target: HookTarget<T>) => boolean
-  hook: HookFunc<T>
+  filter?: (target: SGHookTarget<T>) => boolean
+  hook: SGHookFunc<T>
 }
-export type PluginConfig<T = PluginOptions> = {
+export type SGPluginConfig<T = SGPluginOptions> = {
   name: string
   description?: string
   priority?: number
@@ -348,21 +348,21 @@ export type PluginConfig<T = PluginOptions> = {
     models: Array<SGModelCtrl>
   ) => void
 }
-export type BuildOptions = {
-  plugin?: PluginOptionsMap
+export type SGBuildOptions = {
+  plugin?: SGPluginOptionsMap
 }
-export type BuildConfig = {
-  dataTypes?: Array<DataTypeConfig>
-  types?: Array<TypeConfig>
+export type SGBuildConfig = {
+  dataTypes?: Array<SGDataTypeConfig>
+  types?: Array<SGTypeConfig>
   schemas?: Array<SGSchema>
   services?: Array<typeof SGService & { new (): SGService }>
-  hooks?: Array<HookConfig>
-  plugins?: Array<PluginConfig>
-  queries?: QueryConfigMap
-  mutations?: MutationConfigMap
+  hooks?: Array<SGHookConfig>
+  plugins?: Array<SGPluginConfig>
+  queries?: SGQueryConfigMap
+  mutations?: SGMutationConfigMap
 }
 
-export interface CacheManager {
+export interface SGCacheManager {
   get: (key: string) => Promise<any>
 
   set: (key: string, value: any, expire?: number) => Promise<void>

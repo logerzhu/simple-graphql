@@ -1,10 +1,10 @@
 import { SGSchema } from '../definition/SGSchema'
-import { PluginConfig, PluginOptions, PluginOptionsMap } from '../index'
+import { SGPluginConfig, SGPluginOptions, SGPluginOptionsMap } from '../index'
 
 export default (
   schemas: Array<SGSchema>,
-  plugins: Array<PluginConfig>,
-  defaultOptions: PluginOptionsMap
+  plugins: Array<SGPluginConfig>,
+  defaultOptions: SGPluginOptionsMap
 ) => {
   const result: {
     [key: string]: SGSchema
@@ -12,7 +12,7 @@ export default (
 
   plugins.forEach((plugin) => {
     for (const schema of schemas) {
-      let options: PluginOptions | null | undefined = ((schema.options || {})
+      let options: SGPluginOptions | null | undefined = ((schema.options || {})
         .plugin || {})[plugin.name]
       if (options === undefined) {
         options = defaultOptions[plugin.name]

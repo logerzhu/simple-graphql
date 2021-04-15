@@ -8,12 +8,12 @@ import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
 import StringHelper from '../utils/StringHelper'
 import { ModelAttributes } from 'sequelize/types/lib/model'
-import { SGContext, SGModelCtrl, TypeContext } from '../index'
+import { SGContext, SGModelCtrl, SGTypeContext } from '../index'
 
 function toSequelizeModel(
   sequelize: Sequelize.Sequelize,
   schema: SGSchema,
-  context: TypeContext
+  context: SGTypeContext
 ): ModelCtor<Model> {
   const dbDefinition: { [key: string]: ModelAttributeColumnOptions } = {}
 

@@ -1,3 +1,3 @@
-import { DataTypeConfig } from '../../index'
+import { SGDataTypeConfig } from '../../index'
 
-export default [] as Array<DataTypeConfig>
+export default [] as Array<SGDataTypeConfig>

@@ -14,24 +14,24 @@ import innerFieldTypes from './type'
 import innerDataTypes from './dataType'
 import _ from 'lodash'
 import {
-  ColumnFieldConfig,
-  DataTypeConfig,
-  InputFieldConfig,
-  InterfaceContext,
-  OutputFieldConfig,
-  ResolverContext,
+  SGColumnFieldConfig,
+  SGDataTypeConfig,
+  SGInputFieldConfig,
+  SGInterfaceContext,
+  SGOutputFieldConfig,
+  SGResolverContext,
   SGModel,
-  TypeConfig,
-  TypeContext
+  SGTypeConfig,
+  SGTypeContext
 } from '../index'
 
-type Context = ResolverContext & InterfaceContext
+type Context = SGResolverContext & SGInterfaceContext
 
 function buildModelType(
   schema: SGSchema,
-  fieldTypeContext: TypeContext,
+  fieldTypeContext: SGTypeContext,
   context: Context
-): TypeConfig {
+): SGTypeConfig {
   const typeName = schema.name
   return {
     name: typeName,
@@ -70,7 +70,7 @@ function buildModelType(
                     resolve: value.resolve
                   }
                 }
-              } as OutputFieldConfig
+              } as SGOutputFieldConfig
             })
           },
           {
@@ -175,8 +175,8 @@ function buildModelType(
 
 function buildModelTypeId(
   schema: SGSchema,
-  fieldTypeContext: TypeContext
-): TypeConfig {
+  fieldTypeContext: SGTypeContext
+): SGTypeConfig {
   const typeName = schema.name + 'Id'
   const idType = globalIdType(schema.name)
   return {
@@ -188,11 +188,11 @@ function buildModelTypeId(
 }
 
 function buildDataType(
-  dataTypeOptions: DataTypeConfig,
-  fieldTypeContext: TypeContext,
+  dataTypeOptions: SGDataTypeConfig,
+  fieldTypeContext: SGTypeContext,
   context: Context
-): TypeConfig {
-  const toOutputType = (name: string, options: OutputFieldConfig) => {
+): SGTypeConfig {
+  const toOutputType = (name: string, options: SGOutputFieldConfig) => {
     const outputConfigMap = toGraphQLFieldConfigMap(
       name,
       '',
@@ -210,7 +210,7 @@ function buildDataType(
     return outputConfigMap && outputConfigMap.type
   }
 
-  const toInputType = (name, options: InputFieldConfig) => {
+  const toInputType = (name, options: SGInputFieldConfig) => {
     const inputConfigMap = toGraphQLInputFieldConfigMap(
       name,
       { '': options },
@@ -230,7 +230,7 @@ function buildDataType(
     columnOptions: (
       schema: SGSchema,
       fieldName: string,
-      options: ColumnFieldConfig
+      options: SGColumnFieldConfig
     ) => {
       let columnOptions: ModelAttributeColumnOptions | null = null
       const definition = dataTypeOptions.definition
@@ -283,9 +283,9 @@ function buildDataType(
 
 function buildUnionWrapType(
   wrapType: string,
-  fieldTypeContext: TypeContext,
+  fieldTypeContext: SGTypeContext,
   context: Context
-): TypeConfig {
+): SGTypeConfig {
   const name = `_Union_${wrapType}`
   const typeConfig = fieldTypeContext.typeConfig(wrapType)
   if (!typeConfig?.outputType) {
@@ -315,14 +315,14 @@ function buildUnionWrapType(
 }
 
 export default function (
-  types: Array<TypeConfig>,
-  dataTypes: Array<DataTypeConfig>,
+  types: Array<SGTypeConfig>,
+  dataTypes: Array<SGDataTypeConfig>,
   schemas: Array<SGSchema>,
   context: Context
 ) {
-  const typeMap: { [key: string]: TypeConfig } = {}
+  const typeMap: { [key: string]: SGTypeConfig } = {}
 
-  const resolves: Array<(string) => TypeConfig | undefined> = [
+  const resolves: Array<(string) => SGTypeConfig | undefined> = [
     function resolveInterfaceType(typeName) {
       if (typeName.endsWith('Interface')) {
         const gIntf = context.interface(
@@ -474,7 +474,7 @@ export default function (
     }
   ]
 
-  const fieldTypeContext: TypeContext = {
+  const fieldTypeContext: SGTypeContext = {
     typeConfig: (typeName) => {
       if (typeMap[typeName]) {
         return typeMap[typeName]

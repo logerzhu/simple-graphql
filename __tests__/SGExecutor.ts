@@ -1,8 +1,8 @@
 import { graphql, GraphQLSchema } from 'graphql'
 import {
-  BuildConfig,
+  SGBuildConfig,
   buildGraphQLContext,
-  BuildOptions,
+  SGBuildOptions,
   SGContext
 } from '../src'
 import cls from 'cls-hooked'
@@ -43,8 +43,8 @@ const sequelizeInstance = function (dbConfig) {
 
 class SGExecutor {
   static new: (
-    config: BuildConfig,
-    options: BuildOptions
+    config: SGBuildConfig,
+    options: SGBuildOptions
   ) => Promise<SGExecutor>
 
   graphQLSchema: GraphQLSchema

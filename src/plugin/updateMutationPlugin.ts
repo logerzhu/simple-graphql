@@ -1,16 +1,16 @@
 import _ from 'lodash'
 import StringHelper from '../utils/StringHelper'
 import {
-  HookOptionsMap,
-  InputFieldConfig,
-  InputFieldConfigMap,
-  PluginConfig,
-  PluginOptions
+  SGHookOptionsMap,
+  SGInputFieldConfig,
+  SGInputFieldConfigMap,
+  SGPluginConfig,
+  SGPluginOptions
 } from '../index'
 
-type UpdateMutationOptions = PluginOptions & {
+type UpdateMutationOptions = SGPluginOptions & {
   name?: string
-  hookOptions?: HookOptionsMap
+  hookOptions?: SGHookOptionsMap
 }
 
 declare module '../index' {
@@ -30,13 +30,13 @@ export default {
     const name = 'update' + StringHelper.toInitialUpperCase(schema.name)
     const changedName = 'changed' + StringHelper.toInitialUpperCase(schema.name)
 
-    const isModelType = (fieldOptions: InputFieldConfig) => {
+    const isModelType = (fieldOptions: SGInputFieldConfig) => {
       return (
         fieldOptions.type &&
         schemas.find((s) => s.name === fieldOptions.type) != null
       )
     }
-    const valuesInputFieldMap: InputFieldConfigMap = {}
+    const valuesInputFieldMap: SGInputFieldConfigMap = {}
 
     _.forOwn(schema.config.fields, (value, key) => {
       if (isModelType(value)) {
@@ -55,7 +55,7 @@ export default {
         }
       }
     })
-    const inputFields: InputFieldConfigMap = {
+    const inputFields: SGInputFieldConfigMap = {
       id: {
         type: schema.name + 'Id',
         nullable: false
@@ -135,4 +135,4 @@ export default {
       }
     })
   }
-} as PluginConfig<UpdateMutationOptions>
+} as SGPluginConfig<UpdateMutationOptions>

@@ -1,4 +1,4 @@
-import { CacheManager, SGModel, SGModelCtrl } from '../../index'
+import { SGCacheManager, SGModel, SGModelCtrl } from '../../index'
 import Sequelize, { CountOptions, FindOptions } from 'sequelize'
 import getFindOptionsKey from './getFindOptionsKey'
 import getIncludeModeNames from './getIncludeModeNames'
@@ -7,13 +7,13 @@ import instanceToData from './instanceToData'
 
 export default class Cache<M extends SGModel> {
   prefix: string
-  cacheManger: CacheManager
+  cacheManger: SGCacheManager
   model: SGModelCtrl
   expire?: number
 
   constructor(options: {
     prefix: string
-    cacheManger: CacheManager
+    cacheManger: SGCacheManager
     model: SGModelCtrl
     expire?: number
   }) {

@@ -1,7 +1,7 @@
-import { CacheManager } from '../../index'
+import { SGCacheManager } from '../../index'
 import { LRUMap } from 'lru_map'
 
-export default class LruCacheManager implements CacheManager {
+export default class LruCacheManager implements SGCacheManager {
   cacheMap: LRUMap<string, any>
 
   constructor(limit: number = 1000) {

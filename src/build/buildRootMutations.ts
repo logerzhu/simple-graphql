@@ -5,18 +5,18 @@ import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConf
 import StringHelper from '../utils/StringHelper'
 import mutationWithClientMutationId from '../transformer/mutationWithClientMutationId'
 import {
-  MutationConfig,
-  MutationConfigMap,
-  ResolverContext,
-  TypeContext
+  SGMutationConfig,
+  SGMutationConfigMap,
+  SGResolverContext,
+  SGTypeContext
 } from '../index'
 
 export default (
-  mutationConfigMaps: Array<MutationConfigMap>,
+  mutationConfigMaps: Array<SGMutationConfigMap>,
   payloadFields: {
     [key: string]: graphql.GraphQLFieldConfig<any, any>
   },
-  context: ResolverContext & TypeContext
+  context: SGResolverContext & SGTypeContext
 ): {
   [key: string]: graphql.GraphQLFieldConfig<any, any>
 } => {
@@ -24,7 +24,7 @@ export default (
     [key: string]: graphql.GraphQLFieldConfig<any, any>
   } = {}
 
-  const addMutation = (name: string, options: MutationConfig) => {
+  const addMutation = (name: string, options: SGMutationConfig) => {
     if (mutations[name]) {
       throw new Error(`Mutation ${name} already defined.`)
     }

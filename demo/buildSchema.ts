@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize'
 import path from 'path'
 import fs from 'fs'
-import {SGSchema, buildGraphQLContext, HookConfig, HookFunc} from '../src'
+import {SGSchema, buildGraphQLContext, SGHookConfig, SGHookFunc} from '../src'
 import DemoService from './definition/service/DemoService'
 
 export default function (sequelize: Sequelize.Sequelize) {
@@ -81,7 +81,7 @@ export default function (sequelize: Sequelize.Sequelize) {
           return target.options(target, invokeInfo, next)
         }
       }
-    } as HookConfig<HookFunc>],
+    } as SGHookConfig<SGHookFunc>],
     queries: {
       weather: {
         output: {type: 'String'},
