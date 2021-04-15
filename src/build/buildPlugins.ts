@@ -1,5 +1,5 @@
 import innerPlugins from '../plugin'
-import { SGPluginConfig } from '../index'
+import { SGPluginConfig } from '..'
 
 export default (plugins: Array<SGPluginConfig>): Array<SGPluginConfig> => {
   return [...innerPlugins, ...plugins]

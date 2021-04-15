@@ -9,7 +9,7 @@ import {
   SGMutationConfigMap,
   SGResolverContext,
   SGTypeContext
-} from '../index'
+} from '..'
 
 export default (
   mutationConfigMaps: Array<SGMutationConfigMap>,

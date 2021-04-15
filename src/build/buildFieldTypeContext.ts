@@ -23,7 +23,7 @@ import {
   SGModel,
   SGTypeConfig,
   SGTypeContext
-} from '../index'
+} from '..'
 
 type Context = SGResolverContext & SGInterfaceContext
 

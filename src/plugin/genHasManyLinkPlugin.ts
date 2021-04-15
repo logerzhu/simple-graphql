@@ -4,7 +4,7 @@ import {
   SGInputFieldConfig,
   SGInputFieldConfigMap,
   SGPluginConfig
-} from '../index'
+} from '..'
 import Sequelize from 'sequelize'
 import { FindOptions } from 'sequelize/types/lib/model'
 

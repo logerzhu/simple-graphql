@@ -1,4 +1,4 @@
-import { SGPluginConfig, SGPluginOptionsMap, SGModelCtrl } from '../index'
+import { SGPluginConfig, SGPluginOptionsMap, SGModelCtrl } from '..'
 
 export default (
   models: Array<SGModelCtrl>,

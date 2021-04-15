@@ -8,7 +8,7 @@ import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
 import StringHelper from '../utils/StringHelper'
 import { ModelAttributes } from 'sequelize/types/lib/model'
-import { SGContext, SGModelCtrl, SGTypeContext } from '../index'
+import { SGContext, SGModelCtrl, SGTypeContext } from '..'
 
 function toSequelizeModel(
   sequelize: Sequelize.Sequelize,

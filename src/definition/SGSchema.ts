@@ -15,7 +15,7 @@ import {
   SGMutationConfigMap,
   SGQueryConfigMap,
   SGSchemaOptions
-} from '../index'
+} from '..'
 
 /**
  * @public

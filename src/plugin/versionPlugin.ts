@@ -1,6 +1,6 @@
-import { SGPluginConfig, SGPluginOptions } from '../index'
+import { SGPluginConfig, SGPluginOptions } from '..'
 
-declare module '../index' {
+declare module '..' {
   export interface PluginOptionsMap {
     version?: SGPluginOptions
   }

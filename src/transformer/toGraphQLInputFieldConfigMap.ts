@@ -11,7 +11,7 @@ import {
 import StringHelper from '../utils/StringHelper'
 
 import unionInputType from '../build/type/unionInputType'
-import { SGInputFieldConfig, SGTypeContext } from '../index'
+import { SGInputFieldConfig, SGTypeContext } from '..'
 
 const toGraphQLInputFieldConfigMap = function (
   name: string,

@@ -1,12 +1,12 @@
 import StringHelper from '../utils/StringHelper'
-import { SGHookOptionsMap, SGPluginConfig, SGPluginOptions } from '../index'
+import { SGHookOptionsMap, SGPluginConfig, SGPluginOptions } from '..'
 
 type DeleteMutationOptions = SGPluginOptions & {
   name?: string
   hookOptions?: SGHookOptionsMap
 }
 
-declare module '../index' {
+declare module '..' {
   export interface PluginOptionsMap {
     deleteMutation?: DeleteMutationOptions
   }

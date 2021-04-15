@@ -1,5 +1,5 @@
 import { SGSchema } from '../definition/SGSchema'
-import { SGPluginConfig, SGPluginOptions, SGPluginOptionsMap } from '../index'
+import { SGPluginConfig, SGPluginOptions, SGPluginOptionsMap } from '..'
 
 export default (
   schemas: Array<SGSchema>,

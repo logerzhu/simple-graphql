@@ -10,7 +10,7 @@ import {
   SGQueryConfigMap,
   SGResolverContext,
   SGTypeContext
-} from '../index'
+} from '..'
 
 export default (
   queryConfigMaps: Array<SGQueryConfigMap>,

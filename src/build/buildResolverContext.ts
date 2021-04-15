@@ -4,7 +4,7 @@ import {
   SGHookTarget,
   SGResolverContext,
   SGContext
-} from '../index'
+} from '..'
 
 export default (
   hooks: Array<SGHookConfig>,

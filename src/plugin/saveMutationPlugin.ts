@@ -5,7 +5,7 @@ import {
   SGInputFieldConfigMap,
   SGPluginConfig,
   SGPluginOptions
-} from '../index'
+} from '..'
 import StringHelper from '../utils/StringHelper'
 
 type SaveMutationOptions = SGPluginOptions & {
@@ -13,7 +13,7 @@ type SaveMutationOptions = SGPluginOptions & {
   hookOptions?: SGHookOptionsMap
 }
 
-declare module '../index' {
+declare module '..' {
   export interface PluginOptionsMap {
     saveMutation?: SaveMutationOptions
   }

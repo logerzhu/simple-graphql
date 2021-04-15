@@ -16,7 +16,7 @@ import {
   SGOutputFieldConfig,
   SGResolverContext,
   SGTypeContext
-} from '../index'
+} from '..'
 
 type Context = SGResolverContext & SGTypeContext
 
