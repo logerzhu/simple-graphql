@@ -1,5 +1,5 @@
-import { SGModel, SGModelCtrl } from '../../Definition'
 import { Includeable, IncludeOptions } from 'sequelize'
+import { SGModel, SGModelCtrl } from '../../index'
 
 function restoreTimestamps(
   data: any,

@@ -1,6 +1,10 @@
 import { graphql, GraphQLSchema } from 'graphql'
-import { BuildConfig, BuildOptions, SGContext } from '../src/Definition'
-import { buildGraphQLContext } from '../src'
+import {
+  BuildConfig,
+  buildGraphQLContext,
+  BuildOptions,
+  SGContext
+} from '../src'
 import cls from 'cls-hooked'
 import Sequelize from 'sequelize'
 

@@ -1,5 +1,5 @@
 import { FragmentDefinitionNode, SelectionNode } from 'graphql'
-import { SGModel, SGModelCtrl } from '../../Definition'
+import { SGModel, SGModelCtrl } from '../../index'
 
 export type Selection = {
   namedType?: string

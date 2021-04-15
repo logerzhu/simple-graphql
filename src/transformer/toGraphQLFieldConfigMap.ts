@@ -10,13 +10,13 @@ import {
   GraphQLUnionType
 } from 'graphql'
 import StringHelper from '../utils/StringHelper'
+import toGraphQLInputFieldConfigMap from './toGraphQLInputFieldConfigMap'
 import {
   LinkedFieldConfig,
   OutputFieldConfig,
   ResolverContext,
   TypeContext
-} from '../Definition'
-import toGraphQLInputFieldConfigMap from './toGraphQLInputFieldConfigMap'
+} from '../index'
 
 type Context = ResolverContext & TypeContext
 

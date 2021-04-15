@@ -1,4 +1,4 @@
-import { SGContext, SGService, SGServiceMap } from '../Definition'
+import { SGContext, SGService, SGServiceMap } from '../index'
 
 export default (
   services: Array<typeof SGService & { new (): SGService }>,

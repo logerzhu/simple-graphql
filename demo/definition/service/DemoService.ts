@@ -1,7 +1,7 @@
 import {SGService} from '../../../src'
 import _ from 'lodash'
 
-declare module '../../../src/Definition' {
+declare module '../../../src/index' {
   interface SGServiceMap {
     DemoService: DemoService
   }

@@ -1,6 +1,6 @@
-import { TypeConfig } from '../../Definition'
 import Sequelize from 'sequelize'
 import { GraphQLBoolean } from 'graphql'
+import { TypeConfig } from '../../index'
 
 export default {
   name: 'Boolean',

@@ -1,14 +1,3 @@
-import {
-  ColumnFieldConfig,
-  DataTypeConfig,
-  InputFieldConfig,
-  InterfaceContext,
-  OutputFieldConfig,
-  ResolverContext,
-  SGModel,
-  TypeConfig,
-  TypeContext
-} from '../Definition'
 import { SGSchema } from '../definition/SGSchema'
 import {
   GraphQLFloat,
@@ -24,6 +13,17 @@ import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConf
 import innerFieldTypes from './type'
 import innerDataTypes from './dataType'
 import _ from 'lodash'
+import {
+  ColumnFieldConfig,
+  DataTypeConfig,
+  InputFieldConfig,
+  InterfaceContext,
+  OutputFieldConfig,
+  ResolverContext,
+  SGModel,
+  TypeConfig,
+  TypeContext
+} from '../index'
 
 type Context = ResolverContext & InterfaceContext
 

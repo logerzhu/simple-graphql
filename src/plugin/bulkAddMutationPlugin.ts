@@ -5,7 +5,7 @@ import {
   InputFieldConfigMap,
   PluginConfig,
   PluginOptions
-} from '../Definition'
+} from '../index'
 import StringHelper from '../utils/StringHelper'
 
 type BulkAddMutationOptions = PluginOptions & {
@@ -13,7 +13,7 @@ type BulkAddMutationOptions = PluginOptions & {
   hookOptions?: HookOptionsMap
 }
 
-declare module '../Definition' {
+declare module '../index' {
   export interface PluginOptionsMap {
     bulkAddMutation?: BulkAddMutationOptions
   }

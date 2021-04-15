@@ -1,6 +1,6 @@
-import { TypeConfig } from '../../Definition'
 import { GraphQLString } from 'graphql'
 import Sequelize from 'sequelize'
+import { TypeConfig } from '../../index'
 
 export default {
   name: 'String',

@@ -3,7 +3,7 @@ import {
   HookOptionsMap,
   PluginConfig,
   PluginOptions
-} from '../Definition'
+} from '../index'
 import Sequelize from 'sequelize'
 import LruCacheManager from './cache/LruCacheManager'
 import Cache from './cache/Cache'
@@ -14,7 +14,7 @@ type CacheOptions = PluginOptions & {
   expire?: number
 }
 
-declare module '../Definition' {
+declare module '../index' {
   export interface PluginOptionsMap {
     cache?: CacheOptions
   }

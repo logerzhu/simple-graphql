@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import { GraphQLResolveInfo } from 'graphql'
 import { SGSchema } from '../../definition/SGSchema'
-import { SGContext, SGModel, SGModelCtrl } from '../../Definition'
 import { Selection } from './parseSelections'
 import { Order, OrderItem } from 'sequelize'
 import Model, {
@@ -9,6 +8,7 @@ import Model, {
   IncludeOptions,
   ModelStatic
 } from 'sequelize/types/lib/model'
+import { SGContext, SGModel, SGModelCtrl } from '../../index'
 
 function fieldToSelection(field: string) {
   const index = field.indexOf('.')

@@ -52,7 +52,7 @@ export default function (sequelize: Sequelize.Sequelize) {
       }
     }],
     hooks: [{
-      key:'transaction',
+      name:'transaction',
       description: 'Enable transaction on mutations',
       priority: 100,
       filter: ({
@@ -66,7 +66,7 @@ export default function (sequelize: Sequelize.Sequelize) {
         })
       }
     }, {
-      key:'hook',
+      name:'hook',
       description: '自定义hook',
       priority: 99,
       filter: ({

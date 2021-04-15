@@ -4,7 +4,7 @@ import {
   InputFieldConfig,
   InputFieldConfigMap,
   PluginConfig
-} from '../Definition'
+} from '../index'
 import Sequelize from 'sequelize'
 import { FindOptions } from 'sequelize/types/lib/model'
 

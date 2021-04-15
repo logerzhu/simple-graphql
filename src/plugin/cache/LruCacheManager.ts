@@ -1,4 +1,4 @@
-import { CacheManager } from '../../Definition'
+import { CacheManager } from '../../index'
 import { LRUMap } from 'lru_map'
 
 export default class LruCacheManager implements CacheManager {

@@ -1,6 +1,6 @@
-import { InterfaceContext, SGContext } from '../Definition'
 import { GraphQLInterfaceType } from 'graphql'
 import { fromGlobalId, nodeDefinitions } from 'graphql-relay'
+import { InterfaceContext, SGContext } from '../index'
 
 export default (context: SGContext): InterfaceContext => {
   const interfaces: {

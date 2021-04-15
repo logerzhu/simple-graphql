@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { SGContext, SGModel, SGModelCtrl } from '../../Definition'
+import { SGContext, SGModel, SGModelCtrl } from '../../index'
 import { GraphQLResolveInfo } from 'graphql'
 import { FindOptions, Order, OrderItem } from 'sequelize'
 import { BindOrReplacements } from 'sequelize/types/lib/query-interface'

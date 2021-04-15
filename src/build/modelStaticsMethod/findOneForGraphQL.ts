@@ -2,7 +2,7 @@ import { FindOptions, Includeable } from 'sequelize'
 import { GraphQLResolveInfo } from 'graphql'
 import DataLoader from 'dataloader'
 import getFindOptionsKey from '../../plugin/cache/getFindOptionsKey'
-import { SGModel, SGModelCtrl } from '../../Definition'
+import { SGModel, SGModelCtrl } from '../../index'
 
 export default async function <M extends SGModel>(
   this: SGModelCtrl<M>,

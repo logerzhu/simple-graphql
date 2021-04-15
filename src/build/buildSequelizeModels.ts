@@ -4,11 +4,11 @@ import Sequelize, {
   ModelCtor
 } from 'sequelize'
 import { SGSchema } from '../definition/SGSchema'
-import { SGContext, SGModelCtrl, TypeContext } from '../Definition'
 import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
 import StringHelper from '../utils/StringHelper'
 import { ModelAttributes } from 'sequelize/types/lib/model'
+import { SGContext, SGModelCtrl, TypeContext } from '../index'
 
 function toSequelizeModel(
   sequelize: Sequelize.Sequelize,

@@ -7,14 +7,14 @@ import {
   InputFieldConfigMap,
   PluginConfig,
   PluginOptions
-} from '../Definition'
+} from '../index'
 
 type SingularQueryOptions = PluginOptions & {
   name?: string
   hookOptions?: HookOptionsMap
 }
 
-declare module '../Definition' {
+declare module '../index' {
   export interface PluginOptionsMap {
     singularQuery?: SingularQueryOptions
   }

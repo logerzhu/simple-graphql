@@ -1,4 +1,4 @@
-import { SGModel } from '../../Definition'
+import { SGModel } from '../../index'
 
 export default function (instance: SGModel | null) {
   if (!instance) {

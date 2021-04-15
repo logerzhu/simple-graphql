@@ -16,7 +16,7 @@ import {
   ResolverContext,
   SGContext,
   TypeContext
-} from '../Definition'
+} from '../index'
 
 import applyPluginsToSchemas from './applyPluginsToSchemas'
 import applyPluginsToModels from './applyPluginsToModels'

@@ -1,12 +1,12 @@
 import StringHelper from '../utils/StringHelper'
-import { HookOptionsMap, PluginConfig, PluginOptions } from '../Definition'
+import { HookOptionsMap, PluginConfig, PluginOptions } from '../index'
 
 type DeleteMutationOptions = PluginOptions & {
   name?: string
   hookOptions?: HookOptionsMap
 }
 
-declare module '../Definition' {
+declare module '../index' {
   export interface PluginOptionsMap {
     deleteMutation?: DeleteMutationOptions
   }

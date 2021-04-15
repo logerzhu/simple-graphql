@@ -1,6 +1,6 @@
-import { PluginConfig, PluginOptions } from '../Definition'
+import { PluginConfig, PluginOptions } from '../index'
 
-declare module '../Definition' {
+declare module '../index' {
   export interface PluginOptionsMap {
     timestamp?: PluginOptions
   }

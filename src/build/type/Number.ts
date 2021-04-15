@@ -1,4 +1,4 @@
-import { TypeConfig } from '../../Definition'
+import { TypeConfig } from '../../index'
 import { GraphQLFloat } from 'graphql'
 import Sequelize from 'sequelize'
 

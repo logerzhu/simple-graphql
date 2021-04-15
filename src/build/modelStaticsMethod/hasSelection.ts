@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { GraphQLResolveInfo } from 'graphql'
-import { SGModel, SGModelCtrl } from '../../Definition'
+import { SGModel, SGModelCtrl } from '../../index'
 import { Selection } from './parseSelections'
 
 export default function <M extends SGModel>(

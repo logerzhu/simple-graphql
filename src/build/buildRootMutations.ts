@@ -1,15 +1,15 @@
-import {
-  MutationConfig,
-  MutationConfigMap,
-  ResolverContext,
-  TypeContext
-} from '../Definition'
 import * as graphql from 'graphql'
 import _ from 'lodash'
 import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
 import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConfigMap'
 import StringHelper from '../utils/StringHelper'
 import mutationWithClientMutationId from '../transformer/mutationWithClientMutationId'
+import {
+  MutationConfig,
+  MutationConfigMap,
+  ResolverContext,
+  TypeContext
+} from '../index'
 
 export default (
   mutationConfigMaps: Array<MutationConfigMap>,

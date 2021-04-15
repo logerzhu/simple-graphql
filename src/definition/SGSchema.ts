@@ -1,13 +1,4 @@
 import _ from 'lodash'
-import {
-  ColumnFieldConfigMap,
-  HookOptionsMap,
-  InputFieldConfigMap,
-  LinkedFieldConfigMap,
-  MutationConfigMap,
-  QueryConfigMap,
-  SchemaOptions
-} from '../Definition'
 import Sequelize, {
   BelongsToManyOptions,
   BelongsToOptions,
@@ -16,6 +7,15 @@ import Sequelize, {
   Order,
   OrderItem
 } from 'sequelize'
+import {
+  ColumnFieldConfigMap,
+  HookOptionsMap,
+  InputFieldConfigMap,
+  LinkedFieldConfigMap,
+  MutationConfigMap,
+  QueryConfigMap,
+  SchemaOptions
+} from '../index'
 
 /**
  * @public

@@ -1,3 +1,3 @@
-import { DataTypeConfig } from '../../Definition'
+import { DataTypeConfig } from '../../index'
 
 export default [] as Array<DataTypeConfig>

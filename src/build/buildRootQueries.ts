@@ -1,16 +1,16 @@
 import * as graphql from 'graphql'
 import _ from 'lodash'
 import * as relay from 'graphql-relay'
+import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
+import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConfigMap'
+import StringHelper from '../utils/StringHelper'
 import {
   InterfaceContext,
   QueryConfig,
   QueryConfigMap,
   ResolverContext,
   TypeContext
-} from '../Definition'
-import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
-import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConfigMap'
-import StringHelper from '../utils/StringHelper'
+} from '../index'
 
 export default (
   queryConfigMaps: Array<QueryConfigMap>,

@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { ColumnFieldConfig, SGModel, SGModelCtrl } from '../../Definition'
+import { ColumnFieldConfig, SGModel, SGModelCtrl } from '../../index'
 
 type Selection = {
   namedType?: string

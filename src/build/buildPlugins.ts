@@ -1,5 +1,5 @@
-import { PluginConfig } from '../Definition'
 import innerPlugins from '../plugin'
+import { PluginConfig } from '../index'
 
 export default (plugins: Array<PluginConfig>): Array<PluginConfig> => {
   return [...innerPlugins, ...plugins]

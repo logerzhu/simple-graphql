@@ -1,6 +1,6 @@
-import { TypeConfig } from '../../Definition'
 import Sequelize from 'sequelize'
 import GraphQLScalarTypes from './graphql'
+import { TypeConfig } from '../../index'
 
 export default {
   name: 'JSON',
