@@ -2,20 +2,20 @@ import Sequelize, { FindOptions, Includeable } from 'sequelize'
 import DataLoader from 'dataloader'
 import { GraphQLResolveInfo } from 'graphql'
 import getFindOptionsKey from '../../plugin/cache/getFindOptionsKey'
-import { SGModel, SGModelCtrl } from '../../index'
+import { SGModel, SGModelCtrl, SGResolveContext } from '../../index'
 
 export default async function <M extends SGModel>(
   this: SGModelCtrl<M>,
   id: number,
   options: FindOptions,
-  context: any,
+  context: SGResolveContext,
   info: GraphQLResolveInfo,
   path?: string
 ): Promise<M | null> {
   const dbModel = this
 
   if (context == null) context = {}
-  if (!context._SGLoaders) context._SGLoaders = {}
+  if (!context.dataloaderMap) context.dataloaderMap = {}
 
   const option = dbModel.resolveQueryOption({
     attributes: options.attributes as string[],
@@ -26,8 +26,8 @@ export default async function <M extends SGModel>(
 
   const key = `${dbModel.name}.findByPk|${getFindOptionsKey(dbModel, option)}`
 
-  if (!context._SGLoaders[key]) {
-    context._SGLoaders[key] = new DataLoader(async function (ids) {
+  if (!context.dataloaderMap[key]) {
+    context.dataloaderMap[key] = new DataLoader(async function (ids) {
       const condition = {
         where: {
           id: { [Sequelize.Op.in]: ids }
@@ -45,5 +45,5 @@ export default async function <M extends SGModel>(
     })
   }
 
-  return context._SGLoaders[key].load(id)
+  return context.dataloaderMap[key].load(id)
 }

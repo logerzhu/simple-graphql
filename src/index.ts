@@ -23,6 +23,7 @@ import parseAttributes from './build/modelStaticsMethod/parseAttributes'
 import hasSelection from './build/modelStaticsMethod/hasSelection'
 import findOneForGraphQL from './build/modelStaticsMethod/findOneForGraphQL'
 import findByPkForGraphQL from './build/modelStaticsMethod/findByPkForGraphQL'
+import DataLoader from 'dataloader'
 
 export abstract class SGModel<
   TModelAttributes extends {} = any
@@ -99,7 +100,9 @@ export type SGTypeContext = {
   typeConfig: (name: string) => SGTypeConfig | null
 }
 
-export interface SGResolveContext {}
+export interface SGResolveContext {
+  dataloaderMap?: { [key: string]: DataLoader<any, any> }
+}
 
 export type SGFieldResolve<T = any> = (
   source: T,
