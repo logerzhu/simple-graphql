@@ -40,7 +40,7 @@ export function buildGraphQLContext(
     schemas: applyPluginsToSchemas(
       config.schemas || [],
       plugins,
-      buildOptions.plugin || {}
+      buildOptions.defaultPlugin || {}
     ),
     models: {} as any,
     services: {} as any,
@@ -80,7 +80,7 @@ export function buildGraphQLContext(
   sgContext.models = applyPluginsToModels(
     buildSequelizeModels(sequelize, config.schemas || [], sgContext),
     plugins,
-    buildOptions.plugin || {}
+    buildOptions.defaultPlugin || {}
   )
 
   sgContext.services = buildServices(config.services || [], sgContext)
@@ -90,7 +90,8 @@ export function buildGraphQLContext(
       ...(config.schemas || []).map((schema) => schema.config.queries),
       config.queries || {}
     ],
-    context
+    context,
+    buildOptions.nodeQueryConfig
   )
   const payloadFields: GraphQLFieldConfigMap<any, any> = {}
   const rootQueryObject = new GraphQLObjectType({

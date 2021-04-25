@@ -352,8 +352,10 @@ export type SGPluginConfig<T = SGPluginOptions> = {
   ) => void
 }
 export type SGBuildOptions = {
-  plugin?: SGPluginOptionsMap
+  defaultPlugin?: SGPluginOptionsMap
+  nodeQueryConfig?: { hookOptions?: SGHookOptionsMap }
 }
+
 export type SGBuildConfig = {
   dataTypes?: Array<SGDataTypeConfig>
   types?: Array<SGTypeConfig>

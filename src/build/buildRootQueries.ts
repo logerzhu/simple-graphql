@@ -5,6 +5,7 @@ import toGraphQLFieldConfigMap from '../transformer/toGraphQLFieldConfigMap'
 import toGraphQLInputFieldConfigMap from '../transformer/toGraphQLInputFieldConfigMap'
 import StringHelper from '../utils/StringHelper'
 import {
+  SGHookOptionsMap,
   SGInterfaceContext,
   SGQueryConfig,
   SGQueryConfigMap,
@@ -14,7 +15,8 @@ import {
 
 export default (
   queryConfigMaps: Array<SGQueryConfigMap>,
-  context: SGResolverContext & SGTypeContext & SGInterfaceContext
+  context: SGResolverContext & SGTypeContext & SGInterfaceContext,
+  nodeQueryConfig?: { hookOptions?: SGHookOptionsMap }
 ): {
   [key: string]: graphql.GraphQLFieldConfig<any, any>
 } => {
@@ -99,6 +101,7 @@ export default (
       }
     },
     resolve: context.hookQueryResolve('node', {
+      hookOptions: nodeQueryConfig?.hookOptions,
       output: {
         properties: {
           id: { type: 'Id' }
