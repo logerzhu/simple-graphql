@@ -288,7 +288,7 @@ export interface SGPluginOptions {
   enable: boolean
 }
 
-export interface SGPluginOptionsMap {}
+export interface SGPluginOptionsMap<E extends SGModel = SGModel> {}
 
 export type SGSchemaOptions = {
   description?: string
