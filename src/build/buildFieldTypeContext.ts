@@ -227,6 +227,7 @@ function buildDataType(
     description: dataTypeOptions.description || dataTypeOptions.name,
     inputType: inputType,
     outputType: outputType,
+    outputResolve: dataTypeOptions.definition.metadata?.graphql?.resolve,
     columnOptions: (
       schema: SGSchema,
       fieldName: string,
