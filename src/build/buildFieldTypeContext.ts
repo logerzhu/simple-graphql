@@ -25,6 +25,7 @@ import {
   SGTypeConfig,
   SGTypeContext
 } from '..'
+import StringHelper from '../utils/StringHelper'
 
 type Context = SGResolverContext & SGInterfaceContext
 
@@ -89,7 +90,7 @@ function buildModelType(
       const fieldName = info.fieldName
       if (root[fieldName]) {
         if (typeof root[fieldName] === 'string') {
-          const { type, id } = relay.fromGlobalId(root[fieldName])
+          const { type, id } = StringHelper.fromGlobalId(root[fieldName])
           if (type === typeName) {
             return sgContext.models[typeName].findByPkForGraphQL(
               id,
@@ -113,7 +114,7 @@ function buildModelType(
             info
           )
         } else if (typeof root[fieldName].id === 'string') {
-          const { type, id } = relay.fromGlobalId(root[fieldName].id)
+          const { type, id } = StringHelper.fromGlobalId(root[fieldName].id)
           if (type === typeName) {
             return sgContext.models[typeName].findByPkForGraphQL(
               id,
@@ -364,22 +365,22 @@ export default function (
                   typeof root[fieldName][0] === 'number' ||
                   (root[fieldName][0] != null &&
                     typeof root[fieldName][0].id === 'string' &&
-                    relay.fromGlobalId(root[fieldName][0].id).type ===
+                    StringHelper.fromGlobalId(root[fieldName][0].id).type ===
                       subTypeName))
               ) {
                 const dbModel = sgContext.models[subTypeName]
                 const ids = root[fieldName].map((r) => {
                   if (
                     typeof r === 'string' &&
-                    relay.fromGlobalId(r).type === subTypeName
+                    StringHelper.fromGlobalId(r).type === subTypeName
                   ) {
-                    return relay.fromGlobalId(r).id
+                    return StringHelper.fromGlobalId(r).id
                   } else if (
                     r != null &&
                     typeof r.id === 'string' &&
-                    relay.fromGlobalId(r.id).type === subTypeName
+                    StringHelper.fromGlobalId(r.id).type === subTypeName
                   ) {
-                    return relay.fromGlobalId(r.id).id
+                    return StringHelper.fromGlobalId(r.id).id
                   }
                   return r
                 })
