@@ -1,6 +1,7 @@
 import { GraphQLInterfaceType } from 'graphql'
 import { fromGlobalId, nodeDefinitions } from 'graphql-relay'
 import { SGInterfaceContext, SGContext } from '..'
+import { GraphQLObjectType } from 'graphql/type/definition'
 
 export default (context: SGContext): SGInterfaceContext => {
   const interfaces: {
@@ -19,8 +20,8 @@ export default (context: SGContext): SGInterfaceContext => {
       (obj) => {
         const type = obj._fieldType
         const typeConfig = context.typeConfig(type)
-        if (typeConfig) {
-          return typeConfig.outputType
+        if (typeConfig?.outputType) {
+          return typeConfig.outputType as GraphQLObjectType
         }
         throw new Error(`Type ${type} not exist.`)
       }

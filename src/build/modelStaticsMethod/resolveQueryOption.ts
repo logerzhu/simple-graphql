@@ -82,7 +82,7 @@ function convertOrder(
     if (Array.isArray(item)) {
       return [...parents, ...item] as OrderItem
     } else {
-      return [...parents, item] as OrderItem
+      return [...parents, item] as any
     }
   }
 

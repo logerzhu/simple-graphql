@@ -2,6 +2,7 @@ import {
   GraphQLFieldResolver,
   GraphQLInputType,
   GraphQLInterfaceType,
+  GraphQLNamedType,
   GraphQLOutputType,
   GraphQLResolveInfo
 } from 'graphql'
@@ -58,7 +59,7 @@ export type SGModelCtrl<T extends SGModel = SGModel> = typeof SGModel & {
   new (): T
 } & SGModelStatic
 
-export abstract class SGService {
+export class SGService {
   getSGContext: () => SGContext
 }
 

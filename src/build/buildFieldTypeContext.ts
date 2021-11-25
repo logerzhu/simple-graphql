@@ -2,6 +2,7 @@ import { SGSchema } from '../definition/SGSchema'
 import {
   GraphQLFloat,
   GraphQLList,
+  GraphQLNamedType,
   GraphQLObjectType,
   GraphQLString
 } from 'graphql'
@@ -431,12 +432,12 @@ export default function (
       )
       if (schema) {
         const typeConfig = fieldTypeContext.typeConfig(schema.name)
-        if (!typeConfig) {
+        if (!typeConfig?.outputType) {
           return undefined
         }
         const connectionInfo = relay.connectionDefinitions({
           name: schema.name,
-          nodeType: typeConfig.outputType,
+          nodeType: typeConfig.outputType as GraphQLNamedType,
           connectionFields: {
             count: {
               type: GraphQLFloat

@@ -6,7 +6,7 @@ import { SGModel, SGModelCtrl, SGResolveContext } from '../../index'
 
 export default async function <M extends SGModel>(
   this: SGModelCtrl<M>,
-  id: number,
+  id: number | string,
   options: FindOptions,
   context: SGResolveContext,
   info: GraphQLResolveInfo,
