@@ -10,6 +10,7 @@ import StringHelper from '../utils/StringHelper'
 
 type AddMutationOptions = SGPluginOptions & {
   name?: string
+  additionFields?: SGInputFieldConfigMap
   hookOptions?: SGHookOptionsMap
 }
 
@@ -31,7 +32,9 @@ export default {
     const addedName =
       'added' + StringHelper.toInitialUpperCase(schema.name) + 'Edge'
 
-    const inputFields: SGInputFieldConfigMap = {}
+    const inputFields: SGInputFieldConfigMap = {
+      ...(options.additionFields || {})
+    }
     const isModelType = (fieldOptions: SGInputFieldConfig) => {
       return (
         fieldOptions.type &&
