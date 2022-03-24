@@ -1,5 +1,5 @@
 {
-  "name": "@bwax/simple-graphql",
+  "name": "simple-graphql",
   "version": "4.2.2",
   "description": "The simple way to generates GraphQL schemas and Sequelize models from your models definition.",
   "main": "dist/index.js",
