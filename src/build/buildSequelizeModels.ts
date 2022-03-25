@@ -6,8 +6,6 @@ import Sequelize, {
 import { SGSchema } from '../definition/SGSchema'
 import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
-import StringHelper from '../utils/StringHelper'
-import { ModelAttributes } from 'sequelize/types/lib/model'
 import { SGContext, SGModelCtrl, SGTypeContext } from '..'
 
 function toSequelizeModel(
