@@ -15,10 +15,20 @@ function toSequelizeModel(
 ): ModelCtor<Model> {
   const dbDefinition: { [key: string]: ModelAttributeColumnOptions } = {}
 
-  const versionConfig = (schema.options.tableOptions || {}).version
+  const versionConfig = schema.options.tableOptions?.version
   let versionField: string | null = null
   if (versionConfig === true || typeof versionConfig === 'string') {
     versionField = typeof versionConfig === 'string' ? versionConfig : 'version'
+  }
+
+  const primaryKey = schema.options.tableOptions?.primaryKey
+  if (primaryKey) {
+    dbDefinition.id = {
+      field: primaryKey.field,
+      type: primaryKey.type,
+      primaryKey: true,
+      autoIncrement: primaryKey.autoIncrement
+    }
   }
 
   _.forOwn(schema.config.fields, (value, key) => {

@@ -2,7 +2,6 @@ import {
   GraphQLFieldResolver,
   GraphQLInputType,
   GraphQLInterfaceType,
-  GraphQLNamedType,
   GraphQLOutputType,
   GraphQLResolveInfo
 } from 'graphql'
@@ -294,7 +293,13 @@ export interface SGPluginOptionsMap<E extends SGModel = SGModel> {}
 export type SGSchemaOptions = {
   description?: string
   plugin?: SGPluginOptionsMap
-  tableOptions?: ModelOptions<any>
+  tableOptions?: ModelOptions<any> & {
+    primaryKey?: {
+      field: string
+      type: DataType
+      autoIncrement?: boolean
+    }
+  }
 }
 
 export interface SGHookOptionsMap {}
