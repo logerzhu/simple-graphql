@@ -255,6 +255,7 @@ export type SGColumnFieldConfig = SGFieldTypeDefinition<
     column?: Omit<ModelAttributeColumnOptions, 'type'> & {
       type?: DataType
       constraints?: boolean
+      targetKey?: string
     }
   }
 }

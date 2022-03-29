@@ -157,6 +157,7 @@ function buildModelType(
             name: options.metadata?.column?.field || foreignField + 'Id',
             allowNull: options.nullable !== false
           },
+          targetKey: options.metadata?.column?.targetKey,
           onDelete: onDelete,
           constraints: constraints
         }
