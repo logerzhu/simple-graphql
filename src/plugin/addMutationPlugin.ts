@@ -35,6 +35,9 @@ export default {
     const inputFields: SGInputFieldConfigMap = {
       ...(options.additionFields || {})
     }
+    if (schema.options.tableOptions?.primaryKey?.autoIncrement === false) {
+      inputFields['id'] = { type: schema.name, nullable: true }
+    }
     const isModelType = (fieldOptions: SGInputFieldConfig) => {
       return (
         fieldOptions.type &&
@@ -69,6 +72,12 @@ export default {
         mutateAndGetPayload: async function (args, context, info, sgContext) {
           const dbModel = sgContext.models[schema.name]
           const attrs = {}
+
+          if (
+            schema.options.tableOptions?.primaryKey?.autoIncrement === false
+          ) {
+            attrs['id'] = args['id']
+          }
 
           _.forOwn(schema.config.fields, (value, key) => {
             if (isModelType(value)) {
