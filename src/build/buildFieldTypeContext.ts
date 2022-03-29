@@ -148,28 +148,19 @@ function buildModelType(
         onDelete = undefined
       }
 
-      if (options.nullable === false) {
-        schema.belongsTo({
-          [fieldName]: {
-            target: typeName,
-            hidden: true,
-            foreignField: foreignField,
-            foreignKey: { name: foreignField + 'Id', allowNull: false },
-            onDelete: onDelete,
-            constraints: constraints
-          }
-        })
-      } else {
-        schema.belongsTo({
-          [fieldName]: {
-            target: typeName,
-            hidden: true,
-            foreignField: foreignField,
-            onDelete: onDelete,
-            constraints: constraints
-          }
-        })
-      }
+      schema.belongsTo({
+        [fieldName]: {
+          target: typeName,
+          hidden: true,
+          foreignField: foreignField,
+          foreignKey: {
+            name: options.metadata?.column?.field || foreignField + 'Id',
+            allowNull: options.nullable !== false
+          },
+          onDelete: onDelete,
+          constraints: constraints
+        }
+      })
       return null
     }
   }

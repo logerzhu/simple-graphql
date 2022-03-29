@@ -7,6 +7,7 @@ import { SGSchema } from '../definition/SGSchema'
 import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
 import { SGContext, SGModelCtrl, SGTypeContext } from '..'
+import { ForeignKeyOptions } from 'sequelize/types/lib/associations/base'
 
 function toSequelizeModel(
   sequelize: Sequelize.Sequelize,
@@ -80,12 +81,28 @@ function buildModelAssociations(
     [id: string]: SGModelCtrl
   }
 ) {
+  const getForeignKey = (config: {
+    target: string
+    foreignKey?: string | ForeignKeyOptions
+    foreignField?: string
+  }) => {
+    if (config.foreignKey) {
+      return config.foreignKey
+    } else if (config.foreignField) {
+      const schema = schemas.find((s) => s.name === config.target)
+      const field = schema?.config.fields[config.foreignField]
+      if (field) {
+        return field.metadata?.column?.field || config.foreignField + 'Id'
+      }
+    }
+    return config.foreignField + 'Id'
+  }
   for (const schema of schemas) {
     _.forOwn(schema.config.associations.hasMany, (config, key) => {
       models[schema.name].hasMany(models[config.target], {
         ...config,
         as: key,
-        foreignKey: config.foreignKey || config.foreignField + 'Id'
+        foreignKey: getForeignKey(config)
       })
     })
 
@@ -93,7 +110,7 @@ function buildModelAssociations(
       models[schema.name].belongsToMany(models[config.target], {
         ...config,
         as: key,
-        foreignKey: config.foreignField + 'Id',
+        foreignKey: getForeignKey(config),
         // through: config.through && {...config.through, model: models[config.through.model]}
         through: config.through
       })
@@ -103,17 +120,26 @@ function buildModelAssociations(
       models[schema.name].hasOne(models[config.target], {
         ...config,
         as: key,
-        foreignKey: config.foreignKey || config.foreignField + 'Id'
+        foreignKey: getForeignKey(config)
       })
     })
 
     _.forOwn(schema.config.associations.belongsTo, (config, key) => {
+      const foreignKey = getForeignKey(config)
       models[schema.name].belongsTo(models[config.target], {
         ...config,
         as: key,
-        foreignKey: config.foreignKey || config.foreignField + 'Id',
+        foreignKey: foreignKey,
         targetKey: config.targetKey || 'id'
       })
+      const foreignKeyName =
+        typeof foreignKey === 'string' ? foreignKey : foreignKey.name
+      if (foreignKeyName != config.foreignField + 'Id') {
+        models[schema.name].rawAttributes[config.foreignField + 'Id'] = {
+          type: 'INT(11)',
+          field: foreignKeyName
+        }
+      }
     })
   }
 }
