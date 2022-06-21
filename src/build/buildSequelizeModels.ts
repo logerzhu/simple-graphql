@@ -136,7 +136,7 @@ function buildModelAssociations(
         typeof foreignKey === 'string' ? foreignKey : foreignKey.name
       if (foreignKeyName != config.foreignField + 'Id') {
         models[schema.name].rawAttributes[config.foreignField + 'Id'] = {
-          type: 'INT(11)',
+          type: Sequelize.INTEGER,
           field: foreignKeyName
         }
       }
