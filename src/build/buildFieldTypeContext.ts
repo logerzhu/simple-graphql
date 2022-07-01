@@ -249,7 +249,7 @@ function buildDataType(
         }
       } else if (definition.elements) {
         columnOptions = {
-          type: Sequelize.JSON
+          type: Sequelize.JSONB
         }
       } else {
         columnOptions = {
@@ -402,7 +402,7 @@ export default function (
             }
             return root[fieldName]
           },
-          columnOptions: { type: Sequelize.JSON }
+          columnOptions: { type: Sequelize.JSONB }
         }
       }
     },
