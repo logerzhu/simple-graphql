@@ -23,6 +23,7 @@ export default async function (sequelize: Sequelize.Sequelize) {
     if (index % 10 === 0) {
       for (let index2 = 0; index2 < 30; index2++) {
         await Todo.create({
+          tags: ['Tag' + index2],
           ownerId: index,
           title: 'Task-' + index + '-' + index2,
           description: 'Task Desc ' + index + '-' + index2,

@@ -32,6 +32,7 @@ export default new SGSchema('Todo', {
     type: 'Boolean',
     nullable: false
   },
+  tags: {elements:{type:'String'}},
   dueAt: {type: 'Date'}
 }).queries({
   dueTodos: {
