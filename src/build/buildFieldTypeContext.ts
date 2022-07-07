@@ -26,7 +26,7 @@ import {
   SGTypeContext
 } from '..'
 import StringHelper from '../utils/StringHelper'
-import {SGSchema} from "../definition/SGSchema";
+import { SGSchema } from '../definition/SGSchema'
 
 type Context = SGResolverContext & SGInterfaceContext
 

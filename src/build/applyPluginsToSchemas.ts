@@ -1,6 +1,6 @@
 import { SequelizeSGSchema } from '../definition/SequelizeSGSchema'
 import { SGPluginConfig, SGPluginOptions, SGPluginOptionsMap } from '..'
-import {SGSchema} from "../definition/SGSchema";
+import { SGSchema } from '../definition/SGSchema'
 
 export default (
   schemas: Array<SGSchema>,

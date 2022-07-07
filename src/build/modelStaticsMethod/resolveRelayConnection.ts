@@ -143,9 +143,7 @@ export default async function <M extends SGModel>(
     order = order.map((orderItem) => {
       if (Array.isArray(orderItem)) {
         const revertItem = [...orderItem]
-        if (
-          isPrimaryOrder(sgContext, dbModel.sgSchema, revertItem)
-        ) {
+        if (isPrimaryOrder(sgContext, dbModel.sgSchema, revertItem)) {
           switch (
             (revertItem[revertItem.length - 1] as string).toLocaleUpperCase()
           ) {

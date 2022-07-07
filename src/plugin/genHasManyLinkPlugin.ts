@@ -17,7 +17,7 @@ export default {
   priority: 99,
   description: 'Gen `HasManyLink` for Schema',
   applyToSchema: function hasManyLinkedField(schema, options, schemas): void {
-    if(schema instanceof SequelizeSGSchema) {
+    if (schema instanceof SequelizeSGSchema) {
       _.forOwn(schema.config.associations.hasMany, (config, key) => {
         if (config.hidden) {
           return
@@ -39,7 +39,7 @@ export default {
                 if (argValue !== undefined) {
                   option.where[Sequelize.Op.and] =
                     option.where[Sequelize.Op.and] || []
-                  option.where[Sequelize.Op.and].push({[key]: argValue})
+                  option.where[Sequelize.Op.and].push({ [key]: argValue })
                 }
               }
           }
@@ -48,7 +48,7 @@ export default {
         if (conditionFields && _.keys(conditionFields).length > 0) {
           args.condition = {
             properties: _.mapValues(conditionFields, (field) => {
-              const {mapper, definition} = field
+              const { mapper, definition } = field
               return definition
             })
           }
@@ -61,8 +61,8 @@ export default {
             input: args,
             output:
               config.outputStructure === 'Array'
-                ? {elements: {type: config.target}}
-                : {type: config.target + 'Connection'},
+                ? { elements: { type: config.target } }
+                : { type: config.target + 'Connection' },
             dependentFields: [config.sourceKey || 'id'],
             resolve: async function (root, args, context, info, sgContext) {
               if (
@@ -74,7 +74,7 @@ export default {
               }
 
               const queryOption: any = {
-                where: {...(config.scope || {})},
+                where: { ...(config.scope || {}) },
                 bind: [],
                 attributes: []
               }
@@ -115,7 +115,7 @@ export default {
                   return dbModel.findAll(findOptions)
                 }
               } else {
-                const {condition, ...relayArgs} = args || {}
+                const { condition, ...relayArgs } = args || {}
                 return sgContext.models[config.target].resolveRelayConnection({
                   pagination: relayArgs,
                   selectionInfo: info,

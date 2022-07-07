@@ -15,7 +15,8 @@ import {
   SGInterfaceContext,
   SGResolverContext,
   SGContext,
-  SGTypeContext, SequelizeSGSchema
+  SGTypeContext,
+  SequelizeSGSchema
 } from '..'
 
 import applyPluginsToSchemas from './applyPluginsToSchemas'
@@ -78,9 +79,13 @@ export function buildGraphQLContext(
 
   sgContext.typeConfig = (typeName) => fieldTypeContext.typeConfig(typeName)
   sgContext.models = applyPluginsToModels(
-    buildSequelizeModels(sequelize, (config.schemas || []).filter(s => {
-      return s instanceof SequelizeSGSchema
-    }) as SequelizeSGSchema[], sgContext),
+    buildSequelizeModels(
+      sequelize,
+      (config.schemas || []).filter((s) => {
+        return s instanceof SequelizeSGSchema
+      }) as SequelizeSGSchema[],
+      sgContext
+    ),
     plugins,
     buildOptions.defaultPlugin || {}
   )

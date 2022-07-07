@@ -24,7 +24,7 @@ import hasSelection from './build/modelStaticsMethod/hasSelection'
 import findOneForGraphQL from './build/modelStaticsMethod/findOneForGraphQL'
 import findByPkForGraphQL from './build/modelStaticsMethod/findByPkForGraphQL'
 import DataLoader from 'dataloader'
-import {SGSchema} from "./definition/SGSchema";
+import { SGSchema } from './definition/SGSchema'
 
 export abstract class SGModel<
   TModelAttributes extends {} = any

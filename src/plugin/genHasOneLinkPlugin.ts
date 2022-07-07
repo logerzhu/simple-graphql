@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import {SequelizeSGSchema, SGPluginConfig} from '..'
+import { SequelizeSGSchema, SGPluginConfig } from '..'
 
 export default {
   name: 'genHasOneLink',
@@ -9,7 +9,7 @@ export default {
   priority: 99,
   description: 'Gen `HasOneLink` for Schema',
   applyToSchema: function hasOneFieldsConfig(schema, options, schemas): void {
-    if(schema instanceof SequelizeSGSchema) {
+    if (schema instanceof SequelizeSGSchema) {
       _.forOwn(schema.config.associations.hasOne, (config, key) => {
         if (config.hidden) {
           return
@@ -17,7 +17,7 @@ export default {
         schema.links({
           [key]: {
             hookOptions: config.hookOptions,
-            output: {type: config.target},
+            output: { type: config.target },
             description: config.description,
             dependentFields: ['id'],
             resolve: async function (root, args, context, info, sgContext) {
@@ -28,7 +28,7 @@ export default {
                 return dbModel.findOneForGraphQL(
                   {
                     where: {
-                      ...{...(config.scope || {})},
+                      ...{ ...(config.scope || {}) },
                       [<string>config.foreignKey ||
                       config.foreignField + 'Id']: root.id
                     }

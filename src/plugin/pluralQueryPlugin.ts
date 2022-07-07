@@ -10,7 +10,7 @@ import {
   SGPluginConfig,
   SGPluginOptions
 } from '..'
-import {SGSchema} from "../definition/SGSchema";
+import { SGSchema } from '../definition/SGSchema'
 
 const getSearchFields = (
   additionFields: SGInputFieldConfigMap,
@@ -79,7 +79,7 @@ const getSearchFields = (
   } = {}
   _.forOwn(
     {
-      id: {type: schema.name + 'Id'} as SGColumnFieldConfig,
+      id: { type: schema.name + 'Id' } as SGColumnFieldConfig,
       ...schema.config.fields,
       ...additionFields
     },
@@ -99,7 +99,7 @@ const getSearchFields = (
             definition: {
               ...value,
               nullable: true,
-              metadata: {description: value.metadata?.description}
+              metadata: { description: value.metadata?.description }
             },
             mapper: value.metadata?.graphql?.mapper
           }
@@ -108,7 +108,7 @@ const getSearchFields = (
             definition: advanceType({
               ...value,
               nullable: true,
-              metadata: {description: value.metadata?.description}
+              metadata: { description: value.metadata?.description }
             }),
             mapper: function (
               option: { where: Object; attributes: Array<string> },
@@ -119,7 +119,7 @@ const getSearchFields = (
                 option.where[Sequelize.Op.and] =
                   option.where[Sequelize.Op.and] || []
                 if (argValue == null || typeof argValue === 'boolean') {
-                  option.where[Sequelize.Op.and].push({[key]: argValue})
+                  option.where[Sequelize.Op.and].push({ [key]: argValue })
                 } else {
                   const keyCondition = {}
                   for (const opKey of _.keys(argValue)) {
@@ -135,7 +135,7 @@ const getSearchFields = (
                       )
                     }
                   }
-                  option.where[Sequelize.Op.and].push({[key]: keyCondition})
+                  option.where[Sequelize.Op.and].push({ [key]: keyCondition })
                 }
               }
             }
@@ -173,29 +173,29 @@ export default {
       schemas
     )
 
-    const {enable, ...config} = options
+    const { enable, ...config } = options
 
     schema.queries({
       [`${StringHelper.toInitialLowerCase(
         config.name || schema.name + 's'
       )}`]: {
         hookOptions: config.hookOptions,
-        output: {type: schema.name + 'Connection'},
+        output: { type: schema.name + 'Connection' },
         input: {
           ...(_.keys(searchFields).length > 0
             ? {
-              condition: {
-                elements: {
-                  properties: _.mapValues(searchFields, (fieldConfig) => {
-                    const {mapper, definition} = fieldConfig
-                    return definition
-                  })
-                },
-                metadata: {
-                  description: 'Query Condition'
+                condition: {
+                  elements: {
+                    properties: _.mapValues(searchFields, (fieldConfig) => {
+                      const { mapper, definition } = fieldConfig
+                      return definition
+                    })
+                  },
+                  metadata: {
+                    description: 'Query Condition'
+                  }
                 }
               }
-            }
             : {}),
           sort: {
             elements: {
@@ -216,10 +216,10 @@ export default {
         resolve: async function (args, context, info, sgContext) {
           const dbModel = sgContext.models[schema.name]
 
-          const {sort = [{field: 'id', order: 'ASC'}], condition = []} =
-          args || {}
+          const { sort = [{ field: 'id', order: 'ASC' }], condition = [] } =
+            args || {}
 
-          const queryOption = {where: {}, bind: [], attributes: []}
+          const queryOption = { where: {}, bind: [], attributes: [] }
 
           if (condition && condition.length > 0) {
             const where = queryOption.where

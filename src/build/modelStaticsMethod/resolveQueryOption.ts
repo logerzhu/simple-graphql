@@ -1,15 +1,15 @@
 import _ from 'lodash'
-import {GraphQLResolveInfo} from 'graphql'
-import {SequelizeSGSchema} from '../../definition/SequelizeSGSchema'
-import {Selection} from './parseSelections'
-import {Order, OrderItem} from 'sequelize'
-import {Includeable, IncludeOptions} from 'sequelize/types/lib/model'
-import {SGContext, SGModel, SGModelCtrl} from '../../index'
+import { GraphQLResolveInfo } from 'graphql'
+import { SequelizeSGSchema } from '../../definition/SequelizeSGSchema'
+import { Selection } from './parseSelections'
+import { Order, OrderItem } from 'sequelize'
+import { Includeable, IncludeOptions } from 'sequelize/types/lib/model'
+import { SGContext, SGModel, SGModelCtrl } from '../../index'
 
 function fieldToSelection(field: string) {
   const index = field.indexOf('.')
   if (index === -1) {
-    return {name: field}
+    return { name: field }
   } else {
     return {
       name: field.substr(0, index),
@@ -59,10 +59,7 @@ function convertOrderItem(
         model: model,
         as: first
       },
-      ...convertOrderItem(sgContext, model.sgSchema, [
-        other.join('.'),
-        sort
-      ])
+      ...convertOrderItem(sgContext, model.sgSchema, [other.join('.'), sort])
     ]
   } else {
     return orderItem
@@ -130,7 +127,7 @@ const buildQueryOption = function (args: {
   const include = (() => {
     const copy = (i: Includeable): Includeable => {
       if (typeof i === 'object' && (i as IncludeOptions).as != null) {
-        return {...i}
+        return { ...i }
       } else {
         return i
       }
@@ -295,12 +292,7 @@ export default function <M extends SGModel>(
     )
   ]
 
-  const mainOrder = convertOrder(
-    sgContext,
-    dbModel.sgSchema,
-    order,
-    []
-  )
+  const mainOrder = convertOrder(sgContext, dbModel.sgSchema, order, [])
 
   const option = buildQueryOption({
     sgContext: sgContext,
