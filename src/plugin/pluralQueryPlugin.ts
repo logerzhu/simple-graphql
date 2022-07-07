@@ -9,7 +9,7 @@ import {
   SGInputFieldConfigMap,
   SGPluginConfig,
   SGPluginOptions
-} from '..'
+} from '../index'
 import { SGSchema } from '../definition/SGSchema'
 
 const getSearchFields = (
@@ -153,7 +153,7 @@ type PluralQueryOptions = SGPluginOptions & {
   hookOptions?: SGHookOptionsMap
 }
 
-declare module '..' {
+declare module '../index' {
   export interface SGPluginOptionsMap {
     pluralQuery?: PluralQueryOptions
   }

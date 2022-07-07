@@ -7,14 +7,14 @@ import {
   SGInputFieldConfigMap,
   SGPluginConfig,
   SGPluginOptions
-} from '..'
+} from '../index'
 
 type SingularQueryOptions = SGPluginOptions & {
   name?: string
   hookOptions?: SGHookOptionsMap
 }
 
-declare module '..' {
+declare module '../index' {
   export interface SGPluginOptionsMap {
     singularQuery?: SingularQueryOptions
   }

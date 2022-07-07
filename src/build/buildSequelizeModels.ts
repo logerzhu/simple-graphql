@@ -6,7 +6,7 @@ import Sequelize, {
 import { SequelizeSGSchema } from '../definition/SequelizeSGSchema'
 import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
-import { SGContext, SGModelCtrl, SGTypeContext } from '..'
+import { SGContext, SGModelCtrl, SGTypeContext } from '../index'
 import { ForeignKeyOptions } from 'sequelize/types/lib/associations/base'
 
 function toSequelizeModel(

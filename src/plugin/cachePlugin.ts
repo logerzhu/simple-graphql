@@ -3,7 +3,7 @@ import {
   SGHookOptionsMap,
   SGPluginConfig,
   SGPluginOptions
-} from '..'
+} from '../index'
 import Sequelize from 'sequelize'
 import LruCacheManager from './cache/LruCacheManager'
 import Cache from './cache/Cache'
@@ -14,7 +14,7 @@ type CacheOptions = SGPluginOptions & {
   expire?: number
 }
 
-declare module '..' {
+declare module '../index' {
   export interface SGPluginOptionsMap {
     cache?: CacheOptions
   }

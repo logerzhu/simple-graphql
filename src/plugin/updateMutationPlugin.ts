@@ -7,14 +7,14 @@ import {
   SGInputFieldConfigMap,
   SGPluginConfig,
   SGPluginOptions
-} from '..'
+} from '../index'
 
 type UpdateMutationOptions = SGPluginOptions & {
   name?: string
   hookOptions?: SGHookOptionsMap
 }
 
-declare module '..' {
+declare module '../index' {
   export interface SGPluginOptionsMap {
     updateMutation?: UpdateMutationOptions
   }

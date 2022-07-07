@@ -395,7 +395,7 @@ export interface SGCacheManager {
   del: (pattern: string) => Promise<number>
 }
 
-export * from './definition/SequelizeSGSchema'
+export * from './definition'
 
 export * from './build'
 

@@ -1,4 +1,4 @@
-import { SequelizeSGSchema } from '../definition/SequelizeSGSchema'
+import { SequelizeSGSchema, SGSchema } from '../definition'
 import {
   GraphQLFloat,
   GraphQLList,
@@ -19,14 +19,13 @@ import {
   SGDataTypeConfig,
   SGInputFieldConfig,
   SGInterfaceContext,
+  SGModel,
   SGOutputFieldConfig,
   SGResolverContext,
-  SGModel,
   SGTypeConfig,
   SGTypeContext
 } from '..'
 import StringHelper from '../utils/StringHelper'
-import { SGSchema } from '../definition/SGSchema'
 
 type Context = SGResolverContext & SGInterfaceContext
 

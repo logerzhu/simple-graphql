@@ -1,6 +1,6 @@
-import { SequelizeSGSchema, SGPluginConfig, SGPluginOptions } from '..'
+import { SequelizeSGSchema, SGPluginConfig, SGPluginOptions } from '../index'
 
-declare module '..' {
+declare module '../index' {
   export interface SGPluginOptionsMap {
     version?: SGPluginOptions
   }

@@ -15,7 +15,7 @@ import {
   SGMutationConfigMap,
   SGQueryConfigMap,
   SGSchemaOptions
-} from '..'
+} from '../index'
 import { SGSchema } from './SGSchema'
 
 /**

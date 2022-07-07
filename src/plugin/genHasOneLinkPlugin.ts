@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { SequelizeSGSchema, SGPluginConfig } from '..'
+import { SequelizeSGSchema, SGPluginConfig } from '../index'
 
 export default {
   name: 'genHasOneLink',

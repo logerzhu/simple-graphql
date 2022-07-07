@@ -5,7 +5,7 @@ import {
   SGInputFieldConfigMap,
   SGPluginConfig,
   SGPluginOptions
-} from '..'
+} from '../index'
 import StringHelper from '../utils/StringHelper'
 
 type BulkAddMutationOptions = SGPluginOptions & {
@@ -13,7 +13,7 @@ type BulkAddMutationOptions = SGPluginOptions & {
   hookOptions?: SGHookOptionsMap
 }
 
-declare module '..' {
+declare module '../index' {
   export interface SGPluginOptionsMap {
     bulkAddMutation?: BulkAddMutationOptions
   }
