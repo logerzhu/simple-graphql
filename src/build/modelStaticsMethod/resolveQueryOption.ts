@@ -1,19 +1,15 @@
 import _ from 'lodash'
-import { GraphQLResolveInfo } from 'graphql'
-import { SequelizeSGSchema } from '../../definition/SequelizeSGSchema'
-import { Selection } from './parseSelections'
-import { Order, OrderItem } from 'sequelize'
-import Model, {
-  Includeable,
-  IncludeOptions,
-  ModelStatic
-} from 'sequelize/types/lib/model'
-import { SGContext, SGModel, SGModelCtrl } from '../../index'
+import {GraphQLResolveInfo} from 'graphql'
+import {SequelizeSGSchema} from '../../definition/SequelizeSGSchema'
+import {Selection} from './parseSelections'
+import {Order, OrderItem} from 'sequelize'
+import {Includeable, IncludeOptions} from 'sequelize/types/lib/model'
+import {SGContext, SGModel, SGModelCtrl} from '../../index'
 
 function fieldToSelection(field: string) {
   const index = field.indexOf('.')
   if (index === -1) {
-    return { name: field }
+    return {name: field}
   } else {
     return {
       name: field.substr(0, index),
@@ -57,12 +53,13 @@ function convertOrderItem(
   const iConfig =
     ass.belongsTo[first] || ass.hasOne[first] || ass.hasMany[first]
   if (iConfig) {
+    const model = sgContext.models[iConfig.target]
     return [
       {
-        model: sgContext.models[iConfig.target],
+        model: model,
         as: first
       },
-      ...convertOrderItem(sgContext, sgContext.schemas[iConfig.target], [
+      ...convertOrderItem(sgContext, model.sgSchema, [
         other.join('.'),
         sort
       ])
@@ -133,7 +130,7 @@ const buildQueryOption = function (args: {
   const include = (() => {
     const copy = (i: Includeable): Includeable => {
       if (typeof i === 'object' && (i as IncludeOptions).as != null) {
-        return { ...i }
+        return {...i}
       } else {
         return i
       }
@@ -167,14 +164,15 @@ const buildQueryOption = function (args: {
       ) {
         config = hasManyConfig
         // add hasManyConfig order config
+        const targetModel = sgContext.models[hasManyConfig.target]
         additionOrder.push(
           ...convertOrder(
             sgContext,
-            sgContext.schemas[hasManyConfig.target],
+            targetModel.sgSchema,
             hasManyConfig.order || [['id', 'ASC']],
             [
               {
-                model: sgContext.models[hasManyConfig.target],
+                model: targetModel,
                 as: selection.name
               }
             ]
@@ -190,16 +188,18 @@ const buildQueryOption = function (args: {
         ) as IncludeOptions
       })()
 
+      const targetModel = sgContext.models[config.target]
+
       const option = buildQueryOption({
         sgContext: sgContext,
         attributes: (exit?.attributes as string[]) || [], //TODO
         include: exit?.include || [],
-        schema: sgContext.schemas[config.target],
+        schema: targetModel.sgSchema,
         selections: selection.selections,
         parents: [
           ...parents,
           {
-            model: sgContext.models[config.target],
+            model: targetModel,
             as: selection.name
           }
         ],
@@ -297,7 +297,7 @@ export default function <M extends SGModel>(
 
   const mainOrder = convertOrder(
     sgContext,
-    sgContext.schemas[dbModel.name],
+    dbModel.sgSchema,
     order,
     []
   )
@@ -305,7 +305,7 @@ export default function <M extends SGModel>(
   const option = buildQueryOption({
     sgContext: sgContext,
     include: include,
-    schema: sgContext.schemas[dbModel.name],
+    schema: dbModel.sgSchema,
     selections: selections,
     eagerHasMany: eagerHasMany
   })

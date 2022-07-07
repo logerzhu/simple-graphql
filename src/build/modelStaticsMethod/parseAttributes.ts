@@ -18,7 +18,7 @@ export default function <M extends SGModel>(
   additionSelections: Array<Selection>
 } {
   const dbModel = this
-  const schema = dbModel.getSGContext().schemas[this.name]
+  const schema = this.sgSchema
 
   const getFieldName = (key: string, config: SGColumnFieldConfig) => {
     if (config.type && dbModel.getSGContext().schemas[config.type] != null) {

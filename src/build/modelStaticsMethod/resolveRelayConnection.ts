@@ -22,7 +22,7 @@ const isPrimaryOrder = (
             schema.config.associations.belongsTo[i.as] ||
             schema.config.associations.hasOne[i.as]
           if (config) {
-            schema = sgContext.schemas[config.target]
+            schema = sgContext.models[config.target].sgSchema
           } else {
             return true
           }
@@ -144,7 +144,7 @@ export default async function <M extends SGModel>(
       if (Array.isArray(orderItem)) {
         const revertItem = [...orderItem]
         if (
-          isPrimaryOrder(sgContext, sgContext.schemas[dbModel.name], revertItem)
+          isPrimaryOrder(sgContext, dbModel.sgSchema, revertItem)
         ) {
           switch (
             (revertItem[revertItem.length - 1] as string).toLocaleUpperCase()

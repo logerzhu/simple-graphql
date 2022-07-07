@@ -24,6 +24,7 @@ import hasSelection from './build/modelStaticsMethod/hasSelection'
 import findOneForGraphQL from './build/modelStaticsMethod/findOneForGraphQL'
 import findByPkForGraphQL from './build/modelStaticsMethod/findByPkForGraphQL'
 import DataLoader from 'dataloader'
+import {SGSchema} from "./definition/SGSchema";
 
 export abstract class SGModel<
   TModelAttributes extends {} = any
@@ -73,7 +74,7 @@ export interface SGModelCtrlMap {
 export type SGContext = {
   sequelize: Sequelize
   schemas: {
-    [key: string]: SequelizeSGSchema
+    [key: string]: SGSchema
   }
   models: SGModelCtrlMap
   services: SGServiceMap
@@ -348,9 +349,9 @@ export type SGPluginConfig<T = SGPluginOptions> = {
   priority?: number
   defaultOptions?: T
   applyToSchema?: (
-    schema: SequelizeSGSchema,
+    schema: SGSchema,
     options: T,
-    schemas: Array<SequelizeSGSchema>
+    schemas: Array<SGSchema>
   ) => void
   applyToModel?: (
     model: SGModelCtrl,
@@ -366,7 +367,7 @@ export type SGBuildOptions = {
 export type SGBuildConfig = {
   dataTypes?: Array<SGDataTypeConfig>
   types?: Array<SGTypeConfig>
-  schemas?: Array<SequelizeSGSchema>
+  schemas?: Array<SGSchema>
   services?: Array<typeof SGService & { new (): SGService }>
   hooks?: Array<SGHookConfig>
   plugins?: Array<SGPluginConfig>

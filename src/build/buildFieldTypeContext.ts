@@ -26,6 +26,7 @@ import {
   SGTypeContext
 } from '..'
 import StringHelper from '../utils/StringHelper'
+import {SGSchema} from "../definition/SGSchema";
 
 type Context = SGResolverContext & SGInterfaceContext
 
@@ -312,7 +313,7 @@ function buildUnionWrapType(
 export default function (
   types: Array<SGTypeConfig>,
   dataTypes: Array<SGDataTypeConfig>,
-  schemas: Array<SequelizeSGSchema>,
+  schemas: Array<SGSchema>,
   context: Context
 ) {
   const typeMap: { [key: string]: SGTypeConfig } = {}
@@ -408,13 +409,13 @@ export default function (
     },
     function resolveModelType(typeName) {
       const schema = schemas.find((s) => s.name === typeName)
-      if (schema) {
+      if (schema instanceof SequelizeSGSchema) {
         return buildModelType(schema, fieldTypeContext, context)
       }
     },
     function resolveModelIdType(typeName) {
       const schema = schemas.find((s) => s.name + 'Id' === typeName)
-      if (schema) {
+      if (schema instanceof SequelizeSGSchema) {
         return buildModelTypeId(schema, fieldTypeContext)
       }
     },
