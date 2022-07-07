@@ -1,12 +1,12 @@
 import Sequelize from 'sequelize'
 import path from 'path'
 import fs from 'fs'
-import {SGSchema, buildGraphQLContext, SGHookConfig, SGHookFunc} from '../src'
+import {SequelizeSGSchema, buildGraphQLContext, SGHookConfig, SGHookFunc} from '../src'
 import DemoService from './definition/service/DemoService'
 
 export default function (sequelize: Sequelize.Sequelize) {
-  function listSchemas(dir: string): Array<SGSchema> {
-    const schemas: Array<SGSchema> = []
+  function listSchemas(dir: string): Array<SequelizeSGSchema> {
+    const schemas: Array<SequelizeSGSchema> = []
     const handleFile = d => fs.readdirSync(path.resolve(__dirname, d)).map(function (file) {
       const stats = fs.statSync(path.resolve(__dirname, dir, file))
       const relativePath = [dir, file].join('/')
@@ -19,11 +19,11 @@ export default function (sequelize: Sequelize.Sequelize) {
         if (file.match(/\.ts$/) !== null && file !== 'index.ts') {
           const name = './' + relativePath.replace('.ts', '')
           const schemaOrFun = require(name).default
-          if (schemaOrFun instanceof SGSchema) {
+          if (schemaOrFun instanceof SequelizeSGSchema) {
             schemas.push(schemaOrFun)
           } else if (typeof schemaOrFun === 'function') {
             const schema = schemaOrFun(sequelize)
-            if (schema instanceof SGSchema) {
+            if (schema instanceof SequelizeSGSchema) {
               schemas.push(schema)
             } else {
               console.log('Incorrect schema definition file: ' + name)

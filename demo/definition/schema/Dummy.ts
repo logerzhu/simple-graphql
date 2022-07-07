@@ -1,6 +1,6 @@
-import {SGSchema} from '../../../src'
+import {SequelizeSGSchema} from '../../../src'
 
-export default new SGSchema('Dummy', {
+export default new SequelizeSGSchema('Dummy', {
   plugin: {
     pluralQuery: {
       enable: true

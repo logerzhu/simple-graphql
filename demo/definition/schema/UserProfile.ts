@@ -1,6 +1,6 @@
-import {SGSchema} from '../../../src'
+import {SequelizeSGSchema} from '../../../src'
 
-export default new SGSchema('UserProfile', {
+export default new SequelizeSGSchema('UserProfile', {
   plugin: {
     singularQuery: {
       enable: true

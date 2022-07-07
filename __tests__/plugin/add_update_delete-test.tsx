@@ -1,13 +1,13 @@
 // @flow
 /* eslint-env jest */
-import { SGSchema } from '../../src'
+import { SequelizeSGSchema } from '../../src'
 import SGExecutor from '../SGExecutor'
 
 test('Add/Update/Delete Test', async () => {
   const executor = await SGExecutor.new(
     {
       schemas: [
-        new SGSchema('Dummy', {
+        new SequelizeSGSchema('Dummy', {
           plugin: {
             addMutation: {
               enable: true

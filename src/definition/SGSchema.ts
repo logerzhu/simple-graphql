@@ -1,91 +1,17 @@
-import _ from 'lodash'
-import Sequelize, {
-  BelongsToManyOptions,
-  BelongsToOptions,
-  HasManyOptions,
-  HasOneOptions,
-  Order,
-  OrderItem
-} from 'sequelize'
 import {
   SGColumnFieldConfigMap,
-  SGHookOptionsMap,
-  SGInputFieldConfigMap,
   SGLinkedFieldConfigMap,
   SGMutationConfigMap,
   SGQueryConfigMap,
   SGSchemaOptions
 } from '..'
 
-/**
- * @public
- */
-export type HasOneConfig = {
-  [key: string]: {
-    hookOptions?: SGHookOptionsMap
-    hidden?: boolean
-    target: string
-    description?: string
-    foreignField?: string
-  } & HasOneOptions
-}
-
-/**
- * @public
- */
-export type BelongsToConfig = {
-  [key: string]: {
-    hidden?: boolean
-    target: string
-    description?: string
-    foreignField?: string
-  } & BelongsToOptions
-}
-
-type HasManyConfig = {
-  [key: string]: {
-    hookOptions?: SGHookOptionsMap
-    target: string
-    description?: string
-    foreignField?: string
-    hidden?: boolean
-    conditionFields?: SGInputFieldConfigMap
-    order?: OrderItem[]
-    outputStructure?: 'Connection' | 'Array'
-  } & HasManyOptions
-}
-
-/**
- * @public
- */
-type BelongsToManyConfig = {
-  [key: string]: {
-    hidden?: boolean
-    description?: string
-    target: string
-    foreignField?: string
-  } & BelongsToManyOptions
-}
-
-/**
- * @public
- */
-type AssociationConfig = {
-  hasOne: HasOneConfig
-  belongsTo: BelongsToConfig
-  hasMany: HasManyConfig
-  belongsToMany: BelongsToManyConfig
-}
-
 export class SGSchema {
   name: string
-
-  sequelize: Sequelize.Sequelize
 
   config: {
     fields: SGColumnFieldConfigMap
     links: SGLinkedFieldConfigMap
-    associations: AssociationConfig
     queries: SGQueryConfigMap
     mutations: SGMutationConfigMap
     methods: {
@@ -103,12 +29,6 @@ export class SGSchema {
     this.config = {
       fields: {},
       links: {},
-      associations: {
-        hasOne: {},
-        belongsTo: {},
-        hasMany: {},
-        belongsToMany: {}
-      },
       queries: {},
       mutations: {},
       methods: {},
@@ -121,7 +41,7 @@ export class SGSchema {
    * Add the model base fields, and each field has a corresponding database column.
    * In default, each field generate a GraphQL field, unless it config with "hidden:true".
    */
-  fields(fields: SGColumnFieldConfigMap): SGSchema {
+  fields<T extends SGSchema>(this: T, fields: SGColumnFieldConfigMap): T {
     this.config.fields = Object.assign(this.config.fields, fields)
     return this
   }
@@ -129,7 +49,7 @@ export class SGSchema {
   /**
    * Add the model link fields, and each link generate a GraphQL field but no corresponding database column.
    */
-  links(links: SGLinkedFieldConfigMap): SGSchema {
+  links<T extends SGSchema>(this: T, links: SGLinkedFieldConfigMap): T {
     this.config.links = Object.assign(this.config.links, links)
     return this
   }
@@ -137,7 +57,7 @@ export class SGSchema {
   /**
    * Add the GraphQL query methods.
    */
-  queries(queries: SGQueryConfigMap): SGSchema {
+  queries<T extends SGSchema>(this: T, queries: SGQueryConfigMap): T {
     // TODO duplicate check
     this.config.queries = Object.assign(this.config.queries, queries)
     return this
@@ -146,7 +66,7 @@ export class SGSchema {
   /**
    * Add the GraphQL mutataion methods.
    */
-  mutations(mutations: SGMutationConfigMap): SGSchema {
+  mutations<T extends SGSchema>(this: T, mutations: SGMutationConfigMap): T {
     // TODO duplicate check
     this.config.mutations = Object.assign(this.config.mutations, mutations)
     return this
@@ -155,7 +75,7 @@ export class SGSchema {
   /**
    * Add instance method to current Schema.
    */
-  methods(methods: { [key: string]: any }): SGSchema {
+  methods<T extends SGSchema>(this: T, methods: { [key: string]: any }): T {
     this.config.methods = Object.assign(this.config.methods, methods)
     return this
   }
@@ -163,48 +83,8 @@ export class SGSchema {
   /**
    * Add statics method to current Schema.
    */
-  statics(statics: { [key: string]: any }): SGSchema {
+  statics<T extends SGSchema>(this: T, statics: { [key: string]: any }): T {
     this.config.statics = Object.assign(this.config.statics, statics)
-    return this
-  }
-
-  /**
-   * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#hasone|HasOne} relations to current Schema.
-   */
-  hasOne(config: HasOneConfig): SGSchema {
-    _.forOwn(config, (value, key) => {
-      this.config.associations.hasOne[key] = value
-    })
-    return this
-  }
-
-  /**
-   * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#belongsto|BelongsTo} relations to current Schema.
-   */
-  belongsTo(config: BelongsToConfig): SGSchema {
-    _.forOwn(config, (value, key) => {
-      this.config.associations.belongsTo[key] = value
-    })
-    return this
-  }
-
-  /**
-   * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#one-to-many-associations|HasMany} relations to current Schema.
-   */
-  hasMany(config: HasManyConfig): SGSchema {
-    _.forOwn(config, (value, key) => {
-      this.config.associations.hasMany[key] = value
-    })
-    return this
-  }
-
-  /**
-   * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#belongs-to-many-associations|BelongsToMany} relations to current Schema.
-   */
-  belongsToMany(config: BelongsToManyConfig): SGSchema {
-    _.forOwn(config, (value, key) => {
-      this.config.associations.belongsToMany[key] = value
-    })
     return this
   }
 

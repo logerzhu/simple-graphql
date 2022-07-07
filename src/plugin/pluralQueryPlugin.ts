@@ -10,12 +10,12 @@ import {
   SGPluginConfig,
   SGPluginOptions
 } from '..'
-import { SGSchema } from '..'
+import { SequelizeSGSchema } from '..'
 
 const getSearchFields = (
   additionFields: SGInputFieldConfigMap,
-  schema: SGSchema,
-  schemas: Array<SGSchema>
+  schema: SequelizeSGSchema,
+  schemas: Array<SequelizeSGSchema>
 ) => {
   const isModelType = (fieldOptions: SGInputFieldConfig) => {
     return (

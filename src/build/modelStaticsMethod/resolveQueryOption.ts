@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { GraphQLResolveInfo } from 'graphql'
-import { SGSchema } from '../../definition/SGSchema'
+import { SequelizeSGSchema } from '../../definition/SequelizeSGSchema'
 import { Selection } from './parseSelections'
 import { Order, OrderItem } from 'sequelize'
 import Model, {
@@ -47,7 +47,7 @@ function getOrderFields(order: Order): string[] {
  */
 function convertOrderItem(
   sgContext: SGContext,
-  schema: SGSchema,
+  schema: SequelizeSGSchema,
   orderItem: [string, any]
 ) {
   const [column, sort] = orderItem
@@ -74,7 +74,7 @@ function convertOrderItem(
 
 function convertOrder(
   sgContext: SGContext,
-  schema: SGSchema,
+  schema: SequelizeSGSchema,
   order: Order,
   parents: { model: SGModelCtrl; as: string }[]
 ): OrderItem[] {
@@ -107,7 +107,7 @@ function convertOrder(
 
 const buildQueryOption = function (args: {
   sgContext: SGContext
-  schema: SGSchema
+  schema: SequelizeSGSchema
   include: Includeable | Includeable[]
   attributes?: string[]
   selections?: Selection[]

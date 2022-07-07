@@ -1,6 +1,6 @@
 // @flow
 /* eslint-env jest */
-import { SGSchema } from '../../src'
+import { SequelizeSGSchema } from '../../src'
 import SGExecutor from '../SGExecutor'
 
 test('数据类型生成', async () => {
@@ -28,7 +28,7 @@ test('数据类型生成', async () => {
         }
       ],
       schemas: [
-        new SGSchema('Dummy', {
+        new SequelizeSGSchema('Dummy', {
           plugin: {
             addMutation: {
               enable: true

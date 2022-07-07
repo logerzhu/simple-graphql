@@ -1,13 +1,13 @@
 // @flow
 /* eslint-env jest */
-import { SGSchema } from '../../src'
+import { SequelizeSGSchema } from '../../src'
 import SGExecutor from '../SGExecutor'
 
 test('引用类型生成', async () => {
   const executor = await SGExecutor.new(
     {
       schemas: [
-        new SGSchema('Dummy1', {
+        new SequelizeSGSchema('Dummy1', {
           plugin: {
             singularQuery: {
               enable: true
@@ -37,7 +37,7 @@ test('引用类型生成', async () => {
               foreignField: 'dummyB'
             }
           }),
-        new SGSchema('Dummy2', {
+        new SequelizeSGSchema('Dummy2', {
           plugin: {
             addMutation: {
               enable: true

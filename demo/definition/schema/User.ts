@@ -1,6 +1,6 @@
-import {SGSchema} from '../../../src'
+import {SequelizeSGSchema} from '../../../src'
 
-export default new SGSchema('User', {
+export default new SequelizeSGSchema('User', {
   description: '用户',
   plugin: {
     addMutation: {

@@ -1,6 +1,6 @@
-import {SGSchema} from '../../../src'
+import {SequelizeSGSchema} from '../../../src'
 
-export default new SGSchema('Todo', {
+export default new SequelizeSGSchema('Todo', {
   tableOptions: {
     underscored: true
   },
