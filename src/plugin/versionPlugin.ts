@@ -1,4 +1,4 @@
-import { SGPluginConfig, SGPluginOptions } from '..'
+import { SequelizeSGSchema, SGPluginConfig, SGPluginOptions } from '..'
 
 declare module '..' {
   export interface SGPluginOptionsMap {
@@ -14,22 +14,24 @@ export default {
   priority: 100,
   description: 'Add version field to Schema',
   applyToSchema: (schema, options, schemas) => {
-    const versionConfig = (schema.options.tableOptions || {}).version
-    if (versionConfig === true || typeof versionConfig === 'string') {
-      const versionField =
-        typeof versionConfig === 'string' ? versionConfig : 'version'
-      schema.fields({
-        [versionField]: {
-          type: 'Integer',
-          nullable: false,
-          metadata: {
-            graphql: {
-              initializable: false,
-              updatable: false
+    if (schema instanceof SequelizeSGSchema) {
+      const versionConfig = (schema.options.tableOptions || {}).version
+      if (versionConfig === true || typeof versionConfig === 'string') {
+        const versionField =
+          typeof versionConfig === 'string' ? versionConfig : 'version'
+        schema.fields({
+          [versionField]: {
+            type: 'Integer',
+            nullable: false,
+            metadata: {
+              graphql: {
+                initializable: false,
+                updatable: false
+              }
             }
           }
-        }
-      })
+        })
+      }
     }
   }
 } as SGPluginConfig

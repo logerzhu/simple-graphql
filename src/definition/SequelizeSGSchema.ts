@@ -7,6 +7,7 @@ import Sequelize, {
   OrderItem
 } from 'sequelize'
 import {
+  SequelizeSGSchemaOptions,
   SGColumnFieldConfigMap,
   SGHookOptionsMap,
   SGInputFieldConfigMap,
@@ -94,7 +95,9 @@ export class SequelizeSGSchema extends SGSchema {
     }
   }
 
-  constructor(name: string, options: SGSchemaOptions = {}) {
+  options: SequelizeSGSchemaOptions
+
+  constructor(name: string, options: SequelizeSGSchemaOptions = {}) {
     super(name, options)
     this.config = {
       fields: {},
@@ -110,7 +113,6 @@ export class SequelizeSGSchema extends SGSchema {
       methods: {},
       statics: {}
     }
-    this.options = options
   }
 
   /**

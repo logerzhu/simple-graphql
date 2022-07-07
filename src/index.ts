@@ -295,6 +295,9 @@ export interface SGPluginOptionsMap<E extends SGModel = SGModel> {}
 export type SGSchemaOptions = {
   description?: string
   plugin?: SGPluginOptionsMap
+}
+
+export type SequelizeSGSchemaOptions = SGSchemaOptions & {
   tableOptions?: ModelOptions<any> & {
     primaryKey?: {
       field: string

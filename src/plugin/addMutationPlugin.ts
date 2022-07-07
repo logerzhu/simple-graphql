@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import {
+  SequelizeSGSchema,
   SGHookOptionsMap,
   SGInputFieldConfig,
   SGInputFieldConfigMap,
@@ -35,7 +36,10 @@ export default {
     const inputFields: SGInputFieldConfigMap = {
       ...(options.additionFields || {})
     }
-    if (schema.options.tableOptions?.primaryKey?.autoIncrement === false) {
+    if (
+      schema instanceof SequelizeSGSchema &&
+      schema.options.tableOptions?.primaryKey?.autoIncrement === false
+    ) {
       inputFields['id'] = { type: schema.name, nullable: true }
     }
     const isModelType = (fieldOptions: SGInputFieldConfig) => {
@@ -74,6 +78,7 @@ export default {
           const attrs = {}
 
           if (
+            schema instanceof SequelizeSGSchema &&
             schema.options.tableOptions?.primaryKey?.autoIncrement === false
           ) {
             attrs['id'] = args['id']
