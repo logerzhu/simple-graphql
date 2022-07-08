@@ -3,7 +3,7 @@ import {
   SGLinkedFieldConfigMap,
   SGMutationConfigMap,
   SGQueryConfigMap,
-  SGSchemaOptions
+  BaseSGSchemaOptions
 } from '..'
 
 export class BaseSGSchema {
@@ -22,9 +22,9 @@ export class BaseSGSchema {
     }
   }
 
-  options: SGSchemaOptions
+  options: BaseSGSchemaOptions
 
-  constructor(name: string, options: SGSchemaOptions = {}) {
+  constructor(name: string, options: BaseSGSchemaOptions = {}) {
     this.name = name
     this.config = {
       fields: {},

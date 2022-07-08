@@ -7,14 +7,14 @@ import Sequelize, {
   OrderItem
 } from 'sequelize'
 import {
-  SequelizeSGSchemaOptions,
+  SGSchemaOptions,
   SGColumnFieldConfigMap,
   SGHookOptionsMap,
   SGInputFieldConfigMap,
   SGLinkedFieldConfigMap,
   SGMutationConfigMap,
   SGQueryConfigMap,
-  SGSchemaOptions
+  BaseSGSchemaOptions
 } from '../index'
 import { BaseSGSchema } from './BaseSGSchema'
 
@@ -95,9 +95,9 @@ export class SGSchema extends BaseSGSchema {
     }
   }
 
-  options: SequelizeSGSchemaOptions
+  options: SGSchemaOptions
 
-  constructor(name: string, options: SequelizeSGSchemaOptions = {}) {
+  constructor(name: string, options: SGSchemaOptions = {}) {
     super(name, options)
     this.config = {
       fields: {},

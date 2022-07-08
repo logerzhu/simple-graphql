@@ -292,12 +292,12 @@ export interface SGPluginOptions {
 
 export interface SGPluginOptionsMap<E extends SGModel = SGModel> {}
 
-export type SGSchemaOptions = {
+export type BaseSGSchemaOptions = {
   description?: string
   plugin?: SGPluginOptionsMap
 }
 
-export type SequelizeSGSchemaOptions = SGSchemaOptions & {
+export type SGSchemaOptions = BaseSGSchemaOptions & {
   tableOptions?: ModelOptions<any> & {
     primaryKey?: {
       field: string
