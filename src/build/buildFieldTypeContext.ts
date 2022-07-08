@@ -1,4 +1,4 @@
-import { SequelizeSGSchema, SGSchema } from '../definition'
+import { SGSchema, BaseSGSchema } from '../definition'
 import {
   GraphQLFloat,
   GraphQLList,
@@ -30,7 +30,7 @@ import StringHelper from '../utils/StringHelper'
 type Context = SGResolverContext & SGInterfaceContext
 
 function buildModelType(
-  schema: SequelizeSGSchema,
+  schema: SGSchema,
   fieldTypeContext: SGTypeContext,
   context: Context
 ): SGTypeConfig {
@@ -168,7 +168,7 @@ function buildModelType(
 }
 
 function buildModelTypeId(
-  schema: SequelizeSGSchema,
+  schema: SGSchema,
   fieldTypeContext: SGTypeContext
 ): SGTypeConfig {
   const typeName = schema.name + 'Id'
@@ -223,7 +223,7 @@ function buildDataType(
     outputType: outputType,
     outputResolve: dataTypeOptions.definition.metadata?.graphql?.resolve,
     columnOptions: (
-      schema: SequelizeSGSchema,
+      schema: SGSchema,
       fieldName: string,
       options: SGColumnFieldConfig
     ) => {
@@ -312,7 +312,7 @@ function buildUnionWrapType(
 export default function (
   types: Array<SGTypeConfig>,
   dataTypes: Array<SGDataTypeConfig>,
-  schemas: Array<SGSchema>,
+  schemas: Array<BaseSGSchema>,
   context: Context
 ) {
   const typeMap: { [key: string]: SGTypeConfig } = {}
@@ -408,13 +408,13 @@ export default function (
     },
     function resolveModelType(typeName) {
       const schema = schemas.find((s) => s.name === typeName)
-      if (schema instanceof SequelizeSGSchema) {
+      if (schema instanceof SGSchema) {
         return buildModelType(schema, fieldTypeContext, context)
       }
     },
     function resolveModelIdType(typeName) {
       const schema = schemas.find((s) => s.name + 'Id' === typeName)
-      if (schema instanceof SequelizeSGSchema) {
+      if (schema instanceof SGSchema) {
         return buildModelTypeId(schema, fieldTypeContext)
       }
     },

@@ -1,14 +1,14 @@
-import { SequelizeSGSchema } from '../definition/SequelizeSGSchema'
-import { SGPluginConfig, SGPluginOptions, SGPluginOptionsMap } from '..'
 import { SGSchema } from '../definition/SGSchema'
+import { SGPluginConfig, SGPluginOptions, SGPluginOptionsMap } from '..'
+import { BaseSGSchema } from '../definition/BaseSGSchema'
 
 export default (
-  schemas: Array<SGSchema>,
+  schemas: Array<BaseSGSchema>,
   plugins: Array<SGPluginConfig>,
   defaultOptions: SGPluginOptionsMap
 ) => {
   const result: {
-    [key: string]: SGSchema
+    [key: string]: BaseSGSchema
   } = {}
 
   plugins.forEach((plugin) => {

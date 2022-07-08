@@ -13,7 +13,7 @@ import {
   ModelOptions,
   Sequelize
 } from 'sequelize'
-import { SequelizeSGSchema } from './definition/SequelizeSGSchema'
+import { SGSchema } from './definition/SGSchema'
 import { DataType } from 'sequelize/types/lib/data-types'
 
 import resolveRelayConnection from './build/modelStaticsMethod/resolveRelayConnection'
@@ -24,7 +24,7 @@ import hasSelection from './build/modelStaticsMethod/hasSelection'
 import findOneForGraphQL from './build/modelStaticsMethod/findOneForGraphQL'
 import findByPkForGraphQL from './build/modelStaticsMethod/findByPkForGraphQL'
 import DataLoader from 'dataloader'
-import { SGSchema } from './definition/SGSchema'
+import { BaseSGSchema } from './definition/BaseSGSchema'
 
 export abstract class SGModel<
   TModelAttributes extends {} = any
@@ -50,7 +50,7 @@ export interface SGModelStatic {
   }
 
   clearCache: () => Promise<void>
-  sgSchema: SequelizeSGSchema
+  sgSchema: SGSchema
 
   getSGContext: () => SGContext
 }
@@ -74,7 +74,7 @@ export interface SGModelCtrlMap {
 export type SGContext = {
   sequelize: Sequelize
   schemas: {
-    [key: string]: SGSchema
+    [key: string]: BaseSGSchema
   }
   models: SGModelCtrlMap
   services: SGServiceMap
@@ -132,7 +132,7 @@ export type SGTypeConfig = {
   columnOptions?:
     | ModelAttributeColumnOptions
     | ((
-        schema: SequelizeSGSchema,
+        schema: SGSchema,
         fieldName: string,
         options: SGColumnFieldConfig
       ) => ModelAttributeColumnOptions | null)
@@ -352,9 +352,9 @@ export type SGPluginConfig<T = SGPluginOptions> = {
   priority?: number
   defaultOptions?: T
   applyToSchema?: (
-    schema: SGSchema,
+    schema: BaseSGSchema,
     options: T,
-    schemas: Array<SGSchema>
+    schemas: Array<BaseSGSchema>
   ) => void
   applyToModel?: (
     model: SGModelCtrl,
@@ -370,7 +370,7 @@ export type SGBuildOptions = {
 export type SGBuildConfig = {
   dataTypes?: Array<SGDataTypeConfig>
   types?: Array<SGTypeConfig>
-  schemas?: Array<SGSchema>
+  schemas?: Array<BaseSGSchema>
   services?: Array<typeof SGService & { new (): SGService }>
   hooks?: Array<SGHookConfig>
   plugins?: Array<SGPluginConfig>

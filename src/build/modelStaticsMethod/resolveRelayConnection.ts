@@ -5,11 +5,11 @@ import { FindOptions, Order, OrderItem } from 'sequelize'
 import { BindOrReplacements } from 'sequelize/types/lib/query-interface'
 import { Includeable, WhereOptions } from 'sequelize/types/lib/model'
 import { Selection } from './parseSelections'
-import { SequelizeSGSchema } from '../../definition/SequelizeSGSchema'
+import { SGSchema } from '../../definition/SGSchema'
 
 const isPrimaryOrder = (
   sgContext: SGContext,
-  schema: SequelizeSGSchema,
+  schema: SGSchema,
   orderConfig
 ) => {
   if (_.isArray(orderConfig)) {

@@ -1,17 +1,90 @@
+import _ from 'lodash'
+import Sequelize, {
+  BelongsToManyOptions,
+  BelongsToOptions,
+  HasManyOptions,
+  HasOneOptions,
+  OrderItem
+} from 'sequelize'
 import {
+  SequelizeSGSchemaOptions,
   SGColumnFieldConfigMap,
+  SGHookOptionsMap,
+  SGInputFieldConfigMap,
   SGLinkedFieldConfigMap,
   SGMutationConfigMap,
   SGQueryConfigMap,
   SGSchemaOptions
-} from '..'
+} from '../index'
+import { BaseSGSchema } from './BaseSGSchema'
 
-export class SGSchema {
-  name: string
+/**
+ * @public
+ */
+export type HasOneConfig = {
+  [key: string]: {
+    hookOptions?: SGHookOptionsMap
+    hidden?: boolean
+    target: string
+    description?: string
+    foreignField?: string
+  } & HasOneOptions
+}
+
+/**
+ * @public
+ */
+export type BelongsToConfig = {
+  [key: string]: {
+    hidden?: boolean
+    target: string
+    description?: string
+    foreignField?: string
+  } & BelongsToOptions
+}
+
+type HasManyConfig = {
+  [key: string]: {
+    hookOptions?: SGHookOptionsMap
+    target: string
+    description?: string
+    foreignField?: string
+    hidden?: boolean
+    conditionFields?: SGInputFieldConfigMap
+    order?: OrderItem[]
+    outputStructure?: 'Connection' | 'Array'
+  } & HasManyOptions
+}
+
+/**
+ * @public
+ */
+type BelongsToManyConfig = {
+  [key: string]: {
+    hidden?: boolean
+    description?: string
+    target: string
+    foreignField?: string
+  } & BelongsToManyOptions
+}
+
+/**
+ * @public
+ */
+type AssociationConfig = {
+  hasOne: HasOneConfig
+  belongsTo: BelongsToConfig
+  hasMany: HasManyConfig
+  belongsToMany: BelongsToManyConfig
+}
+
+export class SGSchema extends BaseSGSchema {
+  sequelize: Sequelize.Sequelize
 
   config: {
     fields: SGColumnFieldConfigMap
     links: SGLinkedFieldConfigMap
+    associations: AssociationConfig
     queries: SGQueryConfigMap
     mutations: SGMutationConfigMap
     methods: {
@@ -22,69 +95,63 @@ export class SGSchema {
     }
   }
 
-  options: SGSchemaOptions
+  options: SequelizeSGSchemaOptions
 
-  constructor(name: string, options: SGSchemaOptions = {}) {
-    this.name = name
+  constructor(name: string, options: SequelizeSGSchemaOptions = {}) {
+    super(name, options)
     this.config = {
       fields: {},
       links: {},
+      associations: {
+        hasOne: {},
+        belongsTo: {},
+        hasMany: {},
+        belongsToMany: {}
+      },
       queries: {},
       mutations: {},
       methods: {},
       statics: {}
     }
-    this.options = options
   }
 
   /**
-   * Add the model base fields, and each field has a corresponding database column.
-   * In default, each field generate a GraphQL field, unless it config with "hidden:true".
+   * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#hasone|HasOne} relations to current Schema.
    */
-  fields<T extends SGSchema>(this: T, fields: SGColumnFieldConfigMap): T {
-    this.config.fields = Object.assign(this.config.fields, fields)
+  hasOne(config: HasOneConfig): SGSchema {
+    _.forOwn(config, (value, key) => {
+      this.config.associations.hasOne[key] = value
+    })
     return this
   }
 
   /**
-   * Add the model link fields, and each link generate a GraphQL field but no corresponding database column.
+   * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#belongsto|BelongsTo} relations to current Schema.
    */
-  links<T extends SGSchema>(this: T, links: SGLinkedFieldConfigMap): T {
-    this.config.links = Object.assign(this.config.links, links)
+  belongsTo(config: BelongsToConfig): SGSchema {
+    _.forOwn(config, (value, key) => {
+      this.config.associations.belongsTo[key] = value
+    })
     return this
   }
 
   /**
-   * Add the GraphQL query methods.
+   * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#one-to-many-associations|HasMany} relations to current Schema.
    */
-  queries<T extends SGSchema>(this: T, queries: SGQueryConfigMap): T {
-    // TODO duplicate check
-    this.config.queries = Object.assign(this.config.queries, queries)
+  hasMany(config: HasManyConfig): SGSchema {
+    _.forOwn(config, (value, key) => {
+      this.config.associations.hasMany[key] = value
+    })
     return this
   }
 
   /**
-   * Add the GraphQL mutataion methods.
+   * Add {@link http://docs.sequelizejs.com/en/latest/docs/associations/#belongs-to-many-associations|BelongsToMany} relations to current Schema.
    */
-  mutations<T extends SGSchema>(this: T, mutations: SGMutationConfigMap): T {
-    // TODO duplicate check
-    this.config.mutations = Object.assign(this.config.mutations, mutations)
-    return this
-  }
-
-  /**
-   * Add instance method to current Schema.
-   */
-  methods<T extends SGSchema>(this: T, methods: { [key: string]: any }): T {
-    this.config.methods = Object.assign(this.config.methods, methods)
-    return this
-  }
-
-  /**
-   * Add statics method to current Schema.
-   */
-  statics<T extends SGSchema>(this: T, statics: { [key: string]: any }): T {
-    this.config.statics = Object.assign(this.config.statics, statics)
+  belongsToMany(config: BelongsToManyConfig): SGSchema {
+    _.forOwn(config, (value, key) => {
+      this.config.associations.belongsToMany[key] = value
+    })
     return this
   }
 

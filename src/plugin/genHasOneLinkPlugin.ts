@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { SequelizeSGSchema, SGPluginConfig } from '../index'
+import { SGSchema, SGPluginConfig } from '../index'
 
 export default {
   name: 'genHasOneLink',
@@ -9,7 +9,7 @@ export default {
   priority: 99,
   description: 'Gen `HasOneLink` for Schema',
   applyToSchema: function hasOneFieldsConfig(schema, options, schemas): void {
-    if (schema instanceof SequelizeSGSchema) {
+    if (schema instanceof SGSchema) {
       _.forOwn(schema.config.associations.hasOne, (config, key) => {
         if (config.hidden) {
           return

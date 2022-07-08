@@ -1,2 +1,2 @@
+export * from './BaseSGSchema'
 export * from './SGSchema'
-export * from './SequelizeSGSchema'

@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import {
-  SequelizeSGSchema,
+  SGSchema,
   SGConditionFieldMapper,
   SGInputFieldConfig,
   SGInputFieldConfigMap,
@@ -17,7 +17,7 @@ export default {
   priority: 99,
   description: 'Gen `HasManyLink` for Schema',
   applyToSchema: function hasManyLinkedField(schema, options, schemas): void {
-    if (schema instanceof SequelizeSGSchema) {
+    if (schema instanceof SGSchema) {
       _.forOwn(schema.config.associations.hasMany, (config, key) => {
         if (config.hidden) {
           return

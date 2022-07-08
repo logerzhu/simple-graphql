@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import StringHelper from '../utils/StringHelper'
 import {
-  SequelizeSGSchema,
+  SGSchema,
   SGHookOptionsMap,
   SGInputFieldConfig,
   SGInputFieldConfigMap,
@@ -66,7 +66,7 @@ export default {
       }
     }
     let versionConfig: string | boolean | undefined = false
-    if (schema instanceof SequelizeSGSchema) {
+    if (schema instanceof SGSchema) {
       versionConfig = (schema.options.tableOptions || {}).version
       if (versionConfig === true || typeof versionConfig === 'string') {
         inputFields[

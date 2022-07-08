@@ -10,12 +10,12 @@ import {
   SGPluginConfig,
   SGPluginOptions
 } from '../index'
-import { SGSchema } from '../definition/SGSchema'
+import { BaseSGSchema } from '../definition/BaseSGSchema'
 
 const getSearchFields = (
   additionFields: SGInputFieldConfigMap,
-  schema: SGSchema,
-  schemas: Array<SGSchema>
+  schema: BaseSGSchema,
+  schemas: Array<BaseSGSchema>
 ) => {
   const isModelType = (fieldOptions: SGInputFieldConfig) => {
     return (

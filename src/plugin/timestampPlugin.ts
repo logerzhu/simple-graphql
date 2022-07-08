@@ -1,4 +1,4 @@
-import { SequelizeSGSchema, SGPluginConfig, SGPluginOptions } from '../index'
+import { SGSchema, SGPluginConfig, SGPluginOptions } from '../index'
 
 declare module '../index' {
   export interface SGPluginOptionsMap {
@@ -14,7 +14,7 @@ export default {
   priority: 100,
   description: 'Add createdAt/updatedAt field to Schema',
   applyToSchema: (schema, options, schemas) => {
-    if (schema instanceof SequelizeSGSchema) {
+    if (schema instanceof SGSchema) {
       schema.fields({
         createdAt: {
           type: 'Date',
