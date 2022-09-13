@@ -19,7 +19,11 @@ export default (
         options = defaultOptions[plugin.name]
       }
       if (options === undefined) {
-        options = plugin.defaultOptions
+        if (typeof plugin.defaultOptions === 'function') {
+          options = plugin.defaultOptions(schema)
+        } else {
+          options = plugin.defaultOptions
+        }
       }
       if (options != null && options.enable && plugin.applyToSchema) {
         plugin.applyToSchema(schema, options, schemas)

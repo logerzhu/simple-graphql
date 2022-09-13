@@ -350,7 +350,7 @@ export type SGPluginConfig<T = SGPluginOptions> = {
   name: string
   description?: string
   priority?: number
-  defaultOptions?: T
+  defaultOptions?: T | ((schema: BaseSGSchema) => T)
   applyToSchema?: (
     schema: BaseSGSchema,
     options: T,
