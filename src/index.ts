@@ -105,23 +105,23 @@ export interface SGResolveContext {
   dataloaderMap?: { [key: string]: DataLoader<any, any> }
 }
 
-export type SGFieldResolve<T = any> = (
-  source: T,
+export type SGFieldResolve<S = any, R = any> = (
+  source: S,
   args: {
     [key: string]: any
   },
   context: SGResolveContext,
   info: GraphQLResolveInfo,
   sgContext: SGContext
-) => any
-export type SGRootResolve = (
+) => Promise<R>
+export type SGRootResolve<T = any> = (
   args: {
     [key: string]: any
   },
   context: SGResolveContext,
   info: GraphQLResolveInfo,
   sgContext: SGContext
-) => any
+) => Promise<T>
 export type SGTypeConfig = {
   name: string
   description?: string
@@ -140,11 +140,14 @@ export type SGTypeConfig = {
 export type SGFieldTypeMetadata = {
   description?: string
 }
-export type SGOutputFieldTypeMetadata = SGFieldTypeMetadata & {
+export type SGOutputFieldTypeMetadata<
+  S = any,
+  T = any
+> = SGFieldTypeMetadata & {
   hookOptions?: SGHookOptionsMap
   graphql?: {
     hidden?: boolean
-    resolve?: SGFieldResolve
+    resolve?: SGFieldResolve<S, T>
     dependentFields?: Array<string>
     input?: SGInputFieldConfigMap
   }
@@ -163,7 +166,10 @@ export type SGInputFieldTypeMetadata = SGFieldTypeMetadata & {
 }
 // 基于 https://jsontypedef.com/ 扩展 sequelize / graphql 配置
 export type SGFieldTypeDefinition<
-  T extends SGFieldTypeMetadata = SGFieldTypeMetadata
+  S1 extends SGFieldTypeMetadata = SGFieldTypeMetadata,
+  S2 extends SGFieldTypeMetadata = S1,
+  S3 extends SGFieldTypeMetadata = S2,
+  S4 extends SGFieldTypeMetadata = S3
 > = (
   | {
       type:
@@ -191,7 +197,7 @@ export type SGFieldTypeDefinition<
       mapping?: undefined
     }
   | {
-      elements: SGFieldTypeDefinition<T>
+      elements: SGFieldTypeDefinition<S2, S3, S4>
       type?: undefined
       enum?: undefined
       properties?: undefined
@@ -200,7 +206,7 @@ export type SGFieldTypeDefinition<
       mapping?: undefined
     }
   | {
-      properties: { [key: string]: SGFieldTypeDefinition<T> }
+      properties: { [key: string]: SGFieldTypeDefinition<S2, S3, S4> }
       type?: undefined
       enum?: undefined
       elements?: undefined
@@ -209,7 +215,7 @@ export type SGFieldTypeDefinition<
       mapping?: undefined
     }
   | {
-      values: SGFieldTypeDefinition<T>
+      values: SGFieldTypeDefinition<S2, S3, S4>
       type?: undefined
       enum?: undefined
       elements?: undefined
@@ -219,7 +225,7 @@ export type SGFieldTypeDefinition<
     }
   | {
       discriminator: string
-      mapping: { [key: string]: SGFieldTypeDefinition<T> }
+      mapping: { [key: string]: SGFieldTypeDefinition<S2, S3, S4> }
       type?: undefined
       enum?: undefined
       elements?: undefined
@@ -227,25 +233,29 @@ export type SGFieldTypeDefinition<
       values?: undefined
     }
 ) & {
-  definitions?: { [key: string]: SGFieldTypeDefinition<T> }
+  definitions?: { [key: string]: SGFieldTypeDefinition<S2, S3, S4> }
   nullable?: boolean
-  metadata?: T
+  metadata?: S1
 }
 export type SGInputFieldConfig = SGFieldTypeDefinition<SGInputFieldTypeMetadata>
 export type SGInputFieldConfigMap = { [key: string]: SGInputFieldConfig }
-export type SGOutputFieldConfig = SGFieldTypeDefinition<SGOutputFieldTypeMetadata>
-export type SGOutputFieldConfigMap = { [key: string]: SGOutputFieldConfig }
-export type SGLinkedFieldConfig = {
+export type SGOutputFieldConfig<S = any, T = any> = SGFieldTypeDefinition<
+  SGOutputFieldTypeMetadata<S, T>
+>
+export type SGOutputFieldConfigMap<T = any> = {
+  [key: string]: SGOutputFieldConfig<T>
+}
+export type SGLinkedFieldConfig<S = any, T = any> = {
   description?: string
   hookOptions?: SGHookOptionsMap
   input?: SGInputFieldConfigMap
   dependentFields?: Array<string>
-  output: SGOutputFieldConfig
-  resolve: SGFieldResolve
+  output: SGOutputFieldConfig<T>
+  resolve: SGFieldResolve<S, T>
 }
 export type SGLinkedFieldConfigMap = { [key: string]: SGLinkedFieldConfig }
-export type SGColumnFieldConfig = SGFieldTypeDefinition<
-  SGOutputFieldTypeMetadata & SGInputFieldTypeMetadata
+export type SGColumnFieldConfig<S = any, T = any> = SGFieldTypeDefinition<
+  SGOutputFieldTypeMetadata<S, T> & SGInputFieldTypeMetadata
 > & {
   metadata?: {
     graphql?: {
@@ -269,20 +279,20 @@ export type SGDataTypeConfig = {
   >
   columnOptions?: ModelAttributeColumnOptions
 }
-export type SGQueryConfig = {
+export type SGQueryConfig<T = any> = {
   description?: string
   hookOptions?: SGHookOptionsMap
   input?: SGInputFieldConfigMap
-  output: SGOutputFieldConfig
-  resolve: SGRootResolve
+  output: SGOutputFieldConfig<T>
+  resolve: SGRootResolve<T>
 }
 export type SGQueryConfigMap = { [key: string]: SGQueryConfig }
-export type SGMutationConfig = {
+export type SGMutationConfig<T = any> = {
   description?: string
   hookOptions?: SGHookOptionsMap
   input: SGInputFieldConfigMap
-  output: SGOutputFieldConfigMap
-  mutateAndGetPayload: SGRootResolve
+  output: SGOutputFieldConfigMap<T>
+  mutateAndGetPayload: SGRootResolve<T>
 }
 export type SGMutationConfigMap = { [key: string]: SGMutationConfig }
 
