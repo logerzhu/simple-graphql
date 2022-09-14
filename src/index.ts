@@ -167,9 +167,7 @@ export type SGInputFieldTypeMetadata = SGFieldTypeMetadata & {
 // 基于 https://jsontypedef.com/ 扩展 sequelize / graphql 配置
 export type SGFieldTypeDefinition<
   S1 extends SGFieldTypeMetadata = SGFieldTypeMetadata,
-  S2 extends SGFieldTypeMetadata = S1,
-  S3 extends SGFieldTypeMetadata = S2,
-  S4 extends SGFieldTypeMetadata = S3
+  S2 extends SGFieldTypeMetadata = S1
 > = (
   | {
       type:
@@ -197,7 +195,7 @@ export type SGFieldTypeDefinition<
       mapping?: undefined
     }
   | {
-      elements: SGFieldTypeDefinition<S2, S3, S4>
+      elements: SGFieldTypeDefinition<S2>
       type?: undefined
       enum?: undefined
       properties?: undefined
@@ -206,7 +204,7 @@ export type SGFieldTypeDefinition<
       mapping?: undefined
     }
   | {
-      properties: { [key: string]: SGFieldTypeDefinition<S2, S3, S4> }
+      properties: { [key: string]: SGFieldTypeDefinition<S2> }
       type?: undefined
       enum?: undefined
       elements?: undefined
@@ -215,7 +213,7 @@ export type SGFieldTypeDefinition<
       mapping?: undefined
     }
   | {
-      values: SGFieldTypeDefinition<S2, S3, S4>
+      values: SGFieldTypeDefinition<S2>
       type?: undefined
       enum?: undefined
       elements?: undefined
@@ -225,7 +223,7 @@ export type SGFieldTypeDefinition<
     }
   | {
       discriminator: string
-      mapping: { [key: string]: SGFieldTypeDefinition<S2, S3, S4> }
+      mapping: { [key: string]: SGFieldTypeDefinition<S2> }
       type?: undefined
       enum?: undefined
       elements?: undefined
@@ -233,14 +231,19 @@ export type SGFieldTypeDefinition<
       values?: undefined
     }
 ) & {
-  definitions?: { [key: string]: SGFieldTypeDefinition<S2, S3, S4> }
+  definitions?: { [key: string]: SGFieldTypeDefinition<S2> }
   nullable?: boolean
   metadata?: S1
 }
 export type SGInputFieldConfig = SGFieldTypeDefinition<SGInputFieldTypeMetadata>
 export type SGInputFieldConfigMap = { [key: string]: SGInputFieldConfig }
-export type SGOutputFieldConfig<S = any, T = any> = SGFieldTypeDefinition<
-  SGOutputFieldTypeMetadata<S, T>
+export type SGOutputFieldConfig<
+  S1 = any,
+  S2 = any,
+  S3 = any
+> = SGFieldTypeDefinition<
+  SGOutputFieldTypeMetadata<S1, S2>,
+  SGOutputFieldTypeMetadata<S2, S3>
 >
 export type SGOutputFieldConfigMap<T = any> = {
   [key: string]: SGOutputFieldConfig<T>
