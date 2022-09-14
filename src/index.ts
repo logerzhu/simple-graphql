@@ -240,10 +240,11 @@ export type SGInputFieldConfigMap = { [key: string]: SGInputFieldConfig }
 export type SGOutputFieldConfig<
   S1 = any,
   S2 = any,
-  S3 = any
+  S3 = any,
+  S4 = any
 > = SGFieldTypeDefinition<
   SGOutputFieldTypeMetadata<S1, S2>,
-  SGOutputFieldTypeMetadata<S2, S3>
+  SGOutputFieldTypeMetadata<S3, S4>
 >
 export type SGOutputFieldConfigMap<T = any> = {
   [key: string]: SGOutputFieldConfig<T>
