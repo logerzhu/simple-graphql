@@ -1,4 +1,4 @@
-import {SGSchema} from '../../../src'
+import {SGQueryConfig, SGSchema} from '../../../src'
 
 export default new SGSchema('User', {
   description: '用户',
@@ -135,4 +135,24 @@ export default new SGSchema('User', {
     target: 'UserProfile',
     foreignField: 'owner'
   }
+}).queries({
+  hello:{
+    output:{
+      properties:{
+        a:{
+          type:"String",
+          metadata:{
+            graphql:{
+              resolve:async function({b}){
+                return {c:1,d:'xxx',b}
+              }
+            }
+          }
+        }
+      }
+    },
+    resolve:async function(){
+      return {a:1,b:"XXX"}
+    }
+  } as SGQueryConfig<{a:number, b:string}>
 })

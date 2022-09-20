@@ -43,7 +43,7 @@ function toSequelizeModel(
       }
     } else if (value.elements) {
       columnOptions = {
-        type: Sequelize.JSONB
+        type: Sequelize.JSON
       }
     } else if (value.type) {
       const typeConfig = context.typeConfig(value.type)
