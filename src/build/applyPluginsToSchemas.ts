@@ -11,6 +11,9 @@ export default (
     [key: string]: BaseSGSchema
   } = {}
 
+  const schemaMap: { [name: string]: BaseSGSchema } = {}
+  schemas.forEach((schema) => (schemaMap[schema.name] = schema))
+
   plugins.forEach((plugin) => {
     for (const schema of schemas) {
       let options: SGPluginOptions | null | undefined = ((schema.options || {})
@@ -26,7 +29,7 @@ export default (
         }
       }
       if (options != null && options.enable && plugin.applyToSchema) {
-        plugin.applyToSchema(schema, options, schemas)
+        plugin.applyToSchema(schema, options, schemaMap)
       }
     }
   })

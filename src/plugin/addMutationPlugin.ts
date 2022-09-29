@@ -1,11 +1,11 @@
 import _ from 'lodash'
 import {
-  SGSchema,
   SGHookOptionsMap,
   SGInputFieldConfig,
   SGInputFieldConfigMap,
   SGPluginConfig,
-  SGPluginOptions
+  SGPluginOptions,
+  SGSchema
 } from '../index'
 import StringHelper from '../utils/StringHelper'
 
@@ -42,12 +42,8 @@ export default {
     ) {
       inputFields['id'] = { type: schema.name, nullable: true }
     }
-    const isModelType = (fieldOptions: SGInputFieldConfig) => {
-      return (
-        fieldOptions.type &&
-        schemas.find((s) => s.name === fieldOptions.type) != null
-      )
-    }
+    const isModelType = (fieldOptions: SGInputFieldConfig) =>
+      fieldOptions.type && schemas[fieldOptions.type] != null
 
     _.forOwn(schema.config.fields, (value, key) => {
       if (isModelType(value)) {

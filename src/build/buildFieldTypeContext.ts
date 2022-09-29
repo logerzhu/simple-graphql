@@ -1,4 +1,4 @@
-import { SGSchema, BaseSGSchema } from '../definition'
+import { BaseSGSchema, SGSchema } from '../definition'
 import {
   GraphQLFloat,
   GraphQLList,
@@ -316,6 +316,8 @@ export default function (
   context: Context
 ) {
   const typeMap: { [key: string]: SGTypeConfig } = {}
+  const schemaMap: { [name: string]: BaseSGSchema } = {}
+  schemas.forEach((schema) => (schemaMap[schema.name] = schema))
 
   const resolves: Array<(string) => SGTypeConfig | undefined> = [
     function resolveInterfaceType(typeName) {
@@ -331,7 +333,7 @@ export default function (
         }
       }
     },
-    function resolveArrayType(typeName) {
+    function resolveArrayType(typeName: string) {
       if (typeName.startsWith('[') && typeName.endsWith(']')) {
         const subTypeName = typeName.substr(1, typeName.length - 2)
         const typeConfig = fieldTypeContext.typeConfig(subTypeName)
@@ -349,7 +351,7 @@ export default function (
             : null,
           outputResolve: async function (root, args, context, info, sgContext) {
             const fieldName = info.fieldName
-            if (schemas.find((s) => s.name === subTypeName) != null) {
+            if (schemaMap[subTypeName] != null) {
               if (
                 root[fieldName] != null &&
                 root[fieldName].length > 0 &&
@@ -406,23 +408,30 @@ export default function (
         }
       }
     },
-    function resolveModelType(typeName) {
-      const schema = schemas.find((s) => s.name === typeName)
+    function resolveModelType(typeName: string) {
+      const schema = schemaMap[typeName]
       if (schema instanceof SGSchema) {
         return buildModelType(schema, fieldTypeContext, context)
       }
     },
-    function resolveModelIdType(typeName) {
-      const schema = schemas.find((s) => s.name + 'Id' === typeName)
-      if (schema instanceof SGSchema) {
-        return buildModelTypeId(schema, fieldTypeContext)
+    function resolveModelIdType(typeName: string) {
+      if (typeName.endsWith('Id')) {
+        const schema = schemaMap[typeName.substring(0, typeName.length - 2)]
+        if (schema instanceof SGSchema) {
+          return buildModelTypeId(schema, fieldTypeContext)
+        }
       }
     },
-    function resolveModelConnectionType(typeName) {
-      const schema = schemas.find(
-        (s) =>
-          s.name + 'Connection' === typeName || s.name + 'Edge' === typeName
-      )
+    function resolveModelConnectionType(typeName: string) {
+      let schema = typeName.endsWith('Connection')
+        ? schemaMap[
+            typeName.substring(0, typeName.length - 'Connection'.length)
+          ]
+        : null
+      if (typeName.endsWith('Edge')) {
+        schema =
+          schemaMap[typeName.substring(0, typeName.length - 'Edge'.length)]
+      }
       if (schema) {
         const typeConfig = fieldTypeContext.typeConfig(schema.name)
         if (!typeConfig?.outputType) {

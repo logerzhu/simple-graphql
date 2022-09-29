@@ -30,12 +30,8 @@ export default {
   applyToSchema: function singularQuery(schema, options, schemas): void {
     const name = StringHelper.toInitialLowerCase(schema.name)
 
-    const isModelType = (fieldOptions: SGInputFieldConfig) => {
-      return (
-        fieldOptions.type &&
-        schemas.find((s) => s.name === fieldOptions.type) != null
-      )
-    }
+    const isModelType = (fieldOptions: SGInputFieldConfig) =>
+      fieldOptions.type && schemas[fieldOptions.type] != null
     //TODO support mapper setting
 
     const searchFields: SGInputFieldConfigMap = {

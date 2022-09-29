@@ -15,14 +15,10 @@ import { BaseSGSchema } from '../definition/BaseSGSchema'
 const getSearchFields = (
   additionFields: SGInputFieldConfigMap,
   schema: BaseSGSchema,
-  schemas: Array<BaseSGSchema>
+  schemas: { [name: string]: BaseSGSchema }
 ) => {
-  const isModelType = (fieldOptions: SGInputFieldConfig) => {
-    return (
-      fieldOptions.type &&
-      schemas.find((s) => s.name === fieldOptions.type) != null
-    )
-  }
+  const isModelType = (fieldOptions: SGInputFieldConfig) =>
+    fieldOptions.type && schemas[fieldOptions.type] != null
 
   const advanceType = (options: SGInputFieldConfig): SGInputFieldConfig => {
     if (options.elements) {

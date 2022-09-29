@@ -6,7 +6,7 @@ import Sequelize, {
 import { SGSchema } from '../definition/SGSchema'
 import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
-import { SGContext, SGModelCtrl, SGTypeContext } from '../index'
+import { BaseSGSchema, SGContext, SGModelCtrl, SGTypeContext } from '../index'
 import { ForeignKeyOptions } from 'sequelize/types/lib/associations/base'
 
 function toSequelizeModel(
@@ -81,6 +81,9 @@ function buildModelAssociations(
     [id: string]: SGModelCtrl
   }
 ) {
+  const schemaMap: { [name: string]: BaseSGSchema } = {}
+  schemas.forEach((schema) => (schemaMap[schema.name] = schema))
+
   const getForeignKey = (config: {
     target: string
     foreignKey?: string | ForeignKeyOptions
@@ -89,7 +92,7 @@ function buildModelAssociations(
     if (config.foreignKey) {
       return config.foreignKey
     } else if (config.foreignField) {
-      const schema = schemas.find((s) => s.name === config.target)
+      const schema = schemaMap[config.target]
       const field = schema?.config.fields[config.foreignField]
       if (field) {
         return field.metadata?.column?.field || config.foreignField + 'Id'

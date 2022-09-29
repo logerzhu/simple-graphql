@@ -31,12 +31,8 @@ export default {
     const savedName = 'saved' + StringHelper.toInitialUpperCase(schema.name)
 
     const inputFields: SGInputFieldConfigMap = {}
-    const isModelType = (fieldOptions: SGInputFieldConfig) => {
-      return (
-        fieldOptions.type &&
-        schemas.find((s) => s.name === fieldOptions.type) != null
-      )
-    }
+    const isModelType = (fieldOptions: SGInputFieldConfig) =>
+      fieldOptions.type && schemas[fieldOptions.type] != null
 
     _.forOwn(schema.config.fields, (value, key) => {
       if (isModelType(value)) {

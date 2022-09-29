@@ -368,7 +368,7 @@ export type SGPluginConfig<T = SGPluginOptions> = {
   applyToSchema?: (
     schema: BaseSGSchema,
     options: T,
-    schemas: Array<BaseSGSchema>
+    schemas: { [name: string]: BaseSGSchema }
   ) => void
   applyToModel?: (
     model: SGModelCtrl,
