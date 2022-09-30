@@ -12,11 +12,11 @@ import {
 import {
   SGBuildConfig,
   SGBuildOptions,
+  SGContext,
   SGInterfaceContext,
   SGResolverContext,
-  SGContext,
-  SGTypeContext,
-  SGSchema
+  SGSchema,
+  SGTypeContext
 } from '..'
 
 import applyPluginsToSchemas from './applyPluginsToSchemas'
@@ -43,8 +43,8 @@ export function buildGraphQLContext(
       plugins,
       buildOptions.defaultPlugin || {}
     ),
-    models: {} as any,
-    services: {} as any,
+    models: {},
+    services: {},
     typeConfig: (typeName) => null
   }
 
