@@ -71,8 +71,11 @@ function toSequelizeModel(
       }
     }
   })
-  sequelize.define(schema.name, dbDefinition, schema.options.tableOptions)
-  return sequelize.model(schema.name)
+  return sequelize.define(
+    schema.name,
+    dbDefinition,
+    schema.options.tableOptions
+  )
 }
 
 function buildModelAssociations(
