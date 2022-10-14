@@ -13,7 +13,7 @@ function toSequelizeModel(
   sequelize: Sequelize.Sequelize,
   schema: SGSchema,
   context: SGTypeContext
-): ModelCtor<Model> {
+): [ModelCtor<Model>, { [key: string]: ModelAttributeColumnOptions }] {
   const dbDefinition: { [key: string]: ModelAttributeColumnOptions } = {}
 
   const versionConfig = schema.options.tableOptions?.version
@@ -32,6 +32,7 @@ function toSequelizeModel(
     }
   }
 
+  const extAttributes: { [key: string]: ModelAttributeColumnOptions } = {}
   _.forOwn(schema.config.fields, (value, key) => {
     if (key === versionField) return
 
@@ -63,19 +64,17 @@ function toSequelizeModel(
       }
     }
     if (columnOptions) {
-      dbDefinition[key] = { ...columnOptions }
-      dbDefinition[key].allowNull = value.nullable !== false
-      dbDefinition[key] = {
-        ...dbDefinition[key],
+      extAttributes[key] = {
+        ...columnOptions,
+        allowNull: value.nullable !== false,
         ...(value.metadata?.column || {})
       }
     }
   })
-  return sequelize.define(
-    schema.name,
-    dbDefinition,
-    schema.options.tableOptions
-  )
+  return [
+    sequelize.define(schema.name, dbDefinition, schema.options.tableOptions),
+    extAttributes
+  ]
 }
 
 function buildModelAssociations(
@@ -87,6 +86,7 @@ function buildModelAssociations(
   // 每次associations的改动, 会触发Model.refreshAttributes操作
   // 如果先初始化associations, 再通过通过Model.rawAttributes / refreshAttributes添加其他字段
   // 性能大概提升30%
+
   const schemaMap: { [name: string]: BaseSGSchema } = {}
   schemas.forEach((schema) => (schemaMap[schema.name] = schema))
 
@@ -161,11 +161,14 @@ export default (
   const result: {
     [id: string]: SGModelCtrl
   } = {}
+  const extAttributesMap: {
+    [key: string]: { [key: string]: ModelAttributeColumnOptions }
+  } = {}
   for (const schema of schemas) {
     if (result[schema.name]) {
       throw new Error(`Schema ${schema.name} already define.`)
     }
-    const model: any = toSequelizeModel(
+    const [model, extAttributes] = toSequelizeModel(
       schema.sequelize || sequelize,
       schema,
       context
@@ -181,8 +184,17 @@ export default (
       _fieldType: schema.name,
       ...schema.config.methods
     })
-    result[schema.name] = model
+    result[schema.name] = model as SGModelCtrl
+    extAttributesMap[schema.name] = extAttributes
   }
   buildModelAssociations(schemas, result)
-  return _.values(result)
+  return _.values(result).map((model) => {
+    _.toPairs(extAttributesMap[model.name]).forEach(([key, attribute]) => {
+      if (model.rawAttributes[key] == null) {
+        model.rawAttributes[key] = attribute
+      }
+    })
+    ;(model as any).refreshAttributes()
+    return model
+  })
 }
