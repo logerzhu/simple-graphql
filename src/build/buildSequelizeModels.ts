@@ -84,6 +84,9 @@ function buildModelAssociations(
     [id: string]: SGModelCtrl
   }
 ) {
+  // 每次associations的改动, 会触发Model.refreshAttributes操作
+  // 如果先初始化associations, 再通过通过Model.rawAttributes / refreshAttributes添加其他字段
+  // 性能大概提升30%
   const schemaMap: { [name: string]: BaseSGSchema } = {}
   schemas.forEach((schema) => (schemaMap[schema.name] = schema))
 
