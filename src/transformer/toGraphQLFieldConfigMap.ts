@@ -131,9 +131,10 @@ const toGraphQLFieldConfigMap = function (
         }
         config.resolve = context.hookFieldResolve(path, finalField)
       } else {
-        // 性能优化:默认情况下不加hook
-        config.resolve =
-          config.resolve || context.hookFieldResolve(path, finalField)
+        if (config.resolve) {
+          finalField.resolve = config.resolve
+        }
+        config.resolve = context.hookFieldResolve(path, finalField)
       }
 
       if (field.metadata?.graphql?.input) {
