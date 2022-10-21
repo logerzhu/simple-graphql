@@ -113,6 +113,7 @@ const toGraphQLFieldConfigMap = function (
           ) {
             return resolve(
               {
+                ...source,
                 [info.fieldName]: await cusResolve(
                   source,
                   args,
