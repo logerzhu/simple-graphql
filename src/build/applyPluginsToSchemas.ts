@@ -1,9 +1,15 @@
-import { SGBuildOptions, SGPluginConfig, SGPluginOptions } from '..'
+import {
+  SGBuildConfig,
+  SGBuildOptions,
+  SGPluginConfig,
+  SGPluginOptions
+} from '..'
 import { BaseSGSchema } from '../definition/BaseSGSchema'
 
 export default (
   schemas: Array<BaseSGSchema>,
   plugins: Array<SGPluginConfig>,
+  config: SGBuildConfig,
   buildOptions: SGBuildOptions
 ) => {
   const result: {
@@ -29,7 +35,7 @@ export default (
         }
       }
       if (options != null && options.enable && plugin.applyToSchema) {
-        plugin.applyToSchema(schema, options, schemaMap, buildOptions)
+        plugin.applyToSchema(schema, options, schemaMap, config)
       }
     }
   })

@@ -369,7 +369,7 @@ export type SGPluginConfig<T = SGPluginOptions> = {
     schema: BaseSGSchema,
     options: T,
     schemas: { [name: string]: BaseSGSchema },
-    buildOptions: SGBuildOptions
+    config: SGBuildConfig
   ) => void
   applyToModel?: (
     model: SGModelCtrl,
