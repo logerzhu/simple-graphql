@@ -38,11 +38,7 @@ export function buildGraphQLContext(
   const plugins = buildPlugins(config.plugins || [])
   const sgContext: SGContext = {
     sequelize: sequelize,
-    schemas: applyPluginsToSchemas(
-      config.schemas || [],
-      plugins,
-      buildOptions.defaultPlugin || {}
-    ),
+    schemas: applyPluginsToSchemas(config.schemas || [], plugins, buildOptions),
     models: {},
     services: {},
     typeConfig: (typeName) => null
