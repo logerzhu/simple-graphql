@@ -1,8 +1,4 @@
-import {
-  SGBuildOptions,
-  SGPluginConfig,
-  SGPluginOptions
-} from '..'
+import { SGBuildOptions, SGPluginConfig, SGPluginOptions } from '..'
 import { BaseSGSchema } from '../definition/BaseSGSchema'
 
 export default (
