@@ -13,7 +13,11 @@ export default (dbModel, options: FindOptions | CountOptions) => {
       if (other.include && Array.isArray(other.include)) {
         other.include = other.include.map((i) => formatInclude(i))
       }
-      return { as: other.as, attributes: other.attributes }
+      return {
+        as: other.as,
+        attributes: other.attributes,
+        include: other.include
+      }
     }
     return include
   }
