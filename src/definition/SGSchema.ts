@@ -14,7 +14,7 @@ import {
   SGLinkedFieldConfigMap,
   SGMutationConfigMap,
   SGQueryConfigMap,
-  BaseSGSchemaOptions
+  SGSubscriptionConfigMap
 } from '../index'
 import { BaseSGSchema } from './BaseSGSchema'
 
@@ -86,6 +86,7 @@ export class SGSchema extends BaseSGSchema {
     links: SGLinkedFieldConfigMap
     associations: AssociationConfig
     queries: SGQueryConfigMap
+    subscriptions: SGSubscriptionConfigMap
     mutations: SGMutationConfigMap
     methods: {
       [id: string]: any
@@ -109,6 +110,7 @@ export class SGSchema extends BaseSGSchema {
         belongsToMany: {}
       },
       queries: {},
+      subscriptions: {},
       mutations: {},
       methods: {},
       statics: {}

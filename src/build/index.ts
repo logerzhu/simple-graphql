@@ -29,6 +29,7 @@ import buildSequelizeModels from './buildSequelizeModels'
 import buildServices from './buildServices'
 import buildRootQueries from './buildRootQueries'
 import buildRootMutations from './buildRootMutations'
+import buildRootSubscription from './buildRootSubscription'
 
 export function buildGraphQLContext(
   sequelize: Sequelize,
@@ -57,6 +58,8 @@ export function buildGraphQLContext(
       resolveContext.hookFieldResolve(name, options),
     hookQueryResolve: (name, options) =>
       resolveContext.hookQueryResolve(name, options),
+    hookSubscriptionResolve: (name, options) =>
+      resolveContext.hookSubscriptionResolve(name, options),
     hookMutationResolve: (name, options) =>
       resolveContext.hookMutationResolve(name, options),
 
@@ -101,6 +104,7 @@ export function buildGraphQLContext(
     context,
     buildOptions.nodeQueryConfig
   )
+
   const payloadFields: GraphQLFieldConfigMap<any, any> = {}
   const rootQueryObject = new GraphQLObjectType({
     name: 'RootQuery',
@@ -130,6 +134,20 @@ export function buildGraphQLContext(
     schemaConfig.mutation = new GraphQLObjectType({
       name: 'RootMutation',
       fields: () => rootMutations
+    })
+  }
+
+  const rootSubscriptions = buildRootSubscription(
+    [
+      ...(config.schemas || []).map((schema) => schema.config.subscriptions),
+      config.subscriptions || {}
+    ],
+    context
+  )
+  if (_.keys(rootSubscriptions).length > 0) {
+    schemaConfig.subscription = new GraphQLObjectType({
+      name: 'RootSubscription',
+      fields: () => rootSubscriptions
     })
   }
 

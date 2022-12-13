@@ -5,6 +5,9 @@ import schema from './schema'
 import sequelize from './sequelize'
 import initData from './data'
 
+import { WebSocketServer } from 'ws'; // yarn add ws
+import { useServer } from 'graphql-ws/lib/use/ws';
+
 async function startServer() {
   await sequelize.sync({
     force: true,
@@ -24,6 +27,15 @@ async function startServer() {
 
   console.log('GraphQL Server is now running on http://localhost:4000/graphql')
   app.listen(4000)
+
+  const wsServer = new WebSocketServer({
+    port: 4001,
+    path: '/graphql-ws',
+  });
+
+  useServer({ schema }, wsServer);
+
+  console.log('GraphQL Ws Server is now running on ws://localhost:4001/graphql-ws')
 }
 
 startServer().then(() => null, err => console.log('Init GraphQL Server Fail', err))

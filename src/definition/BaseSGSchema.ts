@@ -1,9 +1,10 @@
 import {
+  BaseSGSchemaOptions,
   SGColumnFieldConfigMap,
   SGLinkedFieldConfigMap,
   SGMutationConfigMap,
   SGQueryConfigMap,
-  BaseSGSchemaOptions
+  SGSubscriptionConfigMap
 } from '..'
 
 export class BaseSGSchema {
@@ -13,6 +14,7 @@ export class BaseSGSchema {
     fields: SGColumnFieldConfigMap
     links: SGLinkedFieldConfigMap
     queries: SGQueryConfigMap
+    subscriptions: SGSubscriptionConfigMap
     mutations: SGMutationConfigMap
     methods: {
       [id: string]: any
@@ -30,6 +32,7 @@ export class BaseSGSchema {
       fields: {},
       links: {},
       queries: {},
+      subscriptions: {},
       mutations: {},
       methods: {},
       statics: {}
@@ -60,6 +63,21 @@ export class BaseSGSchema {
   queries<T extends BaseSGSchema>(this: T, queries: SGQueryConfigMap): T {
     // TODO duplicate check
     this.config.queries = Object.assign(this.config.queries, queries)
+    return this
+  }
+
+  /**
+   * Add the GraphQL subscription methods.
+   */
+  subscriptions<T extends BaseSGSchema>(
+    this: T,
+    subscriptions: SGSubscriptionConfigMap
+  ): T {
+    // TODO duplicate check
+    this.config.subscriptions = Object.assign(
+      this.config.subscriptions,
+      subscriptions
+    )
     return this
   }
 

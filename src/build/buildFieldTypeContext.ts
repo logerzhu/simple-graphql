@@ -80,6 +80,8 @@ function buildModelType(
               context.hookFieldResolve(name, options),
             hookQueryResolve: (name, options) =>
               context.hookQueryResolve(name, options),
+            hookSubscriptionResolve: (name, options) =>
+              context.hookSubscriptionResolve(name, options),
             hookMutationResolve: (name, options) =>
               context.hookMutationResolve(name, options),
             typeConfig: (typeName) => fieldTypeContext.typeConfig(typeName)
@@ -196,6 +198,8 @@ function buildDataType(
           context.hookFieldResolve(name, options),
         hookQueryResolve: (name, options) =>
           context.hookQueryResolve(name, options),
+        hookSubscriptionResolve: (name, options) =>
+          context.hookSubscriptionResolve(name, options),
         hookMutationResolve: (name, options) =>
           context.hookMutationResolve(name, options),
         typeConfig: (typeName) => fieldTypeContext.typeConfig(typeName)

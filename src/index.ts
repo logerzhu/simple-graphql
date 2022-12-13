@@ -41,7 +41,7 @@ export interface SGModelStatic {
   findOneForGraphQL: typeof findOneForGraphQL
   findByPkForGraphQL: typeof findByPkForGraphQL
 
-  withCache: <T, M extends SGModel<T>>(
+  withCache: <T extends {}, M extends SGModel<T>>(
     this: { new (): M } & typeof Model
   ) => {
     findAll: (options?: FindOptions) => Promise<M[]>
@@ -87,6 +87,10 @@ export type SGResolverContext = {
   hookQueryResolve: (
     path: string,
     config: SGQueryConfig
+  ) => GraphQLFieldResolver<any, any>
+  hookSubscriptionResolve: (
+    path: string,
+    config: SGSubscriptionConfig
   ) => GraphQLFieldResolver<any, any>
   hookMutationResolve: (
     path: string,
@@ -291,6 +295,24 @@ export type SGQueryConfig<T = any> = {
   resolve: SGRootResolve<T>
 }
 export type SGQueryConfigMap = { [key: string]: SGQueryConfig }
+
+export type SGSubscriptionConfig<T = any> = {
+  description?: string
+  hookOptions?: SGHookOptionsMap
+  input?: SGInputFieldConfigMap
+  output: SGOutputFieldConfig<T>
+  resolve?: SGFieldResolve<T>
+  subscribe: (
+    args: {
+      [key: string]: any
+    },
+    context: SGResolveContext,
+    info: GraphQLResolveInfo,
+    sgContext: SGContext
+  ) => AsyncGenerator<T>
+}
+export type SGSubscriptionConfigMap = { [key: string]: SGSubscriptionConfig }
+
 export type SGMutationConfig<T = any> = {
   description?: string
   hookOptions?: SGHookOptionsMap
@@ -334,6 +356,10 @@ export type SGHookTarget<T = any> = {
   | {
       type: 'query'
       targetConfig: SGQueryConfig
+    }
+  | {
+      type: 'subscription'
+      targetConfig: SGSubscriptionConfig
     }
   | {
       type: 'mutation'
@@ -391,6 +417,7 @@ export type SGBuildConfig = {
   plugins?: Array<SGPluginConfig>
   queries?: SGQueryConfigMap
   mutations?: SGMutationConfigMap
+  subscriptions?: SGSubscriptionConfigMap
 }
 
 export interface SGCacheManager {

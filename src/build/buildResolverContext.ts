@@ -1,9 +1,9 @@
 import {
+  SGContext,
   SGHookConfig,
   SGHookFunc,
   SGHookTarget,
-  SGResolverContext,
-  SGContext
+  SGResolverContext
 } from '..'
 
 export default (
@@ -84,6 +84,27 @@ export default (
             sgContext: sgContext
           },
           () => options.resolve(args, context, info, sgContext)
+        )
+    },
+    hookSubscriptionResolve: (name, options) => {
+      const target: SGHookTarget = {
+        type: 'subscription',
+        name: name,
+        targetConfig: options
+      }
+      const hookFunc = applyHooks(target)
+
+      return (source, args, context, info) =>
+        hookFunc(
+          target,
+          {
+            source: source,
+            args: args,
+            context: context,
+            info: info,
+            sgContext: sgContext
+          },
+          async () => options.subscribe(args, context, info, sgContext)
         )
     },
     hookMutationResolve: (name, options) => {
