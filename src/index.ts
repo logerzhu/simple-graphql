@@ -296,7 +296,7 @@ export type SGQueryConfig<T = any> = {
 }
 export type SGQueryConfigMap = { [key: string]: SGQueryConfig }
 
-export type SGSubscriptionConfig<T = any> = {
+export type SGSubscriptionConfig<T = any, S = any> = {
   description?: string
   hookOptions?: SGHookOptionsMap
   input?: SGInputFieldConfigMap
@@ -309,7 +309,7 @@ export type SGSubscriptionConfig<T = any> = {
     context: SGResolveContext,
     info: GraphQLResolveInfo,
     sgContext: SGContext
-  ) => AsyncGenerator<T>
+  ) => AsyncIterator<S>
 }
 export type SGSubscriptionConfigMap = { [key: string]: SGSubscriptionConfig }
 
