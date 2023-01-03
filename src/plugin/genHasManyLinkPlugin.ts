@@ -1,13 +1,12 @@
 import _ from 'lodash'
 import {
-  SGSchema,
   SGConditionFieldMapper,
   SGInputFieldConfig,
   SGInputFieldConfigMap,
-  SGPluginConfig
+  SGPluginConfig,
+  SGSchema
 } from '../index'
-import Sequelize from 'sequelize'
-import { FindOptions } from 'sequelize/types/lib/model'
+import Sequelize, { FindOptions } from 'sequelize'
 
 export default {
   name: 'genHasManyLink',

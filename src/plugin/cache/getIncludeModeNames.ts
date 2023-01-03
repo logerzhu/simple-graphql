@@ -1,6 +1,10 @@
-import { CountOptions, FindOptions } from 'sequelize'
+import {
+  CountOptions,
+  FindOptions,
+  Includeable,
+  IncludeOptions
+} from 'sequelize'
 import _ from 'lodash'
-import { Includeable, IncludeOptions } from 'sequelize/types/lib/model'
 
 export default (options?: FindOptions | CountOptions) => {
   if (!options) {

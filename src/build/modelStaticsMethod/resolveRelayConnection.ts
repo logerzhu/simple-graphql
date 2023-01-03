@@ -1,11 +1,15 @@
 import _ from 'lodash'
 import { SGContext, SGModel, SGModelCtrl } from '../../index'
 import { GraphQLResolveInfo } from 'graphql'
-import { FindOptions, Order, OrderItem } from 'sequelize'
-import { BindOrReplacements } from 'sequelize/types/lib/query-interface'
-import { Includeable, WhereOptions } from 'sequelize/types/lib/model'
+import {
+  BindOrReplacements,
+  FindOptions,
+  Includeable,
+  OrderItem,
+  WhereOptions
+} from 'sequelize'
 import { Selection } from './parseSelections'
-import { SGSchema } from '../../definition/SGSchema'
+import { SGSchema } from '../../definition'
 
 const isPrimaryOrder = (
   sgContext: SGContext,

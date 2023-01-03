@@ -1,9 +1,8 @@
 import _ from 'lodash'
 import { GraphQLResolveInfo } from 'graphql'
-import { SGSchema } from '../../definition/SGSchema'
+import { SGSchema } from '../../definition'
 import { Selection } from './parseSelections'
-import { Order, OrderItem } from 'sequelize'
-import { Includeable, IncludeOptions } from 'sequelize/types/lib/model'
+import { Includeable, IncludeOptions, Order, OrderItem } from 'sequelize'
 import { SGContext, SGModel, SGModelCtrl } from '../../index'
 
 function fieldToSelection(field: string) {

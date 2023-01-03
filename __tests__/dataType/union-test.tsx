@@ -81,7 +81,7 @@ test('Union数据类型生成', async () => {
   )
 
   expect(addResult1.errors).toBeUndefined()
-  const node1 = _.get(addResult1, 'data.addDummy.addedDummyEdge.node')
+  const node1: any = _.get(addResult1, 'data.addDummy.addedDummyEdge.node')
   expect(node1.name).toEqual(values.name)
   expect(node1.data).toEqual(values.data)
 
@@ -146,7 +146,7 @@ test('Union数据类型生成', async () => {
   )
 
   expect(addResult2.errors).toBeUndefined()
-  const node2 = _.get(addResult2, 'data.addDummy.addedDummyEdge.node')
+  const node2: any = _.get(addResult2, 'data.addDummy.addedDummyEdge.node')
   expect(node2.name).toEqual(values2.name)
 
   expect(node2.data.value.name).toEqual('Hello')

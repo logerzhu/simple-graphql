@@ -1,19 +1,19 @@
 import Sequelize, {
+  ForeignKeyOptions,
   Model,
   ModelAttributeColumnOptions,
-  ModelCtor
+  ModelStatic
 } from 'sequelize'
 import { SGSchema } from '../definition/SGSchema'
 import _ from 'lodash'
 import staticsMethods from './modelStaticsMethod'
 import { BaseSGSchema, SGContext, SGModelCtrl, SGTypeContext } from '../index'
-import { ForeignKeyOptions } from 'sequelize/types/lib/associations/base'
 
 function toSequelizeModel(
   sequelize: Sequelize.Sequelize,
   schema: SGSchema,
   context: SGTypeContext
-): [ModelCtor<Model>, { [key: string]: ModelAttributeColumnOptions }] {
+): [ModelStatic<Model>, { [key: string]: ModelAttributeColumnOptions }] {
   const dbDefinition: { [key: string]: ModelAttributeColumnOptions } = {}
 
   const versionConfig = schema.options.tableOptions?.version

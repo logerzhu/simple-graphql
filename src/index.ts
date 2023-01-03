@@ -7,14 +7,14 @@ import {
 } from 'graphql'
 import {
   CountOptions,
+  DataType,
   FindOptions,
   Model,
   ModelAttributeColumnOptions,
   ModelOptions,
   Sequelize
 } from 'sequelize'
-import { SGSchema } from './definition/SGSchema'
-import { DataType } from 'sequelize/types/lib/data-types'
+import { BaseSGSchema, SGSchema } from './definition'
 
 import resolveRelayConnection from './build/modelStaticsMethod/resolveRelayConnection'
 import resolveQueryOption from './build/modelStaticsMethod/resolveQueryOption'
@@ -24,7 +24,6 @@ import hasSelection from './build/modelStaticsMethod/hasSelection'
 import findOneForGraphQL from './build/modelStaticsMethod/findOneForGraphQL'
 import findByPkForGraphQL from './build/modelStaticsMethod/findByPkForGraphQL'
 import DataLoader from 'dataloader'
-import { BaseSGSchema } from './definition/BaseSGSchema'
 
 export abstract class SGModel<
   TModelAttributes extends {} = any
