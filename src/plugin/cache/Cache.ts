@@ -1,9 +1,9 @@
-import { SGCacheManager, SGModel, SGModelCtrl } from '../../index'
+import { SGModel, SGModelCtrl } from '../../index'
 import Sequelize, { CountOptions, FindOptions } from 'sequelize'
-import getFindOptionsKey from './getFindOptionsKey'
 import getIncludeModeNames from './getIncludeModeNames'
 import dataToInstance from './dataToInstance'
 import instanceToData from './instanceToData'
+import { SGCacheManager } from './SGCacheManager'
 
 export default class Cache<M extends SGModel> {
   prefix: string
@@ -23,13 +23,13 @@ export default class Cache<M extends SGModel> {
     this.expire = options.expire
   }
 
-  buildCacheKey(method: string, options?: FindOptions | CountOptions) {
-    options = options || {}
+  private buildCacheKey(method: string, options?: FindOptions | CountOptions) {
     const self = this
-    const relateModelNames = [self.model.name, ...getIncludeModeNames(options)]
-    return `${self.prefix}|${method}|${relateModelNames.join(
-      '|'
-    )}|${getFindOptionsKey(self.model, options)}`
+    return `${self.prefix}|${self.cacheManger.buildCacheKey(
+      self.model,
+      method,
+      options
+    )}`
   }
 
   async isCacheValid(options?: FindOptions | CountOptions) {

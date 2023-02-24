@@ -1,11 +1,6 @@
-import {
-  SGCacheManager,
-  SGHookOptionsMap,
-  SGPluginConfig,
-  SGPluginOptions
-} from '../index'
+import { SGPluginConfig, SGPluginOptions } from '../index'
 import Sequelize from 'sequelize'
-import LruCacheManager from './cache/LruCacheManager'
+import { LruCacheManager, SGCacheManager } from './cache'
 import Cache from './cache/Cache'
 
 type CacheOptions = SGPluginOptions & {

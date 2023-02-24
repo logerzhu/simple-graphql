@@ -23,6 +23,7 @@ export * as singularQueryPlugin from './singularQueryPlugin'
 export * as timestampPlugin from './timestampPlugin'
 export * as updateMutationPlugin from './updateMutationPlugin'
 export * as versionPlugin from './versionPlugin'
+export * from './cache'
 
 export default [
   addMutationPlugin,
