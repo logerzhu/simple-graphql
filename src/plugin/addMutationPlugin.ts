@@ -12,6 +12,7 @@ import StringHelper from '../utils/StringHelper'
 type AddMutationOptions = SGPluginOptions & {
   name?: string
   additionFields?: SGInputFieldConfigMap
+  duplicateCheck?: boolean
   hookOptions?: SGHookOptionsMap
 }
 
@@ -93,7 +94,16 @@ export default {
             }
           })
 
-          const instance = await dbModel.create(attrs)
+          const getInstance = async () => {
+            if (options.duplicateCheck) {
+              const existInstance = await dbModel.findOne({ where: attrs })
+              if (existInstance) {
+                return existInstance
+              }
+            }
+            return dbModel.create(attrs)
+          }
+          const instance = await getInstance()
           return {
             [addedName]: {
               node: instance,

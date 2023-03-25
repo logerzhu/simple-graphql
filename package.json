@@ -1,6 +1,6 @@
 {
   "name": "simple-graphql",
-  "version": "5.2.3",
+  "version": "5.2.4",
   "description": "The simple way to generates GraphQL schemas and Sequelize models from your models definition.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
