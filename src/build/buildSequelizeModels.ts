@@ -27,6 +27,7 @@ function toSequelizeModel(
     dbDefinition.id = {
       field: primaryKey.field,
       type: primaryKey.type,
+      defaultValue: primaryKey.defaultValue,
       primaryKey: true,
       autoIncrement: primaryKey.autoIncrement
     }

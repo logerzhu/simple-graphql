@@ -337,6 +337,7 @@ export type SGSchemaOptions = BaseSGSchemaOptions & {
     primaryKey?: {
       field: string
       type: DataType
+      defaultValue: unknown
       autoIncrement?: boolean
     }
   }
